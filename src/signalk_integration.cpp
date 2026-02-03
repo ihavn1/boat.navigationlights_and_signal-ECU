@@ -220,29 +220,33 @@ void setupSignalK(NavigationLightsECU& ecu) {
 
     Serial.println("[SignalK] Connecting ObservableValues to SKOutput...");
     
-    // Connect condition and state
+    // Connect condition and state with 60s max age (forces periodic updates)
     condition_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".condition",
         "/nav/condition",
-        new SKMetadata("", "Lighting condition")
+        new SKMetadata("", "Lighting condition"),
+        60000  // Resend every 60 seconds
     ));
 
     boat_state_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".boatState",
         "/nav/boatState",
-        new SKMetadata("", "Boat operational state")
+        new SKMetadata("", "Boat operational state"),
+        60000  // Resend every 60 seconds
     ));
 
     periodic_muted_value->connect_to(new SKOutput<bool>(
         String(SK_PATH_PREFIX) + ".periodicMuted",
         "/nav/periodicMuted",
-        new SKMetadata("", "Periodic signals muted")
+        new SKMetadata("", "Periodic signals muted"),
+        60000  // Resend every 60 seconds
     ));
 
     countdown_value->connect_to(new SKOutput<int>(
         String(SK_PATH_PREFIX) + ".periodicCountdown",
         "/nav/countdown",
-        new SKMetadata("s", "Seconds until next periodic signal")
+        new SKMetadata("s", "Seconds until next periodic signal"),
+        1000  // Resend every second (countdown changes frequently)
     ));
 
     // Light outputs
@@ -347,61 +351,86 @@ void setupSignalK(NavigationLightsECU& ecu) {
     });
 
     // =======================================================================
-    // PUBLISH INITIAL STATE (delayed to allow connection to establish)
+    // PUBLISH INITIAL STATE ON CONNECTION (using simpler approach)
     // =======================================================================
     
-    Serial.println("\n[SignalK] Scheduling initial state publish (3 second delay)...");
+    Serial.println("\n[SignalK] Setting up connection-based state publishing...");
     
-    // Use DelayEvent to publish initial state after connection has time to establish
-    // This avoids the LED crash bug that happens with connection state observers
-    auto* event_loop = sensesp_app->get_event_loop();
-    event_loop->onDelay(3000, [&ecu]() {
-        Serial.println("\n[SignalK] Publishing initial state...");
+    // Track connection state to republish on reconnect
+    static bool was_connected = false;
+    static bool first_connection = true;
+    static unsigned long connection_time = 0;
+    
+    // Check connection every second and publish state when reconnected
+    sensesp_app->get_event_loop()->onRepeat(1000, [&ecu]() {
+        auto ws_client = sensesp_app->get_ws_client();
+        bool is_connected = ws_client->is_connected();
         
-        // Trigger ObservableValue updates to push initial state to SignalK
-        String initial_condition = String(sk_conditionToString(ecu.getCondition()));
-        String initial_state_str = String(sk_boatStateToString(ecu.getBoatState()));
-        
-        Serial.print("  Initial condition: "); Serial.println(initial_condition);
-        condition_value->set(initial_condition);
-        
-        Serial.print("  Initial boatState: "); Serial.println(initial_state_str);
-        boat_state_value->set(initial_state_str);
-        
-        Serial.print("  Initial periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
-        periodic_muted_value->set(ecu.isPeriodicMuted());
-        
-        Serial.print("  Initial countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
-        countdown_value->set((int)ecu.getPeriodicCountdownSeconds());
+        if (is_connected && !was_connected) {
+            // Just connected
+            if (first_connection) {
+                Serial.println("\n[SignalK] Initial connection - relying on RepeatSensors for data...");
+                first_connection = false;
+                connection_time = 0;  // Don't publish on first connection
+            } else {
+                // Reconnection - record time and prepare to publish
+                connection_time = millis();
+                Serial.println("\n[SignalK] Reconnected, waiting for server to be ready...");
+            }
+        }
+        else if (is_connected && connection_time > 0 && (millis() - connection_time >= 2000)) {
+            // Reconnected (not first connection) and stable for 2+ seconds - republish state
+            Serial.println("\n[SignalK] Publishing state after reconnection...");
+            
+            String initial_condition = String(sk_conditionToString(ecu.getCondition()));
+            String initial_state_str = String(sk_boatStateToString(ecu.getBoatState()));
+            
+            condition_value->set(initial_condition);
+            boat_state_value->set(initial_state_str);
+            periodic_muted_value->set(ecu.isPeriodicMuted());
+            countdown_value->set((int)ecu.getPeriodicCountdownSeconds());
 
-        LightConfiguration lights = ecu.getCurrentLights();
-        Serial.println("  Initial lights:");
-        Serial.print("    masthead: "); Serial.println(lights.masthead_light);
-        masthead_value->set(lights.masthead_light);
-        Serial.print("    port: "); Serial.println(lights.port_sidelight);
-        port_value->set(lights.port_sidelight);
-        Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
-        starboard_value->set(lights.starboard_sidelight);
-        Serial.print("    stern: "); Serial.println(lights.sternlight);
-        stern_value->set(lights.sternlight);
-        Serial.print("    allround_white: "); Serial.println(lights.allround_white);
-        allround_white_value->set(lights.allround_white);
-        Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
-        allround_red_upper_value->set(lights.allround_red_upper);
-        Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
-        allround_red_lower_value->set(lights.allround_red_lower);
+            LightConfiguration lights = ecu.getCurrentLights();
+            masthead_value->set(lights.masthead_light);
+            port_value->set(lights.port_sidelight);
+            starboard_value->set(lights.starboard_sidelight);
+            stern_value->set(lights.sternlight);
+            allround_white_value->set(lights.allround_white);
+            allround_red_upper_value->set(lights.allround_red_upper);
+            allround_red_lower_value->set(lights.allround_red_lower);
+            horn_value->set(ecu.isHornActive());
+            
+            Serial.println("[SignalK] State republished!\n");
+            
+            connection_time = 0;  // Reset so we don't publish again
+        }
         
-        Serial.print("  Initial horn.active: "); Serial.println(ecu.isHornActive());
-        horn_value->set(ecu.isHornActive());
-        
-        Serial.println("[SignalK] Initial state published!\n");
+        was_connected = is_connected;
     });
 
     // =======================================================================
-    // PERIODIC UPDATES (countdown timer and horn status)
+    // PERIODIC UPDATES (all key values updated regularly)
     // =======================================================================
     
-    Serial.println("[SignalK] Setting up periodic updates for countdown and horn...");
+    Serial.println("[SignalK] Setting up periodic updates...");
+    
+    // Update condition every 60 seconds
+    auto* condition_sensor = new RepeatSensor<String>(60000, [&ecu]() {
+        return String(sk_conditionToString(ecu.getCondition()));
+    });
+    condition_sensor->connect_to(condition_value);
+    
+    // Update boat state every 60 seconds
+    auto* state_sensor = new RepeatSensor<String>(60000, [&ecu]() {
+        return String(sk_boatStateToString(ecu.getBoatState()));
+    });
+    state_sensor->connect_to(boat_state_value);
+    
+    // Update mute status every 60 seconds
+    auto* mute_sensor = new RepeatSensor<bool>(60000, [&ecu]() {
+        return ecu.isPeriodicMuted();
+    });
+    mute_sensor->connect_to(periodic_muted_value);
     
     // Update countdown every second
     auto* countdown_sensor = new RepeatSensor<int>(1000, [&ecu]() {
@@ -409,6 +438,20 @@ void setupSignalK(NavigationLightsECU& ecu) {
     });
     countdown_sensor->connect_to(countdown_value);
     
+    // Update all light states every 60 seconds
+    auto* lights_sensor = new RepeatSensor<LightConfiguration>(60000, [&ecu]() {
+        return ecu.getCurrentLights();
+    });
+    lights_sensor->connect_to(new LambdaConsumer<LightConfiguration>([](LightConfiguration lights) {
+        masthead_value->set(lights.masthead_light);
+        port_value->set(lights.port_sidelight);
+        starboard_value->set(lights.starboard_sidelight);
+        stern_value->set(lights.sternlight);
+        allround_white_value->set(lights.allround_white);
+        allround_red_upper_value->set(lights.allround_red_upper);
+        allround_red_lower_value->set(lights.allround_red_lower);
+    }));
+
     // Update horn status every 100ms (needs to be responsive)
     auto* horn_sensor = new RepeatSensor<bool>(100, [&ecu]() {
         return ecu.isHornActive();

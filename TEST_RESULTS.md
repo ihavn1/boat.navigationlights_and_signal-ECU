@@ -1,11 +1,27 @@
 # Test Results Summary
 
-## Overall Status: ✅ 82/82 Tests Passing (100%)
+## Overall Status: ✅ 114/114 Tests Passing (100%)
 
-**Last Run**: 2025-01-XX  
-**Total Duration**: 8.54 seconds  
+**Last Run**: 2026-02-03  
+**Total Duration**: 10.13 seconds  
 **Platform**: Native (x86_64-pc-windows-msvc)  
-**Test Framework**: Unity 2.6.0
+**Test Framework**: Unity 2.6.0  
+**ESP32 Tests**: 15 tests pending hardware
+
+---
+
+## Quick Summary
+
+| Suite | Tests | Duration | Status |
+|-------|-------|----------|--------|
+| **State Machine** | 20 | 2.70s | ✅ PASSED |
+| **Light Controller** | 9 | 2.57s | ✅ PASSED |
+| **Sound Controller** | 11 | 2.28s | ✅ PASSED |
+| **SignalK Integration** | 74 | 2.59s | ✅ PASSED |
+| **TOTAL** | **114** | **10.13s** | **✅ ALL PASSED** |
+
+**Recent Update**: Added 32 new SignalK tests (integration + edge cases)  
+**Previous**: 42 conversion tests → **Now**: 74 comprehensive SignalK tests
 
 ---
 

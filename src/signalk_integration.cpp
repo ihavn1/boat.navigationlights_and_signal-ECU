@@ -5,6 +5,7 @@
 
 #include "signalk_integration.h"
 #include "sensesp/system/valueconsumer.h"
+#include "sensesp/system/lambda_consumer.h"
 #include "sensesp/signalk/signalk_ws_client.h"
 #include "sensesp_app.h"
 
@@ -318,43 +319,60 @@ void setupSignalK(NavigationLightsECU& ecu) {
         Serial.println("[SignalK] All updates published");
     });
 
-    // Publish initial state immediately
-    Serial.println("\n[SignalK] Publishing initial state...");
-    
-    String initial_condition = String(sk_conditionToString(ecu.getCondition()));
-    String initial_state = String(sk_boatStateToString(ecu.getBoatState()));
-    
-    Serial.print("  Initial condition: "); Serial.println(initial_condition);
-    condition_output->set(initial_condition);
-    
-    Serial.print("  Initial boatState: "); Serial.println(initial_state);
-    boat_state_output->set(initial_state);
-    
-    Serial.print("  Initial periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
-    periodic_muted_output->set(ecu.isPeriodicMuted());
-    
-    Serial.print("  Initial countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
-    countdown_output->set((int)ecu.getPeriodicCountdownSeconds());
+    // =======================================================================
+    // PUBLISH INITIAL STATE AFTER CONNECTION
+    // =======================================================================
 
-    LightConfiguration lights = ecu.getCurrentLights();
-    Serial.println("  Initial lights:");
-    Serial.print("    masthead: "); Serial.println(lights.masthead_light);
-    masthead_output->set(lights.masthead_light);
-    Serial.print("    port: "); Serial.println(lights.port_sidelight);
-    port_output->set(lights.port_sidelight);
-    Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
-    starboard_output->set(lights.starboard_sidelight);
-    Serial.print("    stern: "); Serial.println(lights.sternlight);
-    stern_output->set(lights.sternlight);
-    Serial.print("    allround_white: "); Serial.println(lights.allround_white);
-    allround_white_output->set(lights.allround_white);
-    Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
-    allround_red_upper_output->set(lights.allround_red_upper);
-    Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
-    allround_red_lower_output->set(lights.allround_red_lower);
+    Serial.println("[SignalK] Setting up connection state observer...");
     
-    Serial.print("  Initial horn.active: "); Serial.println(ecu.isHornActive());
-    horn_output->set(ecu.isHornActive());
+    // Get the WebSocket client and observe its connection state
+    auto ws_client = sensesp_app->get_ws_client();
     
-    Serial.println("[SignalK] Initial state published!\n");
+    static bool initial_state_sent = false;
+    
+    ws_client->connect_to(new LambdaConsumer<SKWSConnectionState>([&ecu](SKWSConnectionState state) {
+        if (state == SKWSConnectionState::kSKWSConnected && !initial_state_sent) {
+            Serial.println("\n[SignalK] ===== CONNECTED! Publishing initial state =====");
+            initial_state_sent = true;
+            
+            String initial_condition = String(sk_conditionToString(ecu.getCondition()));
+            String initial_state = String(sk_boatStateToString(ecu.getBoatState()));
+            
+            Serial.print("  Initial condition: "); Serial.println(initial_condition);
+            condition_output->set(initial_condition);
+            
+            Serial.print("  Initial boatState: "); Serial.println(initial_state);
+            boat_state_output->set(initial_state);
+            
+            Serial.print("  Initial periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
+            periodic_muted_output->set(ecu.isPeriodicMuted());
+            
+            Serial.print("  Initial countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
+            countdown_output->set((int)ecu.getPeriodicCountdownSeconds());
+
+            LightConfiguration lights = ecu.getCurrentLights();
+            Serial.println("  Initial lights:");
+            Serial.print("    masthead: "); Serial.println(lights.masthead_light);
+            masthead_output->set(lights.masthead_light);
+            Serial.print("    port: "); Serial.println(lights.port_sidelight);
+            port_output->set(lights.port_sidelight);
+            Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
+            starboard_output->set(lights.starboard_sidelight);
+            Serial.print("    stern: "); Serial.println(lights.sternlight);
+            stern_output->set(lights.sternlight);
+            Serial.print("    allround_white: "); Serial.println(lights.allround_white);
+            allround_white_output->set(lights.allround_white);
+            Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
+            allround_red_upper_output->set(lights.allround_red_upper);
+            Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
+            allround_red_lower_output->set(lights.allround_red_lower);
+            
+            Serial.print("  Initial horn.active: "); Serial.println(ecu.isHornActive());
+            horn_output->set(ecu.isHornActive());
+            
+            Serial.println("[SignalK] Initial state published!\n");
+        }
+    }));
+    
+    Serial.println("[SignalK] Connection observer registered - initial state will publish on connect");
 }

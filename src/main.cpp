@@ -65,12 +65,22 @@ void setup() {
     
     // Initialize SensESP application
     SensESPAppBuilder builder;
-
+    std::shared_ptr<SystemStatusLed> null_led = nullptr;
     sensesp_app = (&builder)
-    ->set_hostname("nav-lights-ecu")
-    ->set_sk_server("192.168.71.100", 3000)  // Add this line
-    ->enable_ota("boat-ecu")
-    ->get_app();
+        ->set_hostname("nav-lights-ecu")
+        ->set_sk_server("192.168.71.100", 3000)
+        ->enable_ota("boat-ecu")
+        ->set_system_status_led(null_led)
+        ->get_app();
+    
+    // Print SignalK server configuration
+    auto ws_client = sensesp_app->get_ws_client();
+    Serial.println("\n>>> SignalK Server Configuration <<<");
+    Serial.print("Server Address: ");
+    Serial.println(ws_client->get_server_address());
+    Serial.print("Server Port: ");
+    Serial.println(ws_client->get_server_port());
+    Serial.println();
     
     // Initialize hardware layer
     relay_controller = new ESP32RelayController(

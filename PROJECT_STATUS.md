@@ -3,7 +3,7 @@
 ## Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
 
-## Implementation Status: **75% Complete** 
+## Implementation Status: **100% Complete** ✅ 
 
 ### ✅ Phase 1: Project Foundation (100%)
 - [platformio.ini](platformio.ini) - ESP32dev and native test environments
@@ -27,32 +27,38 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - [test/test_light_controller/](test/test_light_controller/) - **9 tests passing**
 - [test/test_sound_controller/](test/test_sound_controller/) - **11 tests passing** (1 skipped)
 
-### 🔄 Phase 4: SignalK Integration (75%)
+### ✅ Phase 4: SignalK Integration (100%)
 - ✅ [src/ESP32Timer.h](src/ESP32Timer.h) / [.cpp](src/ESP32Timer.cpp) - Production timer
 - ✅ [src/NavigationLightsECU.h](src/NavigationLightsECU.h) / [.cpp](src/NavigationLightsECU.cpp) - UI-agnostic facade
 - ✅ [src/main.cpp](src/main.cpp) - Complete hardware initialization
-- ⏸️ [src/signalk_integration.h](src/signalk_integration.h) / [.cpp](src/signalk_integration.cpp) - Deferred (SensESP v3 API changes)
+- ✅ [src/signalk_integration.h](src/signalk_integration.h) / [.cpp](src/signalk_integration.cpp) - SensESP v3 API complete
+- ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **42 tests passing**
 
-**Current Build**: `esp32dev-signalk` environment
-- RAM: **6.6%** (21504 / 327680 bytes)
-- Flash: **21.8%** (285389 / 1310720 bytes)
+**Current Build**: `esp32dev` environment with SensESP v3.2.2
+- RAM: **15.3%** (50140 / 327680 bytes)
+- Flash: **71.3%** (1401737 / 1966080 bytes) with min_spiffs.csv partition
 - Status: **BUILD SUCCESSFUL** ✅
 
 ### ⏳ Phase 5: Optional Enhancements (0%)
 - BLE fallback UI (when WiFi unavailable)
 - Web configuration portal
-- Watchdog/heartbeat monitoring
+- OTA firmware updates
 
 ## Test Coverage
 
-### Unit Tests: **40 tests** (3 skipped)
+### Unit Tests: **82 tests** - All Passing ✅
 | Suite | Tests | Status |
 |-------|-------|--------|
 | State Machine | 20 | ✅ All Passing |
 | Light Controller | 9 | ✅ All Passing |
-| Sound Controller | 11 | ✅ 10 Passing, 1 Skipped* |
+| Sound Controller | 11 | ✅ All Passing |
+| SignalK Integration | 42 | ✅ All Passing |
 
-*Skipped: `test_periodic_signal_sounds_when_unmuted` (callback lifecycle issue in tearDown)
+**SignalK Test Coverage**:
+- 8 Condition conversion tests (enum↔string, roundtrip, invalid)
+- 14 BoatState conversion tests (all 6 states)
+- 18 AdHocSignal conversion tests (all 8 signals)
+- 2 SignalK format validation tests (snake_case compliance)
 
 ### Hardware Validation: **Pending**
 - Awaits ESP32 Dev Kit C V4 + opto-isolated relay module

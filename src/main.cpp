@@ -17,9 +17,8 @@
  */
 
 #include <Arduino.h>
-// TODO: Complete SensESP v3 API integration (API has changed from v2)
-// #include "sensesp_app_builder.h"
-// #include "signalk_integration.h"
+#include "sensesp_app_builder.h"
+#include "signalk_integration.h"
 
 // Project includes
 #include "ESP32RelayController.h"
@@ -27,6 +26,8 @@
 #include "LightController.h"
 #include "SoundController.h"
 #include "NavigationLightsECU.h"
+
+using namespace sensesp;
 
 // GPIO pin definitions (active-low opto-isolated relay module)
 const uint8_t PIN_MASTHEAD_LIGHT = 25;
@@ -46,30 +47,38 @@ SoundController* sound_controller = nullptr;
 NavigationLightsECU* ecu = nullptr;
 
 void setup() {
-    Serial.begin(115200);
-    delay(100); // Allow serial to stabilize
+    // Setup logging for SensESP
+    SetupLogging();
     
-    Serial.println("\n=== Navigation Lights and Signal ECU ===");
+    delay(500);  // Wait for serial to be ready
+    Serial.flush();
+    
+    Serial.println("\n\n=================================");
+    Serial.println("Navigation Lights and Signal ECU");
     Serial.println("COLREGs compliant - Vessels <15m");
+    Serial.println("=================================\n");
     
     // -----------------------------------------------------------------------
-    // STEP 1: Initialize SensESP (TODO: Complete integration)
+    // STEP 1: Initialize SensESP
     // -----------------------------------------------------------------------
     Serial.println("[1/5] Initializing SensESP...");
+    Serial.flush();
     
-    // TODO: SensESP v3 API has significant changes - need to:
-    // 1. Study updated SensESPAppBuilder API
-    // 2. Understand new SKPutRequestListener pattern
-    // 3. Verify SKOutput template usage
-    // 4. Test on actual hardware with SignalK server
+    // Create SensESP app (SignalK server configured via web UI at 192.168.4.1)
+    SensESPAppBuilder builder;
+    sensesp_app = (&builder)  // CRITICAL: Use address-of operator
+        ->set_hostname("nav-lights-ecu")
+        ->enable_ota("boat-ecu")
+        ->get_app();
     
-    Serial.println("  ⚠ SensESP integration pending (Phase 4 TODO)");
-    Serial.println("  → All core controllers functional");
+    Serial.println("  ✓ SensESP initialized");
+    Serial.flush();
     
     // -----------------------------------------------------------------------
     // STEP 2: Initialize Hardware
     // -----------------------------------------------------------------------
     Serial.println("[2/5] Initializing hardware...");
+    Serial.flush();
     
     // Create relay controller (active-low safety: all relays OFF on boot)
     relay_controller = new ESP32RelayController(
@@ -110,14 +119,13 @@ void setup() {
     Serial.print("  State: ");
     Serial.println(ecu->getStateDescription().c_str());
     
-    // --------------------------------- (TODO: Complete)
+    // -----------------------------------------------------------------------
+    // STEP 5: Setup SignalK Integration
     // -----------------------------------------------------------------------
     Serial.println("[5/5] Setting up SignalK integration...");
     
-    // TODO: Implement SignalK integration once SensESP v3 API is studied
-    // setupSignalK(*ecu);
-    Serial.println("  ⚠ SignalK integration pending");
-    Serial.println("  → ECU ready for programmatic controltive");
+    setupSignalK(*ecu);
+    Serial.println("  ✓ SignalK integration active");
     Serial.println("  ✓ Initial status published");
     
     // -----------------------------------------------------------------------
@@ -127,18 +135,16 @@ void setup() {
     Serial.println("ECU ready for SignalK control");
     Serial.println("All navigation lights OFF (COLREGs default: Day/Moored)");
     Serial.println("Periodic sound signals muted (safety default)");
-    Serial.println("\nWaiting for SignalK commands...\n");
+    Serial.println("\nConnect to WiFi AP 'nav-lights-ecu' to configure network");
+    Serial.println("SignalK paths: electrical.switches.navigationLights.*\n");
 }
 
 void loop() {
-    // TODO: Add SensESP app.tick() when SignalK integration is complete
-    // app.tick();
+    // Process SensESP event loop
+    event_loop()->tick();
     
     // Update ECU (processes sound controller timers)
     if (ecu != nullptr) {
         ecu->update();
     }
-    
-    // Small delay to prevent CPU hogging
-    delay(10);
 }

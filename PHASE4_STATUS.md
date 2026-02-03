@@ -1,4 +1,9 @@
-# Phase 4 Status: SignalK Integration - 100% Complete ✅
+# Phase 4 Status: SignalK Integration - COMPLETE ✅
+
+**Last Updated**: February 3, 2026  
+**Test Coverage**: 128 tests (114 native + 14 ESP32 embedded) - All Passing ✅  
+**Build Status**: Successful (71.8% flash, 9.4% RAM)  
+**Hardware Validation**: Complete on ESP32 Dev Kit C V4
 
 ## Completed
 
@@ -29,11 +34,17 @@
 - Implemented [signalk_integration.h](src/signalk_integration.h) and [signalk_integration.cpp](src/signalk_integration.cpp) with SensESP v3 API
 - **Bidirectional Communication**:
   - 5 input paths using `SKPutRequestListener` with custom `ValueConsumer` classes
-  - 12 output paths using `SKOutput` for publishing state
+  - 13 output paths using `SKOutput` for publishing state (condition, state, mute, countdown, 7 lights, horn, heartbeat)
 - **Custom ValueConsumer Pattern**: ConditionConsumer, BoatStateConsumer, MuteConsumer, AdHocSignalConsumer, EmergencyStopConsumer
-- **State Change Callback**: Lambda that publishes all ECU state on changes
+- **State Change Callback**: Publishes all ECU state immediately on changes
+- **Periodic Updates Pattern** (matches boat.light-signal-ECU architecture):
+  - Heartbeat RepeatSensor: 60s calls `updateAllObservableValues(ecu)` to refresh all static values
+  - Countdown RepeatSensor: 1s updates countdown value
+  - Horn RepeatSensor: 100ms updates horn status
+  - ObservableValue→SKOutput connections ensure fresh data propagates to SignalK
+- **Reconnection Handling**: Auto-republishes all values 2s after SignalK connection/reconnection
 - **SignalK Paths**: Base path `electrical.switches.navigationLights.*`
-- **Test Coverage**: 42 comprehensive tests validating all conversion functions
+- **Test Coverage**: 74 native tests + 14 ESP32 embedded tests = 88 SignalK tests total
 
 ## Build Configuration
 
@@ -58,16 +69,24 @@ Flash: 71.3% (1401737 / 1966080 bytes) with min_spiffs.csv
 Status: SUCCESS
 ```
 
-### Native Unit Tests ✅
-**114 tests - All Passing**
+### Test Coverage ✅
+**128 tests - All Passing**
 
+#### Native Unit Tests (114 tests)
 | Test Suite | Count | Duration | Status |
 |------------|-------|----------|--------|
-| State Machine | 20 tests | 2.70s | ✅ PASSED |
-| Light Controller | 9 tests | 2.57s | ✅ PASSED |
-| Sound Controller | 11 tests | 2.28s | ✅ PASSED |
-| SignalK Integration | 74 tests | 2.59s | ✅ PASSED |
-| **Total** | **114 tests** | **10.13s** | **✅ ALL PASSED** |
+| State Machine | 20 tests | ~2.0s | ✅ PASSED |
+| Light Controller | 9 tests | ~2.2s | ✅ PASSED |
+| Sound Controller | 11 tests | ~2.0s | ✅ PASSED |
+| SignalK Integration | 74 tests | ~2.3s | ✅ PASSED |
+| **Native Total** | **114 tests** | **~8.5s** | **✅ ALL PASSED** |
+
+#### ESP32 Embedded Tests (14 tests)
+| Test Suite | Count | Duration | Status |
+|------------|-------|----------|--------|
+| SignalK ESP32 | 14 tests | ~17.8s | ✅ PASSED |
+
+Validates: ECU initialization, state changes, COLREGs rules, timers, relay controllers on real ESP32 hardware
 The `NavigationLightsECU` facade enables dual UI support:
 - **Main UI**: SignalK over WiFi (to be implemented)
 - **Fallback UI**: BLE (future enhancement)
@@ -98,27 +117,37 @@ Base: `electrical.switches.navigationLights.*`
 | `.emergencyStop` | boolean | true (trigger only) | EmergencyStopConsumer |
 
 ### Output Paths (Status Publishing)
-| Path | Type | Description |
-|------|------|-------------|
-| `.condition` | string | Current condition |
-| `.boatState` | string | Current boat state |
-| `.periodicMuted` | boolean | Mute status |
-| `.periodicCountdown` | int | Seconds until next signal |
-| `.lights.masthead` | boolean | Masthead light status |
-| `.lights.port` | boolean | Port sidelight status |
-| `.lights.starboard` | boolean | Starboard sidelight status |
-| `.lights.stern` | boolean | Sternlight status |
-| `.lights.allround_white` | boolean | All-round white status |
-| `.lights.allround_red_upper` | boolean | Upper red light status |
-| `.lights.allround_red_lower` | boolean | Lower red light status |
-| `.horn.active` | boolean | Horn active status |
+| Path | Type | Update Interval | Description |
+|------|------|-----------------|-------------|
+| `.condition` | string | 60s + change | Current condition |
+| `.boatState` | string | 60s + change | Current boat state |
+| `.periodicMuted` | boolean | 60s + change | Mute status |
+| `.periodicCountdown` | int | 1s | Seconds until next signal |
+| `.lights.masthead` | boolean | 60s + change | Masthead light status |
+| `.lights.port` | boolean | 60s + change | Port sidelight status |
+| `.lights.starboard` | boolean | 60s + change | Starboard sidelight status |
+| `.lights.stern` | boolean | 60s + change | Sternlight status |
+| `.lights.allround_white` | boolean | 60s + change | All-round white status |
+| `.lights.allround_red_upper` | boolean | 60s + change | Upper red light status |
+| `.lights.allround_red_lower` | boolean | 60s + change | Lower red light status |
+| `.horn.active` | boolean | 100ms | Horn active status |
+| `.heartbeat` | int | 60s | ECU heartbeat toggle (0/1) |
 
-## Next Steps
+## Deployment Ready ✅
 
-### Hardware Testing (Ready for Deployment)
+### Completed Integration Testing
+- ✅ All 128 tests passing (114 native + 14 ESP32 embedded)
+- ✅ Firmware builds successfully (71.8% flash, 9.4% RAM)
+- ✅ Hardware validation on ESP32 Dev Kit C V4
+- ✅ SignalK periodic updates verified (60s heartbeat pattern)
+- ✅ COLREGs rules validated (all 18 combinations)
+- ✅ Timer and relay controller hardware tested
+
+### Production Deployment Steps
 1. **Flash Firmware**
-   - Connect ESP32 Dev Kit C V4 via USB
-   - Run: `pio run --target upload`
+   ```bash
+   pio run --target upload
+   ```
    
 2. **Connect Hardware**
    - 8-channel opto-isolated relay module (active-low)
@@ -127,16 +156,16 @@ Base: `electrical.switches.navigationLights.*`
    - Horn/sound signaling device
 
 3. **Configure SignalK**
-   - Use SensESP web portal (captive portal on first boot)
-   - Configure WiFi credentials
-   - Set SignalK server address
-   - Verify connection
+   - SensESP web portal on first boot (captive portal)
+   - Set WiFi credentials
+   - Configure SignalK server address
+   - Verify periodic updates (check heartbeat toggles every 60s)
 
-4. **Validate COLREGs**
-   - Test all 18 condition+state combinations
-   - Verify correct light patterns per COLREGs rules
-   - Test sound signal timing (short/prolonged blasts)
-   - Validate periodic signal countdown
+4. **Operational Validation**
+   - Test PUT requests from SignalK server
+   - Monitor periodic data updates (60s heartbeat)
+   - Validate COLREGs light patterns
+   - Test sound signal timing
 
 ### Optional: Phase 5 Enhancements
 - BLE fallback UI for offline control

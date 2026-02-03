@@ -27,18 +27,23 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - [test/test_light_controller/](test/test_light_controller/) - **9 tests passing**
 - [test/test_sound_controller/](test/test_sound_controller/) - **11 tests passing** (1 skipped)
 
-### ✅ Phase 4: SignalK Integration (100%)
+### ✅ Phase 4: SignalK Integration (100%) - COMPLETE
 - ✅ [src/ESP32Timer.h](src/ESP32Timer.h) / [.cpp](src/ESP32Timer.cpp) - Production timer
 - ✅ [src/NavigationLightsECU.h](src/NavigationLightsECU.h) / [.cpp](src/NavigationLightsECU.cpp) - UI-agnostic facade
-- ✅ [src/main.cpp](src/main.cpp) - Complete hardware initialization
+- ✅ [src/main.cpp](src/main.cpp) - Complete hardware initialization + SignalK setup
 - ✅ [src/signalk_integration.h](src/signalk_integration.h) / [.cpp](src/signalk_integration.cpp) - SensESP v3 API complete
+  - **ObservableValue→SKOutput Pattern**: Bidirectional SignalK communication
+  - **Periodic Updates**: 60s heartbeat calls `updateAllObservableValues(ecu)` (matches boat.light-signal-ECU)
+  - **Reconnection Handling**: Auto-republishes all values 2s after connection
+  - 5 input paths (PUT requests) + 13 output paths (status publishing)
 - ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **74 tests passing** (conversions, integration, edge cases)
-- ✅ [test/test_signalk_esp32/](test/test_signalk_esp32/) - **15 ESP32 embedded tests** (hardware validation)
+- ✅ [test/test_signalk_esp32/](test/test_signalk_esp32/) - **14 ESP32 embedded tests passing** (hardware validation)
 
-**Current Build**: `esp32dev` environment with SensESP v3.2.2
-- RAM: **15.3%** (50140 / 327680 bytes)
-- Flash: **71.3%** (1401737 / 1966080 bytes) with min_spiffs.csv partition
+**Current Build**: `az-delivery-devkit-v4` environment with SensESP v3.2.2
+- RAM: **9.4%** (50052 / 532480 bytes)
+- Flash: **71.8%** (1411669 / 1966080 bytes) with min_spiffs.csv partition
 - Status: **BUILD SUCCESSFUL** ✅
+- **Hardware Validated**: All tests pass on ESP32 Dev Kit C V4
 
 ### ⏳ Phase 5: Optional Enhancements (0%)
 - BLE fallback UI (when WiFi unavailable)
@@ -46,6 +51,23 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - OTA firmware updates
 
 ## Test Coverage
+
+**Total: 128 tests - All Passing ✅**
+
+### Native Tests (114 tests, ~8.5s)
+| Test Suite | Tests | Files | Status |
+|------------|-------|-------|--------|
+| State Machine | 20 | [test_state_machine.cpp](test/test_state_machine/test_state_machine.cpp) | ✅ PASSED |
+| Light Controller | 9 | [test_light_controller.cpp](test/test_light_controller/test_light_controller.cpp) | ✅ PASSED |
+| Sound Controller | 11 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
+| SignalK Integration | 74 | [test_signalk_integration.cpp](test/test_signalk_integration/test_signalk_integration.cpp) | ✅ PASSED |
+
+### ESP32 Embedded Tests (14 tests, ~17.8s)
+| Test Suite | Tests | Files | Status |
+|------------|-------|-------|--------|
+| SignalK ESP32 | 14 | [test_signalk_esp32.cpp](test/test_signalk_esp32/test_signalk_esp32.cpp) | ✅ PASSED |
+
+**Hardware Validation**: All embedded tests pass on ESP32 Dev Kit C V4 with real GPIO, timers, and relay control.
 
 ### Unit Tests: **114 tests** - All Passing ✅
 | Suite | Tests | Status |

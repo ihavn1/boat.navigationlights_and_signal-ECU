@@ -34,18 +34,18 @@ static SoundController* sound_controller = nullptr;
 
 void setup_test_ecu() {
     // Create real hardware controllers
-    relay_controller = new ESP32RelayController(TEST_PINS);
+    relay_controller = new ESP32RelayController(
+        TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+    );
+    relay_controller->begin();
+    
     timer = new ESP32Timer();
-    light_controller = new LightController(relay_controller);
-    sound_controller = new SoundController(relay_controller, timer);
+    light_controller = new LightController(*relay_controller);
+    sound_controller = new SoundController(*relay_controller, *timer);
     
     // Create ECU
-    test_ecu = new NavigationLightsECU(
-        light_controller,
-        sound_controller,
-        Condition::DAY,
-        BoatState::MOORED
-    );
+    test_ecu = new NavigationLightsECU(*light_controller, *sound_controller);
 }
 
 void teardown_test_ecu() {
@@ -71,7 +71,7 @@ void test_ecu_initializes_with_safe_defaults() {
     
     TEST_ASSERT_EQUAL(Condition::DAY, test_ecu->getCondition());
     TEST_ASSERT_EQUAL(BoatState::MOORED, test_ecu->getBoatState());
-    TEST_ASSERT_FALSE(test_ecu->isPeriodicMuted());  // Changed: Always start muted
+    TEST_ASSERT_TRUE(test_ecu->isPeriodicMuted());  // Always start muted (safety requirement)
     TEST_ASSERT_FALSE(test_ecu->isHornActive());
     
     LightConfiguration lights = test_ecu->getCurrentLights();
@@ -155,16 +155,16 @@ void test_ecu_anchorage_enables_anchor_light() {
 void test_ecu_mute_unmute_periodic_signals() {
     setup_test_ecu();
     
-    // Start unmuted (default)
-    TEST_ASSERT_FALSE(test_ecu->isPeriodicMuted());
-    
-    // Mute
-    test_ecu->mutePeriodicSignals();
+    // Start muted (safety default)
     TEST_ASSERT_TRUE(test_ecu->isPeriodicMuted());
     
     // Unmute
     test_ecu->unmutePeriodicSignals();
     TEST_ASSERT_FALSE(test_ecu->isPeriodicMuted());
+    
+    // Mute again
+    test_ecu->mutePeriodicSignals();
+    TEST_ASSERT_TRUE(test_ecu->isPeriodicMuted());
     
     teardown_test_ecu();
 }
@@ -293,9 +293,10 @@ void test_timer_callbacks_execute() {
     
     bool callback_executed = false;
     
-    timer->setTimeout([&callback_executed]() {
+    // Use scheduleOnce instead of setTimeout
+    timer->scheduleOnce(100, [&callback_executed]() {
         callback_executed = true;
-    }, 100);
+    });
     
     // Wait for timeout
     delay(150);
@@ -308,30 +309,40 @@ void test_timer_callbacks_execute() {
 }
 
 void test_relay_controller_initializes_pins_low() {
-    relay_controller = new ESP32RelayController(TEST_PINS);
+    relay_controller = new ESP32RelayController(
+        TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+    );
+    relay_controller->begin();
     
-    // All pins should be OUTPUT mode with LOW state (relays off)
-    for (int i = 0; i < 8; i++) {
-        // Can't directly test pin mode, but we can verify setRelay works
-        relay_controller->setRelay(i, false);
-        // No assertion - just verify no crash
-    }
+    // All relays should be inactive on initialization
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::MASTHEAD_LIGHT));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::PORT_SIDELIGHT));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::STARBOARD_SIDELIGHT));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::STERNLIGHT));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::ALLROUND_WHITE));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::ALLROUND_RED_UPPER));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::ALLROUND_RED_LOWER));
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::HORN));
     
     delete relay_controller;
     relay_controller = nullptr;
 }
 
 void test_relay_controller_set_relay() {
-    relay_controller = new ESP32RelayController(TEST_PINS);
+    relay_controller = new ESP32RelayController(
+        TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+    );
+    relay_controller->begin();
     
-    // Turn on relay 0
-    relay_controller->setRelay(0, true);
+    // Activate masthead light relay
+    relay_controller->activate(RelayChannel::MASTHEAD_LIGHT);
+    TEST_ASSERT_TRUE(relay_controller->isActive(RelayChannel::MASTHEAD_LIGHT));
     
-    // Turn off relay 0
-    relay_controller->setRelay(0, false);
-    
-    // No crash = success (can't easily verify GPIO state in test)
-    TEST_ASSERT_TRUE(true);
+    // Deactivate masthead light relay
+    relay_controller->deactivate(RelayChannel::MASTHEAD_LIGHT);
+    TEST_ASSERT_FALSE(relay_controller->isActive(RelayChannel::MASTHEAD_LIGHT));
     
     delete relay_controller;
     relay_controller = nullptr;

@@ -95,6 +95,7 @@ static ObservableValue<bool>* allround_white_value = nullptr;
 static ObservableValue<bool>* allround_red_upper_value = nullptr;
 static ObservableValue<bool>* allround_red_lower_value = nullptr;
 static ObservableValue<bool>* horn_value = nullptr;
+static ObservableValue<int>* heartbeat_value = nullptr;
 
 void setupSignalK(NavigationLightsECU& ecu) {
     Serial.println("\n[SignalK] ===== Starting SignalK Integration Setup =====");
@@ -121,6 +122,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
     allround_red_upper_value = new ObservableValue<bool>(initial_lights.allround_red_upper);
     allround_red_lower_value = new ObservableValue<bool>(initial_lights.allround_red_lower);
     horn_value = new ObservableValue<bool>(ecu.isHornActive());
+    heartbeat_value = new ObservableValue<int>(0);  // Start at 0, will toggle
     
     Serial.println("[SignalK] ObservableValue objects created");
     
@@ -220,33 +222,29 @@ void setupSignalK(NavigationLightsECU& ecu) {
 
     Serial.println("[SignalK] Connecting ObservableValues to SKOutput...");
     
-    // Connect condition and state with 60s max age (forces periodic updates)
+    // Connect condition and state
     condition_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".condition",
         "/nav/condition",
-        new SKMetadata("", "Lighting condition"),
-        60000  // Resend every 60 seconds
+        new SKMetadata("", "Lighting condition")
     ));
 
     boat_state_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".boatState",
         "/nav/boatState",
-        new SKMetadata("", "Boat operational state"),
-        60000  // Resend every 60 seconds
+        new SKMetadata("", "Boat operational state")
     ));
 
     periodic_muted_value->connect_to(new SKOutput<bool>(
         String(SK_PATH_PREFIX) + ".periodicMuted",
         "/nav/periodicMuted",
-        new SKMetadata("", "Periodic signals muted"),
-        60000  // Resend every 60 seconds
+        new SKMetadata("", "Periodic signals muted")
     ));
 
     countdown_value->connect_to(new SKOutput<int>(
         String(SK_PATH_PREFIX) + ".periodicCountdown",
         "/nav/countdown",
-        new SKMetadata("s", "Seconds until next periodic signal"),
-        1000  // Resend every second (countdown changes frequently)
+        new SKMetadata("s", "Seconds until next periodic signal")
     ));
 
     // Light outputs
@@ -298,6 +296,13 @@ void setupSignalK(NavigationLightsECU& ecu) {
         String(SK_PATH_PREFIX) + ".horn.active",
         "/nav/horn",
         new SKMetadata("", "Horn active")
+    ));
+
+    // Heartbeat - toggles between 0 and 1 every 60 seconds to force updates
+    heartbeat_value->connect_to(new SKOutput<int>(
+        String(SK_PATH_PREFIX) + ".heartbeat",
+        "/nav/heartbeat",
+        new SKMetadata("", "ECU heartbeat - toggles every 60 seconds")
     ));
 
     // =======================================================================
@@ -409,54 +414,38 @@ void setupSignalK(NavigationLightsECU& ecu) {
     });
 
     // =======================================================================
-    // PERIODIC UPDATES (all key values updated regularly)
+    // PERIODIC UPDATES (RepeatSensors for regular polling)
     // =======================================================================
     
     Serial.println("[SignalK] Setting up periodic updates...");
     
-    // Update condition every 60 seconds
-    auto* condition_sensor = new RepeatSensor<String>(60000, [&ecu]() {
-        return String(sk_conditionToString(ecu.getCondition()));
+    // HEARTBEAT: Toggles between 0 and 1 every 60 seconds
+    // This forces SignalK to update all values even when they haven't changed
+    // The working project uses this exact pattern to ensure updates every minute
+    auto* heartbeat_sensor = new RepeatSensor<int>(60000, []() {
+        static int toggle = 0;
+        toggle = 1 - toggle;  // Toggle between 0 and 1
+        Serial.println("\n[SignalK] ♥ HEARTBEAT - Forcing update of all values");
+        return toggle;
     });
-    condition_sensor->connect_to(condition_value);
+    heartbeat_sensor->connect_to(heartbeat_value);
     
-    // Update boat state every 60 seconds
-    auto* state_sensor = new RepeatSensor<String>(60000, [&ecu]() {
-        return String(sk_boatStateToString(ecu.getBoatState()));
-    });
-    state_sensor->connect_to(boat_state_value);
-    
-    // Update mute status every 60 seconds
-    auto* mute_sensor = new RepeatSensor<bool>(60000, [&ecu]() {
-        return ecu.isPeriodicMuted();
-    });
-    mute_sensor->connect_to(periodic_muted_value);
-    
-    // Update countdown every second
+    // Countdown every second (for responsive countdown display)
     auto* countdown_sensor = new RepeatSensor<int>(1000, [&ecu]() {
         return (int)ecu.getPeriodicCountdownSeconds();
     });
     countdown_sensor->connect_to(countdown_value);
     
-    // Update all light states every 60 seconds
-    auto* lights_sensor = new RepeatSensor<LightConfiguration>(60000, [&ecu]() {
-        return ecu.getCurrentLights();
-    });
-    lights_sensor->connect_to(new LambdaConsumer<LightConfiguration>([](LightConfiguration lights) {
-        masthead_value->set(lights.masthead_light);
-        port_value->set(lights.port_sidelight);
-        starboard_value->set(lights.starboard_sidelight);
-        stern_value->set(lights.sternlight);
-        allround_white_value->set(lights.allround_white);
-        allround_red_upper_value->set(lights.allround_red_upper);
-        allround_red_lower_value->set(lights.allround_red_lower);
-    }));
-
-    // Update horn status every 100ms (needs to be responsive)
+    // Horn every 100ms (responsive feedback for horn activation)
     auto* horn_sensor = new RepeatSensor<bool>(100, [&ecu]() {
         return ecu.isHornActive();
     });
     horn_sensor->connect_to(horn_value);
     
-    Serial.println("[SignalK] Periodic updates configured");
+    Serial.println("[SignalK] Periodic updates configured:");
+    Serial.println("  - Heartbeat: 60s (forces all values to update)");
+    Serial.println("  - Countdown: 1s");
+    Serial.println("  - Horn: 100ms");
+
+    Serial.println("\n[SignalK] ===== SignalK Integration Setup Complete =====\n");
 }

@@ -71,15 +71,6 @@ void setup() {
         ->enable_ota("boat-ecu")
         ->get_app();
     
-    // Print SignalK server configuration
-    auto ws_client = sensesp_app->get_ws_client();
-    Serial.println("\n>>> SignalK Server Configuration <<<");
-    Serial.print("Server Address: ");
-    Serial.println(ws_client->get_server_address());
-    Serial.print("Server Port: ");
-    Serial.println(ws_client->get_server_port());
-    Serial.println();
-    
     // Initialize hardware layer
     relay_controller = new ESP32RelayController(
         PIN_MASTHEAD_LIGHT,

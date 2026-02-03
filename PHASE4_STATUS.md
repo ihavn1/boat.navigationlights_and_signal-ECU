@@ -59,15 +59,15 @@ Status: SUCCESS
 ```
 
 ### Native Unit Tests ✅
-**82 tests - All Passing**
+**114 tests - All Passing**
 
 | Test Suite | Count | Duration | Status |
 |------------|-------|----------|--------|
-| State Machine | 20 tests | 2.01s | ✅ PASSED |
-| Light Controller | 9 tests | 2.30s | ✅ PASSED |
-| Sound Controller | 11 tests | 2.09s | ✅ PASSED |
-| SignalK Integration | 42 tests | 2.14s | ✅ PASSED |
-| **Total** | **82 tests** | **8.54s** | **✅ ALL PASSED** |
+| State Machine | 20 tests | 2.70s | ✅ PASSED |
+| Light Controller | 9 tests | 2.57s | ✅ PASSED |
+| Sound Controller | 11 tests | 2.28s | ✅ PASSED |
+| SignalK Integration | 74 tests | 2.59s | ✅ PASSED |
+| **Total** | **114 tests** | **10.13s** | **✅ ALL PASSED** |
 The `NavigationLightsECU` facade enables dual UI support:
 - **Main UI**: SignalK over WiFi (to be implemented)
 - **Fallback UI**: BLE (future enhancement)

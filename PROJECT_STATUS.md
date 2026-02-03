@@ -32,7 +32,8 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - ✅ [src/NavigationLightsECU.h](src/NavigationLightsECU.h) / [.cpp](src/NavigationLightsECU.cpp) - UI-agnostic facade
 - ✅ [src/main.cpp](src/main.cpp) - Complete hardware initialization
 - ✅ [src/signalk_integration.h](src/signalk_integration.h) / [.cpp](src/signalk_integration.cpp) - SensESP v3 API complete
-- ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **42 tests passing**
+- ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **74 tests passing** (conversions, integration, edge cases)
+- ✅ [test/test_signalk_esp32/](test/test_signalk_esp32/) - **15 ESP32 embedded tests** (hardware validation)
 
 **Current Build**: `esp32dev` environment with SensESP v3.2.2
 - RAM: **15.3%** (50140 / 327680 bytes)
@@ -46,19 +47,30 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 
 ## Test Coverage
 
-### Unit Tests: **82 tests** - All Passing ✅
+### Unit Tests: **114 tests** - All Passing ✅
 | Suite | Tests | Status |
 |-------|-------|--------|
 | State Machine | 20 | ✅ All Passing |
 | Light Controller | 9 | ✅ All Passing |
 | Sound Controller | 11 | ✅ All Passing |
-| SignalK Integration | 42 | ✅ All Passing |
+| SignalK Integration | 74 | ✅ All Passing |
 
-**SignalK Test Coverage**:
-- 8 Condition conversion tests (enum↔string, roundtrip, invalid)
-- 14 BoatState conversion tests (all 6 states)
-- 18 AdHocSignal conversion tests (all 8 signals)
-- 2 SignalK format validation tests (snake_case compliance)
+**SignalK Test Coverage** (74 tests):
+- **Conversion Functions** (42 tests): enum↔string, all states/signals, roundtrip, invalid input handling
+- **Integration Tests** (12 tests): MockECU interactions, callbacks, state transitions
+- **Edge Cases** (20 tests): Empty/null strings, case sensitivity, whitespace, typos, rapid changes, callback safety
+
+### ESP32 Embedded Tests: **15 tests** (requires hardware)
+| Suite | Tests | Status |
+|-------|-------|--------|
+| SignalK ESP32 | 15 | ⏳ Pending Hardware |
+
+**ESP32 Test Coverage**:
+- ECU initialization and safe defaults
+- COLREGs light combinations on hardware
+- Hardware timer callbacks
+- Relay controller pin initialization
+- Ad-hoc signal triggering with real timing
 
 ### Hardware Validation: **Pending**
 - Awaits ESP32 Dev Kit C V4 + opto-isolated relay module

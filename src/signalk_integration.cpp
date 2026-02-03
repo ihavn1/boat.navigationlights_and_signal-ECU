@@ -425,7 +425,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
     auto* heartbeat_sensor = new RepeatSensor<int>(60000, [&ecu]() {
         static int toggle = 0;
         toggle = 1 - toggle;  // Toggle between 0 and 1
-        Serial.println("\n[SignalK] ♥ HEARTBEAT - Updating all values");
+        Serial.println("\n[SignalK] HEARTBEAT - Updating all values");
         
         // Update ALL ObservableValues - this forces them to send to SignalK
         condition_value->set(sk_conditionToString(ecu.getCondition()));

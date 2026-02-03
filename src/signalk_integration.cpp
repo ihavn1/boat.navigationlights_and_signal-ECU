@@ -7,6 +7,7 @@
 #include "sensesp/system/valueconsumer.h"
 #include "sensesp/system/lambda_consumer.h"
 #include "sensesp/signalk/signalk_ws_client.h"
+#include "sensesp/sensors/sensor.h"
 #include "sensesp_app.h"
 
 using namespace sensesp;
@@ -81,23 +82,47 @@ static AdHocSignal sk_stringToAdHocSignal(const String& str) {
 // SIGNALK INTEGRATION SETUP
 // =======================================================================
 
-// Global pointers to SKOutput objects (must persist)
-static SKOutput<String>* condition_output = nullptr;
-static SKOutput<String>* boat_state_output = nullptr;
-static SKOutput<bool>* periodic_muted_output = nullptr;
-static SKOutput<int>* countdown_output = nullptr;
-static SKOutput<bool>* masthead_output = nullptr;
-static SKOutput<bool>* port_output = nullptr;
-static SKOutput<bool>* starboard_output = nullptr;
-static SKOutput<bool>* stern_output = nullptr;
-static SKOutput<bool>* allround_white_output = nullptr;
-static SKOutput<bool>* allround_red_upper_output = nullptr;
-static SKOutput<bool>* allround_red_lower_output = nullptr;
-static SKOutput<bool>* horn_output = nullptr;
+// Global ObservableValue objects (source of truth that triggers SignalK updates)
+static ObservableValue<String>* condition_value = nullptr;
+static ObservableValue<String>* boat_state_value = nullptr;
+static ObservableValue<bool>* periodic_muted_value = nullptr;
+static ObservableValue<int>* countdown_value = nullptr;
+static ObservableValue<bool>* masthead_value = nullptr;
+static ObservableValue<bool>* port_value = nullptr;
+static ObservableValue<bool>* starboard_value = nullptr;
+static ObservableValue<bool>* stern_value = nullptr;
+static ObservableValue<bool>* allround_white_value = nullptr;
+static ObservableValue<bool>* allround_red_upper_value = nullptr;
+static ObservableValue<bool>* allround_red_lower_value = nullptr;
+static ObservableValue<bool>* horn_value = nullptr;
 
 void setupSignalK(NavigationLightsECU& ecu) {
     Serial.println("\n[SignalK] ===== Starting SignalK Integration Setup =====");
     Serial.println("[SignalK] Base path: " SK_PATH_PREFIX);
+    
+    // =======================================================================
+    // CREATE OBSERVABLE VALUES (Sources that trigger SignalK updates)
+    // =======================================================================
+    
+    Serial.println("[SignalK] Creating ObservableValue objects...");
+    
+    // Initialize with current ECU state
+    condition_value = new ObservableValue<String>(String(sk_conditionToString(ecu.getCondition())));
+    boat_state_value = new ObservableValue<String>(String(sk_boatStateToString(ecu.getBoatState())));
+    periodic_muted_value = new ObservableValue<bool>(ecu.isPeriodicMuted());
+    countdown_value = new ObservableValue<int>((int)ecu.getPeriodicCountdownSeconds());
+    
+    LightConfiguration initial_lights = ecu.getCurrentLights();
+    masthead_value = new ObservableValue<bool>(initial_lights.masthead_light);
+    port_value = new ObservableValue<bool>(initial_lights.port_sidelight);
+    starboard_value = new ObservableValue<bool>(initial_lights.starboard_sidelight);
+    stern_value = new ObservableValue<bool>(initial_lights.sternlight);
+    allround_white_value = new ObservableValue<bool>(initial_lights.allround_white);
+    allround_red_upper_value = new ObservableValue<bool>(initial_lights.allround_red_upper);
+    allround_red_lower_value = new ObservableValue<bool>(initial_lights.allround_red_lower);
+    horn_value = new ObservableValue<bool>(ecu.isHornActive());
+    
+    Serial.println("[SignalK] ObservableValue objects created");
     
     // =======================================================================
     // INPUT LISTENERS (PUT requests from SignalK)
@@ -190,189 +215,205 @@ void setupSignalK(NavigationLightsECU& ecu) {
     emergency_listener->connect_to(new EmergencyStopConsumer(&ecu));
 
     // =======================================================================
-    // OUTPUT PUBLISHERS (Status to SignalK)
+    // OUTPUT PUBLISHERS (Connect ObservableValues to SignalK)
     // =======================================================================
 
-    // Create persistent SK output objects
-    condition_output = new SKOutput<String>(
+    Serial.println("[SignalK] Connecting ObservableValues to SKOutput...");
+    
+    // Connect condition and state
+    condition_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".condition",
         "/nav/condition",
         new SKMetadata("", "Lighting condition")
-    );
+    ));
 
-    boat_state_output = new SKOutput<String>(
+    boat_state_value->connect_to(new SKOutput<String>(
         String(SK_PATH_PREFIX) + ".boatState",
         "/nav/boatState",
         new SKMetadata("", "Boat operational state")
-    );
+    ));
 
-    periodic_muted_output = new SKOutput<bool>(
+    periodic_muted_value->connect_to(new SKOutput<bool>(
         String(SK_PATH_PREFIX) + ".periodicMuted",
         "/nav/periodicMuted",
         new SKMetadata("", "Periodic signals muted")
-    );
+    ));
 
-    countdown_output = new SKOutput<int>(
+    countdown_value->connect_to(new SKOutput<int>(
         String(SK_PATH_PREFIX) + ".periodicCountdown",
         "/nav/countdown",
         new SKMetadata("s", "Seconds until next periodic signal")
-    );
+    ));
 
     // Light outputs
     String lights_prefix = String(SK_PATH_PREFIX) + ".lights.";
     
-    masthead_output = new SKOutput<bool>(
+    masthead_value->connect_to(new SKOutput<bool>(
         lights_prefix + "mastheadLight",
         "/nav/lights/masthead",
         new SKMetadata("", "Masthead light")
-    );
+    ));
 
-    port_output = new SKOutput<bool>(
+    port_value->connect_to(new SKOutput<bool>(
         lights_prefix + "portSidelight",
         "/nav/lights/port",
         new SKMetadata("", "Port sidelight")
-    );
+    ));
 
-    starboard_output = new SKOutput<bool>(
+    starboard_value->connect_to(new SKOutput<bool>(
         lights_prefix + "starboardSidelight",
         "/nav/lights/starboard",
         new SKMetadata("", "Starboard sidelight")
-    );
+    ));
 
-    stern_output = new SKOutput<bool>(
+    stern_value->connect_to(new SKOutput<bool>(
         lights_prefix + "sternlight",
         "/nav/lights/stern",
         new SKMetadata("", "Sternlight")
-    );
+    ));
 
-    allround_white_output = new SKOutput<bool>(
+    allround_white_value->connect_to(new SKOutput<bool>(
         lights_prefix + "allroundWhite",
         "/nav/lights/white",
         new SKMetadata("", "All-round white light")
-    );
+    ));
 
-    allround_red_upper_output = new SKOutput<bool>(
+    allround_red_upper_value->connect_to(new SKOutput<bool>(
         lights_prefix + "allroundRedUpper",
         "/nav/lights/red_upper",
         new SKMetadata("", "All-round red upper")
-    );
+    ));
 
-    allround_red_lower_output = new SKOutput<bool>(
+    allround_red_lower_value->connect_to(new SKOutput<bool>(
         lights_prefix + "allroundRedLower",
         "/nav/lights/red_lower",
         new SKMetadata("", "All-round red lower")
-    );
+    ));
 
-    horn_output = new SKOutput<bool>(
+    horn_value->connect_to(new SKOutput<bool>(
         String(SK_PATH_PREFIX) + ".horn.active",
         "/nav/horn",
         new SKMetadata("", "Horn active")
-    );
+    ));
 
     // =======================================================================
-    // STATE CHANGE CALLBACK (Publish updates)
+    // STATE CHANGE CALLBACK (Update ObservableValues which trigger SignalK)
     // =======================================================================
 
     Serial.println("[SignalK] Setting up state change callback...");
 
     ecu.onStateChange([&ecu]() {
-        Serial.println("\n[SignalK] State changed! Publishing updates...");
+        Serial.println("\n[SignalK] State changed! Updating ObservableValues...");
         
-        // Publish current state
+        // Update ObservableValues - they will automatically push to SignalK
         String condition_str = String(sk_conditionToString(ecu.getCondition()));
         String state_str = String(sk_boatStateToString(ecu.getBoatState()));
         
         Serial.print("  condition: "); Serial.println(condition_str);
-        condition_output->set(condition_str);
+        condition_value->set(condition_str);
         
         Serial.print("  boatState: "); Serial.println(state_str);
-        boat_state_output->set(state_str);
+        boat_state_value->set(state_str);
         
         Serial.print("  periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
-        periodic_muted_output->set(ecu.isPeriodicMuted());
+        periodic_muted_value->set(ecu.isPeriodicMuted());
         
         Serial.print("  countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
-        countdown_output->set((int)ecu.getPeriodicCountdownSeconds());
+        countdown_value->set((int)ecu.getPeriodicCountdownSeconds());
 
-        // Publish light status
+        // Update light status
         LightConfiguration lights = ecu.getCurrentLights();
         Serial.println("  Lights:");
         Serial.print("    masthead: "); Serial.println(lights.masthead_light);
-        masthead_output->set(lights.masthead_light);
+        masthead_value->set(lights.masthead_light);
         Serial.print("    port: "); Serial.println(lights.port_sidelight);
-        port_output->set(lights.port_sidelight);
+        port_value->set(lights.port_sidelight);
         Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
-        starboard_output->set(lights.starboard_sidelight);
+        starboard_value->set(lights.starboard_sidelight);
         Serial.print("    stern: "); Serial.println(lights.sternlight);
-        stern_output->set(lights.sternlight);
+        stern_value->set(lights.sternlight);
         Serial.print("    allround_white: "); Serial.println(lights.allround_white);
-        allround_white_output->set(lights.allround_white);
+        allround_white_value->set(lights.allround_white);
         Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
-        allround_red_upper_output->set(lights.allround_red_upper);
+        allround_red_upper_value->set(lights.allround_red_upper);
         Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
-        allround_red_lower_output->set(lights.allround_red_lower);
+        allround_red_lower_value->set(lights.allround_red_lower);
 
-        // Publish horn status
+        // Update horn status
         Serial.print("  horn.active: "); Serial.println(ecu.isHornActive());
-        horn_output->set(ecu.isHornActive());
+        horn_value->set(ecu.isHornActive());
         
-        Serial.println("[SignalK] All updates published");
+        Serial.println("[SignalK] ObservableValues updated - changes pushed to SignalK");
     });
 
     // =======================================================================
-    // PUBLISH INITIAL STATE AFTER CONNECTION
+    // PUBLISH INITIAL STATE (delayed to allow connection to establish)
     // =======================================================================
+    
+    Serial.println("\n[SignalK] Scheduling initial state publish (3 second delay)...");
+    
+    // Use DelayEvent to publish initial state after connection has time to establish
+    // This avoids the LED crash bug that happens with connection state observers
+    auto* event_loop = sensesp_app->get_event_loop();
+    event_loop->onDelay(3000, [&ecu]() {
+        Serial.println("\n[SignalK] Publishing initial state...");
+        
+        // Trigger ObservableValue updates to push initial state to SignalK
+        String initial_condition = String(sk_conditionToString(ecu.getCondition()));
+        String initial_state_str = String(sk_boatStateToString(ecu.getBoatState()));
+        
+        Serial.print("  Initial condition: "); Serial.println(initial_condition);
+        condition_value->set(initial_condition);
+        
+        Serial.print("  Initial boatState: "); Serial.println(initial_state_str);
+        boat_state_value->set(initial_state_str);
+        
+        Serial.print("  Initial periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
+        periodic_muted_value->set(ecu.isPeriodicMuted());
+        
+        Serial.print("  Initial countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
+        countdown_value->set((int)ecu.getPeriodicCountdownSeconds());
 
-    Serial.println("[SignalK] Setting up connection state observer...");
-    
-    // Get the WebSocket client and observe its connection state
-    auto ws_client = sensesp_app->get_ws_client();
-    
-    static bool initial_state_sent = false;
-    
-    ws_client->connect_to(new LambdaConsumer<SKWSConnectionState>([&ecu](SKWSConnectionState state) {
-        if (state == SKWSConnectionState::kSKWSConnected && !initial_state_sent) {
-            Serial.println("\n[SignalK] ===== CONNECTED! Publishing initial state =====");
-            initial_state_sent = true;
-            
-            String initial_condition = String(sk_conditionToString(ecu.getCondition()));
-            String initial_state = String(sk_boatStateToString(ecu.getBoatState()));
-            
-            Serial.print("  Initial condition: "); Serial.println(initial_condition);
-            condition_output->set(initial_condition);
-            
-            Serial.print("  Initial boatState: "); Serial.println(initial_state);
-            boat_state_output->set(initial_state);
-            
-            Serial.print("  Initial periodicMuted: "); Serial.println(ecu.isPeriodicMuted() ? "true" : "false");
-            periodic_muted_output->set(ecu.isPeriodicMuted());
-            
-            Serial.print("  Initial countdown: "); Serial.println(ecu.getPeriodicCountdownSeconds());
-            countdown_output->set((int)ecu.getPeriodicCountdownSeconds());
+        LightConfiguration lights = ecu.getCurrentLights();
+        Serial.println("  Initial lights:");
+        Serial.print("    masthead: "); Serial.println(lights.masthead_light);
+        masthead_value->set(lights.masthead_light);
+        Serial.print("    port: "); Serial.println(lights.port_sidelight);
+        port_value->set(lights.port_sidelight);
+        Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
+        starboard_value->set(lights.starboard_sidelight);
+        Serial.print("    stern: "); Serial.println(lights.sternlight);
+        stern_value->set(lights.sternlight);
+        Serial.print("    allround_white: "); Serial.println(lights.allround_white);
+        allround_white_value->set(lights.allround_white);
+        Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
+        allround_red_upper_value->set(lights.allround_red_upper);
+        Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
+        allround_red_lower_value->set(lights.allround_red_lower);
+        
+        Serial.print("  Initial horn.active: "); Serial.println(ecu.isHornActive());
+        horn_value->set(ecu.isHornActive());
+        
+        Serial.println("[SignalK] Initial state published!\n");
+    });
 
-            LightConfiguration lights = ecu.getCurrentLights();
-            Serial.println("  Initial lights:");
-            Serial.print("    masthead: "); Serial.println(lights.masthead_light);
-            masthead_output->set(lights.masthead_light);
-            Serial.print("    port: "); Serial.println(lights.port_sidelight);
-            port_output->set(lights.port_sidelight);
-            Serial.print("    starboard: "); Serial.println(lights.starboard_sidelight);
-            starboard_output->set(lights.starboard_sidelight);
-            Serial.print("    stern: "); Serial.println(lights.sternlight);
-            stern_output->set(lights.sternlight);
-            Serial.print("    allround_white: "); Serial.println(lights.allround_white);
-            allround_white_output->set(lights.allround_white);
-            Serial.print("    allround_red_upper: "); Serial.println(lights.allround_red_upper);
-            allround_red_upper_output->set(lights.allround_red_upper);
-            Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
-            allround_red_lower_output->set(lights.allround_red_lower);
-            
-            Serial.print("  Initial horn.active: "); Serial.println(ecu.isHornActive());
-            horn_output->set(ecu.isHornActive());
-            
-            Serial.println("[SignalK] Initial state published!\n");
-        }
-    }));
+    // =======================================================================
+    // PERIODIC UPDATES (countdown timer and horn status)
+    // =======================================================================
     
-    Serial.println("[SignalK] Connection observer registered - initial state will publish on connect");
+    Serial.println("[SignalK] Setting up periodic updates for countdown and horn...");
+    
+    // Update countdown every second
+    auto* countdown_sensor = new RepeatSensor<int>(1000, [&ecu]() {
+        return (int)ecu.getPeriodicCountdownSeconds();
+    });
+    countdown_sensor->connect_to(countdown_value);
+    
+    // Update horn status every 100ms (needs to be responsive)
+    auto* horn_sensor = new RepeatSensor<bool>(100, [&ecu]() {
+        return ecu.isHornActive();
+    });
+    horn_sensor->connect_to(horn_value);
+    
+    Serial.println("[SignalK] Periodic updates configured");
 }

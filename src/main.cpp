@@ -65,12 +65,10 @@ void setup() {
     
     // Initialize SensESP application
     SensESPAppBuilder builder;
-    std::shared_ptr<SystemStatusLed> null_led = nullptr;
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
         ->set_sk_server("192.168.71.100", 3000)
         ->enable_ota("boat-ecu")
-        ->set_system_status_led(null_led)
         ->get_app();
     
     // Print SignalK server configuration

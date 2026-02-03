@@ -422,10 +422,27 @@ void setupSignalK(NavigationLightsECU& ecu) {
     // HEARTBEAT: Toggles between 0 and 1 every 60 seconds
     // This forces SignalK to update all values even when they haven't changed
     // The working project uses this exact pattern to ensure updates every minute
-    auto* heartbeat_sensor = new RepeatSensor<int>(60000, []() {
+    auto* heartbeat_sensor = new RepeatSensor<int>(60000, [&ecu]() {
         static int toggle = 0;
         toggle = 1 - toggle;  // Toggle between 0 and 1
-        Serial.println("\n[SignalK] ♥ HEARTBEAT - Forcing update of all values");
+        Serial.println("\n[SignalK] ♥ HEARTBEAT - Updating all values");
+        
+        // Update ALL ObservableValues - this forces them to send to SignalK
+        condition_value->set(sk_conditionToString(ecu.getCondition()));
+        boat_state_value->set(sk_boatStateToString(ecu.getBoatState()));
+        periodic_muted_value->set(ecu.isPeriodicMuted());
+        countdown_value->set((int)ecu.getPeriodicCountdownSeconds());
+        
+        LightConfiguration lights = ecu.getCurrentLights();
+        masthead_value->set(lights.masthead_light);
+        port_value->set(lights.port_sidelight);
+        starboard_value->set(lights.starboard_sidelight);
+        stern_value->set(lights.sternlight);
+        allround_white_value->set(lights.allround_white);
+        allround_red_upper_value->set(lights.allround_red_upper);
+        allround_red_lower_value->set(lights.allround_red_lower);
+        horn_value->set(ecu.isHornActive());
+        
         return toggle;
     });
     heartbeat_sensor->connect_to(heartbeat_value);

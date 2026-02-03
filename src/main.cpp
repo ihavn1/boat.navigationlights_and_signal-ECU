@@ -18,6 +18,7 @@
 
 #include <Arduino.h>
 #include "sensesp_app_builder.h"
+#include "sensesp/system/led_blinker.h"
 #include "signalk_integration.h"
 
 // Project includes
@@ -47,40 +48,31 @@ SoundController* sound_controller = nullptr;
 NavigationLightsECU* ecu = nullptr;
 
 void setup() {
-    // Setup logging for SensESP
+    // Initialize logging subsystem
     SetupLogging();
     
-    delay(500);  // Wait for serial to be ready
-    Serial.flush();
+    // Initialize serial communication
+    Serial.begin(115200);
+    while (!Serial && millis() < 3000) {
+        delay(10);
+    }
     
-    Serial.println("\n\n=================================");
-    Serial.println("Navigation Lights and Signal ECU");
-    Serial.println("COLREGs compliant - Vessels <15m");
-    Serial.println("=================================\n");
+    Serial.println("\n\n");
+    Serial.println("========================================");
+    Serial.println("Navigation Lights & Signal ECU");
+    Serial.println("Version 1.0.0 - Production");
+    Serial.println("========================================");
     
-    // -----------------------------------------------------------------------
-    // STEP 1: Initialize SensESP
-    // -----------------------------------------------------------------------
-    Serial.println("[1/5] Initializing SensESP...");
-    Serial.flush();
-    
-    // Create SensESP app (SignalK server configured via web UI at 192.168.4.1)
+    // Initialize SensESP application
     SensESPAppBuilder builder;
-    sensesp_app = (&builder)  // CRITICAL: Use address-of operator
-        ->set_hostname("nav-lights-ecu")
-        ->enable_ota("boat-ecu")
-        ->get_app();
+
+    sensesp_app = (&builder)
+    ->set_hostname("nav-lights-ecu")
+    ->set_sk_server("192.168.71.100", 3000)  // Add this line
+    ->enable_ota("boat-ecu")
+    ->get_app();
     
-    Serial.println("  ✓ SensESP initialized");
-    Serial.flush();
-    
-    // -----------------------------------------------------------------------
-    // STEP 2: Initialize Hardware
-    // -----------------------------------------------------------------------
-    Serial.println("[2/5] Initializing hardware...");
-    Serial.flush();
-    
-    // Create relay controller (active-low safety: all relays OFF on boot)
+    // Initialize hardware layer
     relay_controller = new ESP32RelayController(
         PIN_MASTHEAD_LIGHT,
         PIN_PORT_SIDELIGHT,
@@ -92,56 +84,29 @@ void setup() {
         PIN_HORN
     );
     relay_controller->begin();
-    Serial.println("  ✓ Relay controller initialized (all relays OFF)");
     
     // Create timer
     timer = new ESP32Timer();
-    Serial.println("  ✓ Timer initialized");
     
-    // -----------------------------------------------------------------------
-    // STEP 3: Create Controllers
-    // -----------------------------------------------------------------------
-    Serial.println("[3/5] Creating controllers...");
-    
+    // Create controllers
     light_controller = new LightController(*relay_controller);
-    Serial.println("  ✓ Light controller ready");
-    
     sound_controller = new SoundController(*relay_controller, *timer);
-    Serial.println("  ✓ Sound controller ready (periodic signals start muted)");
     
-    // -----------------------------------------------------------------------
-    // STEP 4: Create ECU Facade
-    // -----------------------------------------------------------------------
-    Serial.println("[4/5] Creating ECU controller...");
-    
+    // Create ECU facade
     ecu = new NavigationLightsECU(*light_controller, *sound_controller);
-    Serial.println("  ✓ ECU initialized with default state");
-    Serial.print("  State: ");
-    Serial.println(ecu->getStateDescription().c_str());
     
-    // -----------------------------------------------------------------------
-    // STEP 5: Setup SignalK Integration
-    // -----------------------------------------------------------------------
-    Serial.println("[5/5] Setting up SignalK integration...");
-    
+    // Setup SignalK integration
     setupSignalK(*ecu);
-    Serial.println("  ✓ SignalK integration active");
-    Serial.println("  ✓ Initial status published");
     
-    // -----------------------------------------------------------------------
-    // READY
-    // -----------------------------------------------------------------------
-    Serial.println("\n=== SETUP COMPLETE ===");
-    Serial.println("ECU ready for SignalK control");
-    Serial.println("All navigation lights OFF (COLREGs default: Day/Moored)");
-    Serial.println("Periodic sound signals muted (safety default)");
-    Serial.println("\nConnect to WiFi AP 'nav-lights-ecu' to configure network");
-    Serial.println("SignalK paths: electrical.switches.navigationLights.*\n");
+    Serial.println("\nSystem initialized successfully");
+    Serial.println("Connect to http://nav-lights-ecu.local for configuration");
 }
 
 void loop() {
-    // Process SensESP event loop
-    event_loop()->tick();
+    // CRITICAL: Process SensESP event loop (handles WiFi, HTTP server, WebSocket)
+    // This MUST be called - it runs the ReactESP event loop which drives RepeatSensors
+    static auto event_loop = sensesp_app->get_event_loop();
+    event_loop->tick();
     
     // Update ECU (processes sound controller timers)
     if (ecu != nullptr) {

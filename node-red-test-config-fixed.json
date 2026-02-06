@@ -1,0 +1,1082 @@
+[
+    {
+        "id": "f1a2b3c4d5e6f7g8",
+        "type": "tab",
+        "label": "Nav Lights ECU Test",
+        "disabled": false,
+        "info": "Node-RED configuration for testing Navigation Lights ECU"
+    },
+    {
+        "id": "zz9yy8xx7ww6vv5uu4",
+        "type": "comment",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "COMMANDS TO ECU (PUT requests)",
+        "info": "",
+        "x": 180,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "aa1bb2cc3dd4ee5ff6",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Condition: Day",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.condition",
+        "payload": "day",
+        "payloadType": "str",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "gg7hh8ii9jj0kk1ll2",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Condition: Hours of Darkness",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.condition",
+        "payload": "hours_of_darkness",
+        "payloadType": "str",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "mm3nn4oo5pp6qq7rr8",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Condition: Restricted Visibility",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.condition",
+        "payload": "restricted_visibility",
+        "payloadType": "str",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "ss9tt0uu1vv2ww3xx4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: Moored",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "moored",
+        "payloadType": "str",
+        "x": 130,
+        "y": 240,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "yy5zz6aaa7bbb8ccc9",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: Underway Making Way",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "underway_making_way",
+        "payloadType": "str",
+        "x": 180,
+        "y": 280,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "ddd0eee1fff2ggg3hh4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: Underway No Way",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "underway_no_way",
+        "payloadType": "str",
+        "x": 170,
+        "y": 320,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "iii5jjj6kkk7lll8mm9",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: Anchorage",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "anchorage",
+        "payloadType": "str",
+        "x": 140,
+        "y": 360,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "nnn0ooo1ppp2qqq3rr4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: NUC Making Way",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "nuc_making_way",
+        "payloadType": "str",
+        "x": 170,
+        "y": 400,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "sss5ttt6uuu7vvv8ww9",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: NUC No Way",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "nuc_no_way",
+        "payloadType": "str",
+        "x": 150,
+        "y": 440,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "xxx0yyy1zzz2aaaa3bb4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Mute Periodic Signals",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.periodicMuted",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 160,
+        "y": 500,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "cccc5dddd6eeee7ff8",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Unmute Periodic Signals",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.periodicMuted",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 170,
+        "y": 540,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "gggg9hhhh0iiii1jj2",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Turn Starboard (●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "turn_starboard",
+        "payloadType": "str",
+        "x": 170,
+        "y": 600,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "kkkk3llll4mmmm5nn6",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Turn Port (●●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "turn_port",
+        "payloadType": "str",
+        "x": 160,
+        "y": 640,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "oooo7pppp8qqqq9rr0",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Astern Propulsion (●●●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "astern_propulsion",
+        "payloadType": "str",
+        "x": 190,
+        "y": 680,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "ssss1tttt2uuuu3vv4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Danger/Confusion (●●●●●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "danger_confusion",
+        "payloadType": "str",
+        "x": 200,
+        "y": 720,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "wwww5xxxx6yyyy7zz8",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Pay Attention (━)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "pay_attention",
+        "payloadType": "str",
+        "x": 170,
+        "y": 760,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "aaaa9bbbb0cccc1dd2",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Overtake Starboard (━ ● ●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "overtake_starboard",
+        "payloadType": "str",
+        "x": 200,
+        "y": 800,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "eeee3ffff4gggg5hh6",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Overtake Port (━ ● ● ●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "overtake_port",
+        "payloadType": "str",
+        "x": 200,
+        "y": 840,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "iiii7jjjj8kkkk9ll0",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: Agreement Overtaken (━ ● ━ ●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "agreement_overtaken",
+        "payloadType": "str",
+        "x": 210,
+        "y": 880,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "mmmm1nnnn2oooo3pp4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "⚠️ EMERGENCY STOP",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.emergencyStop",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 150,
+        "y": 940,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "a1b2c3d4e5f6g7h8",
+        "type": "function",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Format PUT Request",
+        "func": "    msg.topic = msg.topic;\n    msg.payload = msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 500,
+        "wires": [
+            [
+                "0ef60adc19e07b73",
+                "41e794fb29b55b30"
+            ]
+        ]
+    },
+    {
+        "id": "tt3ss2rr1qq0pp9oo8",
+        "type": "comment",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "STATUS FROM ECU (Subscribe to updates)",
+        "info": "",
+        "x": 190,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "mm7nn8oo9pp0qq1rr2",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Condition",
+        "path": "electrical.switches.navigationLights.condition",
+        "period": 1000,
+        "x": 150,
+        "y": 1100,
+        "wires": [
+            [
+                "q7r8s9t0u1v2w3x4"
+            ]
+        ]
+    },
+    {
+        "id": "q7r8s9t0u1v2w3x4",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Condition",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 380,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "ss3tt4uu5vv6ww7xx8",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Boat State",
+        "path": "electrical.switches.navigationLights.boatState",
+        "period": 1000,
+        "x": 160,
+        "y": 1140,
+        "wires": [
+            [
+                "y5z6a7b8c9d0e1f2"
+            ]
+        ]
+    },
+    {
+        "id": "y5z6a7b8c9d0e1f2",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Boat State",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 390,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "yy9zz0aaa1bbb2ccc3",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Periodic Muted",
+        "path": "electrical.switches.navigationLights.periodicMuted",
+        "period": 1000,
+        "x": 180,
+        "y": 1180,
+        "wires": [
+            [
+                "g3h4i5j6k7l8m9n0"
+            ]
+        ]
+    },
+    {
+        "id": "g3h4i5j6k7l8m9n0",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Periodic Muted",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 410,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "ddd4eee5fff6ggg7hh8",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Countdown",
+        "path": "electrical.switches.navigationLights.periodicCountdown",
+        "period": 1000,
+        "x": 170,
+        "y": 1220,
+        "wires": [
+            [
+                "o1p2q3r4s5t6u7v8"
+            ]
+        ]
+    },
+    {
+        "id": "o1p2q3r4s5t6u7v8",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Countdown (s)",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "iii9jjj0kkk1lll2mm3",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Masthead Light",
+        "path": "electrical.switches.navigationLights.lights.mastheadLight",
+        "period": 1000,
+        "x": 180,
+        "y": 1280,
+        "wires": [
+            [
+                "w9x0y1z2a3b4c5d6"
+            ]
+        ]
+    },
+    {
+        "id": "w9x0y1z2a3b4c5d6",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 Masthead",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "nnn4ooo5ppp6qqq7rr8",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Port Sidelight",
+        "path": "electrical.switches.navigationLights.lights.portSidelight",
+        "period": 1000,
+        "x": 180,
+        "y": 1320,
+        "wires": [
+            [
+                "e7f8g9h0i1j2k3l4"
+            ]
+        ]
+    },
+    {
+        "id": "e7f8g9h0i1j2k3l4",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 Port (Red)",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "sss9ttt0uuu1vvv2ww3",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Starboard Sidelight",
+        "path": "electrical.switches.navigationLights.lights.starboardSidelight",
+        "period": 1000,
+        "x": 190,
+        "y": 1360,
+        "wires": [
+            [
+                "m5n6o7p8q9r0s1t2"
+            ]
+        ]
+    },
+    {
+        "id": "m5n6o7p8q9r0s1t2",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 Starboard (Green)",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 430,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "xxx4yyy5zzz6aaaa7bb8",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Sternlight",
+        "path": "electrical.switches.navigationLights.lights.sternlight",
+        "period": 1000,
+        "x": 160,
+        "y": 1400,
+        "wires": [
+            [
+                "u3v4w5x6y7z8a9b0"
+            ]
+        ]
+    },
+    {
+        "id": "u3v4w5x6y7z8a9b0",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 Stern",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 380,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "cccc9dddd0eeee1ff2",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: All-Round White",
+        "path": "electrical.switches.navigationLights.lights.allroundWhite",
+        "period": 1000,
+        "x": 190,
+        "y": 1440,
+        "wires": [
+            [
+                "c1d2e3f4g5h6i7j8"
+            ]
+        ]
+    },
+    {
+        "id": "c1d2e3f4g5h6i7j8",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 All-Round White",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 420,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "gggg3hhhh4iiii5jj6",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: All-Round Red Upper",
+        "path": "electrical.switches.navigationLights.lights.allroundRedUpper",
+        "period": 1000,
+        "x": 200,
+        "y": 1480,
+        "wires": [
+            [
+                "k9l0m1n2o3p4q5r6"
+            ]
+        ]
+    },
+    {
+        "id": "k9l0m1n2o3p4q5r6",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 All-Round Red Upper",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 430,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "kkkk7llll8mmmm9nn0",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: All-Round Red Lower",
+        "path": "electrical.switches.navigationLights.lights.allroundRedLower",
+        "period": 1000,
+        "x": 200,
+        "y": 1520,
+        "wires": [
+            [
+                "s7t8u9v0w1x2y3z4"
+            ]
+        ]
+    },
+    {
+        "id": "s7t8u9v0w1x2y3z4",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💡 All-Round Red Lower",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 430,
+        "y": 1520,
+        "wires": []
+    },
+    {
+        "id": "oooo1pppp2qqqq3rr4",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Horn Active",
+        "path": "electrical.switches.navigationLights.horn.active",
+        "period": 100,
+        "x": 170,
+        "y": 1560,
+        "wires": [
+            [
+                "aa5bb6cc7dd8ee9ff0"
+            ]
+        ]
+    },
+    {
+        "id": "aa5bb6cc7dd8ee9ff0",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "📢 Horn Active",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "ssss5tttt6uuuu7vv8",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: Heartbeat",
+        "path": "electrical.switches.navigationLights.heartbeat",
+        "period": 1000,
+        "x": 160,
+        "y": 1600,
+        "wires": [
+            [
+                "gg1hh2ii3jj4kk5ll6"
+            ]
+        ]
+    },
+    {
+        "id": "gg1hh2ii3jj4kk5ll6",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "💓 Heartbeat",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1600,
+        "wires": []
+    },
+    {
+        "id": "0ef60adc19e07b73",
+        "type": "signalk-send-pathvalue",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "",
+        "path": "",
+        "source": "",
+        "meta": "",
+        "x": 610,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "41e794fb29b55b30",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "cc4b5c9844ca9b65",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@signalk/node-red-embedded": "2.18.2"
+        }
+    }
+]

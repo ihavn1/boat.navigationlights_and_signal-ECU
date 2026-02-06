@@ -7,14 +7,22 @@
  * - Outputs: Publish current state, countdown, mute status to SignalK server
  * 
  * SignalK Paths (following official specification):
- * - electrical.switches.navigationLights.condition - String: day/hours_of_darkness/restricted_visibility
- * - electrical.switches.navigationLights.boatState - String: moored/underway_making_way/underway_no_way/anchorage/nuc_making_way/nuc_no_way
- * - electrical.switches.navigationLights.periodicMuted - bool
+ * 
+ * COMMAND PATHS (PUT requests to ECU):
+ * - electrical.switches.navigationLights.command.condition - String: day/hours_of_darkness/restricted_visibility
+ * - electrical.switches.navigationLights.command.boatState - String: moored/underway_making_way/underway_no_way/anchorage/nuc_making_way/nuc_no_way
+ * - electrical.switches.navigationLights.command.periodicMuted - bool
+ * - electrical.switches.navigationLights.command.adHocSignal - String for triggering signals
+ * - electrical.switches.navigationLights.command.emergencyStop - bool (write-only trigger)
+ * 
+ * STATUS PATHS (ECU publishes state):
+ * - electrical.switches.navigationLights.condition - String: current condition
+ * - electrical.switches.navigationLights.boatState - String: current boat state
+ * - electrical.switches.navigationLights.periodicMuted - bool: current mute status
  * - electrical.switches.navigationLights.periodicCountdown - int (seconds)
  * - electrical.switches.navigationLights.lights.* - bool per light
  * - electrical.switches.navigationLights.horn.active - bool
- * - electrical.switches.navigationLights.adHocSignal - String for triggering signals
- * - electrical.switches.navigationLights.emergencyStop - bool (write-only trigger)
+ * - electrical.switches.navigationLights.heartbeat - int
  */
 
 #ifndef SIGNALK_INTEGRATION_H

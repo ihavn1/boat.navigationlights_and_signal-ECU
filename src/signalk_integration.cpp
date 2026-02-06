@@ -200,7 +200,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
       NavigationLightsECU* ecu;
     };
     auto* condition_listener = new StringSKPutRequestListener(
-        String(SK_PATH_PREFIX) + ".condition"
+        String(SK_PATH_PREFIX) + ".command.condition"
     );
     condition_listener->connect_to(new ConditionConsumer(&ecu));
 
@@ -216,7 +216,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
       NavigationLightsECU* ecu;
     };
     auto* boat_state_listener = new StringSKPutRequestListener(
-        String(SK_PATH_PREFIX) + ".boatState"
+        String(SK_PATH_PREFIX) + ".command.boatState"
     );
     boat_state_listener->connect_to(new BoatStateConsumer(&ecu));
 
@@ -235,7 +235,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
       NavigationLightsECU* ecu;
     };
     auto* mute_listener = new BoolSKPutRequestListener(
-        String(SK_PATH_PREFIX) + ".periodicMuted"
+        String(SK_PATH_PREFIX) + ".command.periodicMuted"
     );
     mute_listener->connect_to(new MuteConsumer(&ecu));
 
@@ -251,7 +251,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
       NavigationLightsECU* ecu;
     };
     auto* adhoc_listener = new StringSKPutRequestListener(
-        String(SK_PATH_PREFIX) + ".adHocSignal"
+        String(SK_PATH_PREFIX) + ".command.adHocSignal"
     );
     adhoc_listener->connect_to(new AdHocSignalConsumer(&ecu));
 
@@ -268,7 +268,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
       NavigationLightsECU* ecu;
     };
     auto* emergency_listener = new BoolSKPutRequestListener(
-        String(SK_PATH_PREFIX) + ".emergencyStop"
+        String(SK_PATH_PREFIX) + ".command.emergencyStop"
     );
     emergency_listener->connect_to(new EmergencyStopConsumer(&ecu));
 

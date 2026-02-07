@@ -137,9 +137,40 @@ void SoundController::onPeriodicTimerExpired() {
 }
 
 void SoundController::playPeriodicSignal() {
-    // Simplified implementation: just sound short blast for now
-    // Full implementation would play the complete pattern
-    playShortBlast();
+    std::vector<BlastStep> sequence;
+    
+    switch (current_periodic_pattern_) {
+        case SoundSignalPattern::NONE:
+            return; // No signal to play
+            
+        case SoundSignalPattern::PROLONGED_2MIN:
+            // ▬▬ - 1 prolonged blast (Rule 35: underway making no way, restricted visibility)
+            sequence = {{true}};
+            Serial.println("[HORN] Periodic: 1 prolonged blast");
+            break;
+            
+        case SoundSignalPattern::PROLONGED_PROLONGED_2MIN:
+            // ▬▬ ▬▬ - 2 prolonged blasts (Rule 35: underway making way, restricted visibility)
+            sequence = {{true}, {true}};
+            Serial.println("[HORN] Periodic: 2 prolonged blasts");
+            break;
+            
+        case SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN:
+            // ▬▬ ● ● - 1 prolonged + 2 short blasts (Rule 35: NUC, restricted visibility)
+            sequence = {{true}, {false}, {false}};
+            Serial.println("[HORN] Periodic: 1 prolonged + 2 short blasts");
+            break;
+            
+        case SoundSignalPattern::SHORT_PROLONGED_SHORT:
+            // ● ▬▬ ● - Short, prolonged, short (Rule 35: anchorage warning)
+            sequence = {{false}, {true}, {false}};
+            Serial.println("[HORN] Periodic: Short-Prolonged-Short");
+            break;
+    }
+    
+    if (!sequence.empty()) {
+        playSequence(sequence);
+    }
 }
 
 void SoundController::playAdHocPattern(AdHocSignal signal) {

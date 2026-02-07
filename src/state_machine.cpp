@@ -127,9 +127,12 @@ SoundSignalPattern StateMachine::computeSignalForRestrictedVisibility() const {
             return SoundSignalPattern::NONE;
             
         case BoatState::UNDERWAY_NO_WAY:
-        case BoatState::UNDERWAY_MAKING_WAY:
-            // Rule 35(a) and (c): Power-driven vessel - 2 prolonged blasts every 2min
+            // Rule 35(b): Power-driven vessel underway but stopped (making no way) - 2 prolonged blasts every 2min
             return SoundSignalPattern::PROLONGED_PROLONGED_2MIN;
+            
+        case BoatState::UNDERWAY_MAKING_WAY:
+            // Rule 35(a): Power-driven vessel making way through the water - 1 prolonged blast every 2min
+            return SoundSignalPattern::PROLONGED_2MIN;
             
         case BoatState::ANCHORAGE:
             // Rule 35(g): Anchored vessel - rapid bell ringing
@@ -149,6 +152,7 @@ uint16_t StateMachine::getPeriodicSignalIntervalSeconds() const {
     SoundSignalPattern pattern = getPeriodicSoundSignal();
     
     switch (pattern) {
+        case SoundSignalPattern::PROLONGED_2MIN:
         case SoundSignalPattern::PROLONGED_PROLONGED_2MIN:
         case SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN:
             return 120; // 2 minutes
@@ -199,6 +203,7 @@ const char* boatStateToString(BoatState state) {
 const char* soundSignalPatternToString(SoundSignalPattern pattern) {
     switch (pattern) {
         case SoundSignalPattern::NONE: return "None";
+        case SoundSignalPattern::PROLONGED_2MIN: return "▬▬ / 2min";
         case SoundSignalPattern::PROLONGED_PROLONGED_2MIN: return "▬▬ ▬▬ / 2min";
         case SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN: return "▬▬ ● ● / 2min";
         case SoundSignalPattern::SHORT_PROLONGED_SHORT: return "● ▬▬ ●";

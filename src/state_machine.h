@@ -65,9 +65,10 @@ struct LightConfiguration {
  */
 enum class SoundSignalPattern : uint8_t {
     NONE = 0,                          // No periodic signal
-    PROLONGED_PROLONGED_2MIN = 1,      // ▬▬ ▬▬ every 2 minutes (underway no way, restricted visibility)
-    PROLONGED_SHORT_SHORT_2MIN = 2,    // ▬▬ ● ● every 2 minutes (NUC, restricted visibility)
-    SHORT_PROLONGED_SHORT = 3          // ● ▬▬ ● (anchorage warning, restricted visibility)
+    PROLONGED_2MIN = 1,                // ▬▬ every 2 minutes (underway making no way, restricted visibility)
+    PROLONGED_PROLONGED_2MIN = 2,      // ▬▬ ▬▬ every 2 minutes (underway making way, restricted visibility)
+    PROLONGED_SHORT_SHORT_2MIN = 3,    // ▬▬ ● ● every 2 minutes (NUC, restricted visibility)
+    SHORT_PROLONGED_SHORT = 4          // ● ▬▬ ● (anchorage warning, restricted visibility)
 };
 
 /**

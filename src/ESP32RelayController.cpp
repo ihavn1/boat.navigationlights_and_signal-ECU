@@ -38,15 +38,18 @@ bool ESP32RelayController::begin() {
     for (int i = 0; i < 8; i++) {
         pinMode(pin_map_[i], OUTPUT);
         digitalWrite(pin_map_[i], LOW); // Ensure all relays OFF
+        delay(10); // Small delay to ensure pin stabilizes
     }
 #else
     // Production active-low mode: HIGH = OFF
     for (int i = 0; i < 8; i++) {
         pinMode(pin_map_[i], OUTPUT);
         digitalWrite(pin_map_[i], HIGH); // Ensure all relays OFF
+        delay(10); // Small delay to ensure pin stabilizes
     }
 #endif
     
+    Serial.println("[RelayController] All relay pins initialized");
     return true;
 }
 

@@ -46,7 +46,7 @@ The rules for lantern use and signaling are summarized in the table below.
 |  | ***Making no way*** | ***Making way*** | ***Making no way*** | ***Making way*** |  |  |
 | **Daylight** | Nothing | Nothing | ⬤⬤ (Two black balls) | ⬤⬤(Two black balls) | Nothing | ⬤(One black ball) |
 | **Hours of darkness** | Sidelights,Sternlight,Masthead light | Sidelights,Sternlight,Masthead light | ⬤⬤ Two all-round red lights in a vertical line | ⬤⬤ Two all-round red lights in a vertical line Sidelights,Sternlight | Nothing | All-round white light |
-| **Restricted visibility** | Sidelights, Sternlight, Masthead light Sound signal: ▬▬/2min | Sidelights, Sternlight, Masthead light Sound signal: ▬▬ ▬▬/2 min | Sidelights,Sternlight ⬤⬤Two all-round red lights in a vertical line  Sound signal: ▬▬ ●● | ⬤⬤Two all-round red lights in a vertical line Sound signal:▬▬ ●● | Nothing | All-round white lightSound signal: ● ▬▬ ● (Warning) |
+| **Restricted visibility** | Sidelights, Sternlight, Masthead light Sound signal: ▬▬ ▬▬/2 min (Rule 35b) | Sidelights, Sternlight, Masthead light Sound signal: ▬▬/2min (Rule 35a) | Sidelights,Sternlight ⬤⬤Two all-round red lights in a vertical line  Sound signal: ▬▬ ●● (Rule 35c) | ⬤⬤Two all-round red lights in a vertical line Sound signal:▬▬ ●● (Rule 35c) | Nothing | All-round white lightSound signal: ● ▬▬ ● (Warning) |
 
 **Explanation of the different lights:**
 

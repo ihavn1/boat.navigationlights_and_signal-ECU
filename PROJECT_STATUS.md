@@ -121,18 +121,32 @@ Both UIs control the same underlying controllers.
 
 ## GPIO Pin Mapping
 
-| GPIO | Function | Relay Channel |
-|------|----------|---------------|
-| 25 | Masthead Light | 1 |
-| 26 | Port Sidelight | 2 |
-| 27 | Starboard Sidelight | 3 |
-| 14 | Sternlight | 4 |
-| 12 | All-round White | 5 |
-| 13 | All-round Red Upper | 6 |
-| 15 | All-round Red Lower | 7 |
-| 4 | Horn | 8 |
+### Relay Output Pins
+| GPIO | Function | Relay CH | COLREGs Rule | Active-LOW* | Active-HIGH** |
+|------|----------|----------|--------------|-------------|---------------|
+| **25** | Masthead Light | 1 | Rule 23 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **26** | Port Sidelight | 2 | Rule 21 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **27** | Starboard Sidelight | 3 | Rule 21 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **14** | Sternlight | 4 | Rule 21 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **12** | All-round White | 5 | Rule 30 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **13** | All-round Red Upper | 6 | Rule 27 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **15** | All-round Red Lower | 7 | Rule 27 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
+| **4** | Horn | 8 | Rule 35 | LOW=ON, HIGH=OFF | HIGH=ON, LOW=OFF |
 
-*Note: Active-low control (LOW = relay ON, HIGH = relay OFF)*
+*Production mode (default) - opto-isolated relay module  
+**Testing mode - set `ACTIVE_HIGH_RELAYS` in platformio.ini*
+
+### System Pins (Reserved)
+- **GPIO 2**: Built-in LED (SensESP status blink)
+- **GPIO 0**: BOOT button (do not use)
+- **GPIO 1/3**: UART TX/RX (Serial console)
+- **GPIO 6-11**: Internal SPI flash (never use)
+
+### Network Configuration
+- **WiFi**: Configurable via web portal (no hardcoded SSID)
+- **DHCP Range**: 10.100.100.100 - 10.100.100.250
+- **SignalK Server**: Configurable via web portal (no hardcoded IP)
+- **Hostname**: nav-lights-ecu.local
 
 ## Next Steps
 

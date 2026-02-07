@@ -84,6 +84,7 @@ pio test -e native && pio test -e esp32test
 - ✅ Safe defaults (Day, Moored, all lights OFF)
 
 ## Documentation
+- [HARDWARE.md](HARDWARE.md) - **Complete GPIO pin mapping, wiring, and hardware guide**
 - [PROJECT_STATUS.md](PROJECT_STATUS.md) - Overall project status
 - [PHASE4_STATUS.md](PHASE4_STATUS.md) - SignalK integration details
 - [TEST_RESULTS.md](TEST_RESULTS.md) - Complete test documentation
@@ -91,10 +92,61 @@ pio test -e native && pio test -e esp32test
 - [Project Proposal Navigation Lights and Signaling ECU.md](Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md) - COLREGs requirements
 
 ## Hardware
-- **MCU**: AZ-Delivery ESP32 Dev Kit C V4 (ESP32-D0WD-V3, 240MHz, 520KB RAM, 4MB Flash)
-- **Relays**: 8-channel opto-isolated module (active-low control)
-- **Outputs**: 
-  - Navigation lights (masthead, port sidelight, starboard sidelight, sternlight)
-  - Special lights (all-round white, 2× all-round red for NUC)
-  - Sound signal (horn)
-- **Communication**: WiFi (SignalK via SensESP), optional BLE (future)
+
+### MCU Specifications
+- **Board**: AZ-Delivery ESP32 Dev Kit C V4
+- **Chip**: ESP32-D0WD-V3 (Dual-core Xtensa LX6)
+- **Clock**: 240 MHz
+- **RAM**: 520 KB SRAM
+- **Flash**: 4 MB
+- **WiFi**: 802.11 b/g/n (built-in, 2.4 GHz)
+- **Bluetooth**: BLE 4.2 (optional future use)
+
+### GPIO Pin Mapping
+
+#### Relay Outputs (8 channels)
+| GPIO | Function | Relay | COLREGs Purpose | Polarity |
+|------|----------|-------|-----------------|----------|
+| **GPIO 25** | Masthead Light | CH1 | Rule 23 - Power-driven vessel | Active-LOW* |
+| **GPIO 26** | Port Sidelight | CH2 | Rule 21 - Red (port side) | Active-LOW* |
+| **GPIO 27** | Starboard Sidelight | CH3 | Rule 21 - Green (starboard) | Active-LOW* |
+| **GPIO 14** | Sternlight | CH4 | Rule 21 - White (aft) | Active-LOW* |
+| **GPIO 12** | All-round White | CH5 | Rule 30 - Anchorage | Active-LOW* |
+| **GPIO 13** | All-round Red Upper | CH6 | Rule 27 - NUC (upper) | Active-LOW* |
+| **GPIO 15** | All-round Red Lower | CH7 | Rule 27 - NUC (lower) | Active-LOW* |
+| **GPIO 4** | Horn | CH8 | Rule 35 - Sound signals | Active-LOW* |
+
+**Active-LOW** = Production mode (HIGH=OFF, LOW=ON) for opto-isolated relay safety  
+*Set `ACTIVE_HIGH_RELAYS` in [platformio.ini](platformio.ini) for testing with active-HIGH hardware*
+
+#### System Pins (Automatic)
+| GPIO | Function | Used By | Notes |
+|------|----------|---------|-------|
+| **GPIO 2** | Built-in LED | SensESP | Blinks when sending SignalK data |
+| **WiFi** | 802.11 b/g/n | SensESP | SignalK communication (10.100.100.x) |
+
+#### Reserved/Unavailable Pins
+*Do NOT use these GPIOs - they cause boot issues or are internally connected:*
+- **GPIO 0**: BOOT button (must be HIGH at boot)
+- **GPIO 1**: UART0 TX (Serial debug output)
+- **GPIO 3**: UART0 RX (Serial debug input)  
+- **GPIO 5**: Strapping pin (boot mode selection)
+- **GPIO 6-11**: Connected to internal SPI flash (DO NOT USE)
+
+### Relay Module
+- **Type**: 8-channel opto-isolated relay module
+- **Control Logic**: Active-LOW (production) / Active-HIGH (testing)
+- **Safety**: All relays OFF on power-up, boot, or crash
+- **Switching**: Minimized - only changes on state transitions
+
+### Outputs
+- **Navigation Lights**: Masthead, port sidelight, starboard sidelight, sternlight
+- **Special Lights**: All-round white (anchorage), 2× all-round red (NUC - Not Under Command)
+- **Sound Signal**: Horn/buzzer for COLREGs sound patterns
+
+### Communication
+- **Primary**: WiFi (SignalK server via SensESP framework)
+- **Network**: DHCP (10.100.100.100-250 range)
+- **Hostname**: `nav-lights-ecu.local` (mDNS)
+- **Web UI**: Configuration portal for WiFi and SignalK server settings
+- **Future**: BLE fallback UI when WiFi unavailable

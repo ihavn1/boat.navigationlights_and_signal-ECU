@@ -121,7 +121,8 @@ Each condition+state combination maps to specific light configurations and perio
 - BLE service should mirror SignalK control surface (condition, state, signals)
 
 ## Key Files & References
-- [Project Proposal Navigation Lights and Signaling ECU.md](Project Proposal Navigation Lights and Signaling ECU.md) - Complete COLREGs tables, signal definitions, and requirements
+- [HARDWARE.md](../HARDWARE.md) - **Complete GPIO pin mapping, reserved pins, wiring diagrams**
+- [Project Proposal Navigation Lights and Signaling ECU.md](../Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md) - Complete COLREGs tables, signal definitions, and requirements
 - Platform docs: SensESP GitHub repo, ESP32 Arduino core docs
 - COLREGs reference: Convention on International Regulations for Preventing Collisions at Sea, 1972
 

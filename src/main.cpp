@@ -14,6 +14,11 @@
  * - GPIO 13: All-round Red Upper (Relay 6)
  * - GPIO 15: All-round Red Lower (Relay 7)
  * - GPIO 4: Horn (Relay 8)
+ * 
+ * Active-LOW control (production): HIGH=OFF, LOW=ON
+ * Active-HIGH testing mode: Set ACTIVE_HIGH_RELAYS in platformio.ini
+ * 
+ * See HARDWARE.md for complete pin mapping, reserved pins, and wiring diagrams.
  */
 
 #include <Arduino.h>

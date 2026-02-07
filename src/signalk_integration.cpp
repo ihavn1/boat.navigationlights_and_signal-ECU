@@ -193,13 +193,14 @@ void setupSignalK(NavigationLightsECU& ecu) {
      public:
       ConditionConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr) {}
       void set(const String& value) override {
+        Serial.printf("[PUT] Condition received: %s\n", value.c_str());
         Condition new_condition = sk_stringToCondition(value);
         ecu->setCondition(new_condition);
       }
      private:
       NavigationLightsECU* ecu;
     };
-    auto* condition_listener = new StringSKPutRequestListener(
+    auto* condition_listener = new SKValueListener<String>(
         String(SK_PATH_PREFIX) + ".command.condition"
     );
     condition_listener->connect_to(new ConditionConsumer(&ecu));
@@ -209,13 +210,14 @@ void setupSignalK(NavigationLightsECU& ecu) {
      public:
       BoatStateConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr) {}
       void set(const String& value) override {
+        Serial.printf("[PUT] BoatState received: %s\n", value.c_str());
         BoatState new_state = sk_stringToBoatState(value);
         ecu->setBoatState(new_state);
       }
      private:
       NavigationLightsECU* ecu;
     };
-    auto* boat_state_listener = new StringSKPutRequestListener(
+    auto* boat_state_listener = new SKValueListener<String>(
         String(SK_PATH_PREFIX) + ".command.boatState"
     );
     boat_state_listener->connect_to(new BoatStateConsumer(&ecu));
@@ -225,6 +227,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
      public:
       MuteConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr) {}
       void set(const bool& value) override {
+        Serial.printf("[PUT] PeriodicMuted received: %s\n", value ? "true" : "false");
         if (value) {
             ecu->mutePeriodicSignals();
         } else {
@@ -234,7 +237,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
      private:
       NavigationLightsECU* ecu;
     };
-    auto* mute_listener = new BoolSKPutRequestListener(
+    auto* mute_listener = new SKValueListener<bool>(
         String(SK_PATH_PREFIX) + ".command.periodicMuted"
     );
     mute_listener->connect_to(new MuteConsumer(&ecu));
@@ -242,15 +245,25 @@ void setupSignalK(NavigationLightsECU& ecu) {
     // Ad-hoc signal listener
     class AdHocSignalConsumer : public ValueConsumer<String> {
      public:
-      AdHocSignalConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr) {}
+      AdHocSignalConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr), first_value_received(false) {}
       void set(const String& value) override {
+        // Ignore first value (initial state from server on boot)
+        // Ad-hoc signals should only trigger on active commands, not stale state
+        if (!first_value_received) {
+          first_value_received = true;
+          Serial.printf("[PUT] AdHocSignal initial value ignored: %s\n", value.c_str());
+          return;
+        }
+        
+        Serial.printf("[PUT] AdHocSignal received: %s\n", value.c_str());
         AdHocSignal signal = sk_stringToAdHocSignal(value);
         ecu->triggerAdHocSignal(signal);
       }
      private:
       NavigationLightsECU* ecu;
+      bool first_value_received;
     };
-    auto* adhoc_listener = new StringSKPutRequestListener(
+    auto* adhoc_listener = new SKValueListener<String>(
         String(SK_PATH_PREFIX) + ".command.adHocSignal"
     );
     adhoc_listener->connect_to(new AdHocSignalConsumer(&ecu));
@@ -258,16 +271,25 @@ void setupSignalK(NavigationLightsECU& ecu) {
     // Emergency stop listener
     class EmergencyStopConsumer : public ValueConsumer<bool> {
      public:
-      EmergencyStopConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr) {}
+      EmergencyStopConsumer(NavigationLightsECU* ecu_ptr) : ecu(ecu_ptr), first_value_received(false) {}
       void set(const bool& value) override {
+        // Ignore first value (initial state from server on boot)
+        if (!first_value_received) {
+          first_value_received = true;
+          Serial.printf("[PUT] EmergencyStop initial value ignored: %s\n", value ? "true" : "false");
+          return;
+        }
+        
+        Serial.printf("[PUT] EmergencyStop received: %s\n", value ? "true" : "false");
         if (value) {
             ecu->emergencyStop();
         }
       }
      private:
       NavigationLightsECU* ecu;
+      bool first_value_received;
     };
-    auto* emergency_listener = new BoolSKPutRequestListener(
+    auto* emergency_listener = new SKValueListener<bool>(
         String(SK_PATH_PREFIX) + ".command.emergencyStop"
     );
     emergency_listener->connect_to(new EmergencyStopConsumer(&ecu));

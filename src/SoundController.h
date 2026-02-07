@@ -15,6 +15,7 @@
 #include "interfaces/ITimer.h"
 #include "state_machine.h"
 #include <functional>
+#include <vector>
 
 // COLREGs blast durations (milliseconds)
 constexpr uint32_t SHORT_BLAST_MS = 1000;      // ~1 second (Rule 32)
@@ -129,6 +130,16 @@ private:
     // Signal playback state
     bool signal_in_progress_;
     
+    // Sequence playback for ad-hoc signals
+    struct BlastStep {
+        bool is_prolonged;  // true = prolonged, false = short
+    };
+    std::vector<BlastStep> current_sequence_;
+    size_t sequence_index_;
+    uint32_t sequence_timer_id_;
+    bool sequence_horn_active_;  // true = playing blast, false = in pause
+    uint32_t sequence_state_start_ms_;
+    
     // Horn control helpers
     void startHorn();
     void stopHorn();
@@ -138,6 +149,10 @@ private:
     void playAdHocPattern(AdHocSignal signal);
     void playShortBlast();
     void playProlongedBlast();
+    
+    // Sequence playback
+    void playSequence(const std::vector<BlastStep>& sequence);
+    void updateSequencePlayback();
     
     // Timing helpers
     void scheduleNextPeriodicSignal();

@@ -3,12 +3,12 @@
  * @brief SignalK integration for Navigation Lights ECU (SensESP v3 API)
  * 
  * Implements bidirectional communication:
- * - Inputs: Receive condition, boat state, signal commands from SignalK server via PUT requests
+ * - Inputs: Subscribe to condition, boat state, signal commands from SignalK server (delta updates)
  * - Outputs: Publish current state, countdown, mute status to SignalK server
  * 
  * SignalK Paths (following official specification):
  * 
- * COMMAND PATHS (PUT requests to ECU):
+ * COMMAND PATHS (ECU subscribes to delta updates from SignalK server):
  * - electrical.switches.navigationLights.command.condition - String: day/hours_of_darkness/restricted_visibility
  * - electrical.switches.navigationLights.command.boatState - String: moored/underway_making_way/underway_no_way/anchorage/nuc_making_way/nuc_no_way
  * - electrical.switches.navigationLights.command.periodicMuted - bool
@@ -29,7 +29,7 @@
 #define SIGNALK_INTEGRATION_H
 
 #include "sensesp/signalk/signalk_output.h"
-#include "sensesp/signalk/signalk_put_request_listener.h"
+#include "sensesp/signalk/signalk_value_listener.h"
 #include "NavigationLightsECU.h"
 
 // SignalK path prefix

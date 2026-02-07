@@ -4,6 +4,7 @@
  */
 
 #include "SoundController.h"
+#include <Arduino.h>
 
 SoundController::SoundController(IRelayController& relay_controller, ITimer& timer)
     : relay_controller_(relay_controller),
@@ -13,7 +14,11 @@ SoundController::SoundController(IRelayController& relay_controller, ITimer& tim
       periodic_muted_(true), // Safety: always start muted
       periodic_timer_id_(0),
       last_periodic_start_ms_(0),
-      signal_in_progress_(false) {
+      signal_in_progress_(false),
+      sequence_index_(0),
+      sequence_timer_id_(0),
+      sequence_horn_active_(false),
+      sequence_state_start_ms_(0) {
 }
 
 SoundController::~SoundController() {
@@ -23,6 +28,11 @@ SoundController::~SoundController() {
 
 void SoundController::update() {
     timer_.update();
+    
+    // Update sequence playback if active
+    if (signal_in_progress_ && !current_sequence_.empty()) {
+        updateSequencePlayback();
+    }
 }
 
 void SoundController::setPeriodicSignal(SoundSignalPattern pattern, uint16_t interval_seconds) {
@@ -68,9 +78,12 @@ uint16_t SoundController::getPeriodicCountdownSeconds() const {
 
 void SoundController::triggerAdHocSignal(AdHocSignal signal) {
     if (signal_in_progress_) {
+        Serial.println("[HORN] Signal already in progress, ignoring new trigger");
         return; // Don't interrupt ongoing signal
     }
     
+    // Set flag immediately to prevent race condition
+    signal_in_progress_ = true;
     playAdHocPattern(signal);
 }
 
@@ -93,10 +106,12 @@ bool SoundController::isHornActive() const {
 // =============================================================================
 
 void SoundController::startHorn() {
+    Serial.println("[HORN] Horn STARTED");
     relay_controller_.activate(RelayChannel::HORN);
 }
 
 void SoundController::stopHorn() {
+    Serial.println("[HORN] Horn STOPPED");
     relay_controller_.deactivate(RelayChannel::HORN);
 }
 
@@ -128,9 +143,45 @@ void SoundController::playPeriodicSignal() {
 }
 
 void SoundController::playAdHocPattern(AdHocSignal signal) {
-    // Simplified implementation: just sound short blast for now
-    // Full implementation would play complete patterns (multiple blasts with pauses)
-    playShortBlast();
+    std::vector<BlastStep> sequence;
+    
+    switch (signal) {
+        case AdHocSignal::TURN_STARBOARD:
+            // ● - 1 short blast
+            sequence = {{false}};
+            break;
+        case AdHocSignal::TURN_PORT:
+            // ●● - 2 short blasts
+            sequence = {{false}, {false}};
+            break;
+        case AdHocSignal::ASTERN_PROPULSION:
+            // ●●● - 3 short blasts
+            sequence = {{false}, {false}, {false}};
+            break;
+        case AdHocSignal::DANGER_CONFUSION:
+            // ●●●●● - 5 short blasts
+            sequence = {{false}, {false}, {false}, {false}, {false}};
+            break;
+        case AdHocSignal::PAY_ATTENTION:
+            // ▬ - 1 prolonged blast (vessel approaching bend/obstruction)
+            sequence = {{true}};
+            break;
+        case AdHocSignal::OVERTAKE_STARBOARD:
+            // ▬ ▬ ● - 2 prolonged + 1 short (Rule 34(c)(i))
+            sequence = {{true}, {true}, {false}};
+            break;
+        case AdHocSignal::OVERTAKE_PORT:
+            // ▬ ▬ ●● - 2 prolonged + 2 short (Rule 34(c)(ii))
+            sequence = {{true}, {true}, {false}, {false}};
+            break;
+        case AdHocSignal::AGREEMENT_OVERTAKEN:
+            // ▬ ● ▬ ● - prolonged, short, prolonged, short (Rule 34(c))
+            sequence = {{true}, {false}, {true}, {false}};
+            break;
+    }
+    
+    Serial.printf("[HORN] Playing ad-hoc signal with %d blasts\n", sequence.size());
+    playSequence(sequence);
 }
 
 void SoundController::playShortBlast() {
@@ -151,4 +202,85 @@ void SoundController::playProlongedBlast() {
         this->stopHorn();
         this->signal_in_progress_ = false;
     });
+}
+
+void SoundController::playSequence(const std::vector<BlastStep>& sequence) {
+    if (sequence.empty()) {
+        return;
+    }
+    
+    current_sequence_ = sequence;
+    sequence_index_ = 0;
+    signal_in_progress_ = true;
+    sequence_state_start_ms_ = timer_.millis();
+    
+    // Start first blast immediately
+    bool is_prolonged = current_sequence_[0].is_prolonged;
+    Serial.printf("[HORN] Playing blast 1/%d (%s)\n", 
+                  sequence.size(),
+                  is_prolonged ? "prolonged" : "short");
+    startHorn();
+    sequence_horn_active_ = true;
+}
+
+void SoundController::updateSequencePlayback() {
+    if (current_sequence_.empty()) {
+        // Safety check - shouldn't happen
+        if (sequence_horn_active_) {
+            stopHorn();
+        }
+        signal_in_progress_ = false;
+        sequence_horn_active_ = false;
+        return;
+    }
+    
+    uint32_t elapsed = timer_.millis() - sequence_state_start_ms_;
+    
+    if (sequence_horn_active_) {
+        // Currently playing a blast - check if it should end
+        bool is_prolonged = current_sequence_[sequence_index_].is_prolonged;
+        uint32_t blast_duration = is_prolonged ? PROLONGED_BLAST_MS : SHORT_BLAST_MS;
+        
+        if (elapsed >= blast_duration) {
+            // Blast finished - stop horn
+            stopHorn();
+            sequence_horn_active_ = false;
+            sequence_state_start_ms_ = timer_.millis();
+            
+            // Move to next blast
+            sequence_index_++;
+            
+            // Check if sequence is complete
+            if (sequence_index_ >= current_sequence_.size()) {
+                signal_in_progress_ = false;
+                current_sequence_.clear();
+                sequence_index_ = 0;
+                Serial.println("[HORN] Sequence complete");
+            }
+        }
+    } else {
+        // Currently in pause between blasts
+        if (elapsed >= PAUSE_MS) {
+            // Check if we've played all blasts
+            if (sequence_index_ >= current_sequence_.size()) {
+                // All blasts complete
+                signal_in_progress_ = false;
+                current_sequence_.clear();
+                sequence_index_ = 0;
+                Serial.println("[HORN] Sequence complete");
+                return;
+            }
+            
+            // Start next blast (sequence_index was incremented after previous blast)
+            bool is_prolonged = current_sequence_[sequence_index_].is_prolonged;
+            Serial.printf("[HORN] Playing blast %d/%d (%s)\n", 
+                          sequence_index_ + 1, 
+                          current_sequence_.size(),
+                          is_prolonged ? "prolonged" : "short");
+            
+            startHorn();
+            sequence_horn_active_ = true;
+            sequence_state_start_ms_ = timer_.millis();
+        }
+    }
 }

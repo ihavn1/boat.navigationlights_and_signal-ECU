@@ -67,7 +67,6 @@ void setup() {
     SensESPAppBuilder builder;
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
-        ->set_sk_server("192.168.71.100", 3000)
         ->enable_ota("boat-ecu")
         ->get_app();
     

@@ -30,7 +30,9 @@
 
 using namespace sensesp;
 
-// GPIO pin definitions (active-low opto-isolated relay module)
+// GPIO pin definitions
+// Production: Active-LOW opto-isolated relay module (LOW=ON, HIGH=OFF)
+// Testing: Set ACTIVE_HIGH_RELAYS in platformio.ini for active-HIGH relays (HIGH=ON, LOW=OFF)
 const uint8_t PIN_MASTHEAD_LIGHT = 25;
 const uint8_t PIN_PORT_SIDELIGHT = 26;
 const uint8_t PIN_STARBOARD_SIDELIGHT = 27;
@@ -61,6 +63,11 @@ void setup() {
     Serial.println("========================================");
     Serial.println("Navigation Lights & Signal ECU");
     Serial.println("Version 1.0.0 - Production");
+#ifdef ACTIVE_HIGH_RELAYS
+    Serial.println("Relay Mode: ACTIVE-HIGH (Testing)");
+#else
+    Serial.println("Relay Mode: ACTIVE-LOW (Production)");
+#endif
     Serial.println("========================================");
     
     // Initialize SensESP application

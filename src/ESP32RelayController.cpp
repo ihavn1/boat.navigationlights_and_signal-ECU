@@ -31,12 +31,21 @@ ESP32RelayController::ESP32RelayController(
 }
 
 bool ESP32RelayController::begin() {
-    // SAFETY CRITICAL: Configure all GPIO pins as OUTPUT with HIGH state
-    // BEFORE relay module is powered up (active-low = HIGH is OFF)
+    // SAFETY CRITICAL: Configure all GPIO pins as OUTPUT with safe state
+    // BEFORE relay module is powered up
+#ifdef ACTIVE_HIGH_RELAYS
+    // Active-high mode for testing: LOW = OFF
+    for (int i = 0; i < 8; i++) {
+        pinMode(pin_map_[i], OUTPUT);
+        digitalWrite(pin_map_[i], LOW); // Ensure all relays OFF
+    }
+#else
+    // Production active-low mode: HIGH = OFF
     for (int i = 0; i < 8; i++) {
         pinMode(pin_map_[i], OUTPUT);
         digitalWrite(pin_map_[i], HIGH); // Ensure all relays OFF
     }
+#endif
     
     return true;
 }
@@ -45,7 +54,11 @@ void ESP32RelayController::activate(RelayChannel channel) {
     uint8_t pin = getPin(channel);
     uint8_t idx = getIndex(channel);
     
-    digitalWrite(pin, LOW); // Active-low: LOW = relay ON
+#ifdef ACTIVE_HIGH_RELAYS
+    digitalWrite(pin, HIGH); // Active-high: HIGH = relay ON
+#else
+    digitalWrite(pin, LOW);  // Active-low: LOW = relay ON
+#endif
     relay_states_[idx] = true;
 }
 
@@ -53,7 +66,11 @@ void ESP32RelayController::deactivate(RelayChannel channel) {
     uint8_t pin = getPin(channel);
     uint8_t idx = getIndex(channel);
     
+#ifdef ACTIVE_HIGH_RELAYS
+    digitalWrite(pin, LOW);  // Active-high: LOW = relay OFF
+#else
     digitalWrite(pin, HIGH); // Active-low: HIGH = relay OFF
+#endif
     relay_states_[idx] = false;
 }
 
@@ -63,10 +80,17 @@ bool ESP32RelayController::isActive(RelayChannel channel) const {
 
 void ESP32RelayController::deactivateAll() {
     // Emergency/safety function: turn off all relays immediately
+#ifdef ACTIVE_HIGH_RELAYS
+    for (int i = 0; i < 8; i++) {
+        digitalWrite(pin_map_[i], LOW); // Active-high: LOW = OFF
+        relay_states_[i] = false;
+    }
+#else
     for (int i = 0; i < 8; i++) {
         digitalWrite(pin_map_[i], HIGH); // Active-low: HIGH = OFF
         relay_states_[i] = false;
     }
+#endif
 }
 
 uint8_t ESP32RelayController::getPin(RelayChannel channel) const {

@@ -2,11 +2,12 @@
 
 ESP32-based controller for COLREGs-compliant navigation lights and sound signals on pleasure boats <15m. Integrated with SignalK for remote monitoring and control.
 
-## Status: ✅ Production Ready
+## Status: ✅ Code Complete - ⚠️ Hardware Integration Pending
 
-**Test Coverage**: 128 tests passing (114 native + 14 ESP32 embedded)  
+**Test Coverage**: 119 native tests passing, 14 ESP32 tests pending re-run  
 **Build**: Successful (71.8% flash, 9.4% RAM)  
-**Hardware**: Validated on ESP32 Dev Kit C V4  
+**Code Status**: Complete and validated via comprehensive unit tests  
+**Hardware Status**: Testing in progress (Phase 5)  
 **SignalK**: Full bidirectional integration with periodic updates
 
 ## Quick Start
@@ -25,10 +26,10 @@ pio device monitor
 
 ### Run Tests
 ```bash
-# Native tests (fast, ~8.5s)
+# Native tests (fast, ~7.8s)
 pio test -e native
 
-# ESP32 embedded tests (requires hardware, ~17.8s)
+# ESP32 embedded tests (requires hardware, ~17.8s) - pending re-run
 pio test -e esp32test
 
 # Run all tests
@@ -44,7 +45,7 @@ pio test -e native && pio test -e esp32test
 │   │   └── ITimer.h                # Timer interface
 │   ├── state_machine.cpp/.h        # COLREGs state management (✅ 20 tests)
 │   ├── LightController.cpp/.h      # Light relay control (✅ 9 tests)
-│   ├── SoundController.cpp/.h      # Horn/signal control (✅ 11 tests)
+│   ├── SoundController.cpp/.h      # Horn/signal control (✅ 16 tests)
 │   ├── NavigationLightsECU.cpp/.h  # ECU facade (✅ tested)
 │   ├── signalk_integration.cpp/.h  # SignalK layer (✅ 74 tests)
 │   ├── ESP32RelayController.cpp/.h # GPIO implementation
@@ -52,9 +53,9 @@ pio test -e native && pio test -e esp32test
 ├── test/
 │   ├── test_state_machine/         # 20 COLREGs tests
 │   ├── test_light_controller/      # 9 relay tests
-│   ├── test_sound_controller/      # 11 timing tests
+│   ├── test_sound_controller/      # 16 timing tests
 │   ├── test_signalk_integration/   # 74 SignalK tests
-│   └── test_signalk_esp32/         # 14 ESP32 hardware tests
+│   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
 ├── platformio.ini                  # Build configuration
 └── Project Proposal...md           # COLREGs requirements
 ```
@@ -81,7 +82,8 @@ pio test -e native && pio test -e esp32test
 ### Safety Features
 - ✅ Active-low relay control (OFF on boot/crash)
 - ✅ Periodic signals always start muted (unmute triggers immediate playback)
-- ✅ Emergency stop function
+- ✅ Ad-hoc signal queueing (prevents overlapping horn signals, auto-plays after 2s delay)
+- ✅ Emergency stop function (clears all queues and timers)
 - ✅ Safe defaults (Day, Moored, all lights OFF)
 
 ## Documentation

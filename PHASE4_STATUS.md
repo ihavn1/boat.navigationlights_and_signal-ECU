@@ -1,9 +1,9 @@
-# Phase 4 Status: SignalK Integration - COMPLETE ✅
+# Phase 4 Status: SignalK Integration - CODE COMPLETE ✅
 
-**Last Updated**: February 3, 2026  
-**Test Coverage**: 128 tests (114 native + 14 ESP32 embedded) - All Passing ✅  
+**Last Updated**: February 8, 2026  
+**Test Coverage**: 119 native tests passing (ESP32 embedded tests pending re-run)  
 **Build Status**: Successful (71.8% flash, 9.4% RAM)  
-**Hardware Validation**: Complete on ESP32 Dev Kit C V4
+**Hardware Validation**: Pending (Phase 5)
 
 ## Completed
 
@@ -44,7 +44,14 @@
   - ObservableValue→SKOutput connections ensure fresh data propagates to SignalK
 - **Reconnection Handling**: Auto-republishes all values 2s after SignalK connection/reconnection
 - **SignalK Paths**: Base path `electrical.switches.navigationLights.*`
-- **Test Coverage**: 74 native tests + 14 ESP32 embedded tests = 88 SignalK tests total
+- **Test Coverage**: 74 native tests (conversion, integration, edge cases)
+
+### 5. Recent Feature Additions ✅
+- **Ad-hoc Signal Queueing**: Single-queue system with 2-second delay after signal completion (prevents overlapping horn signals)
+- **Unmute Immediate Playback**: Signal plays immediately when unmuted, countdown resets to full interval
+- **Platform-Independent Debug Logging**: DEBUG_PRINT/PRINTLN/PRINTF macros with NATIVE_BUILD flag
+- **COLREGs Rule 35 Corrections**: Making way = 1 prolonged blast (Rule 35a), Stopped = 2 prolonged blasts (Rule 35b)
+- **Test Coverage Expanded**: 16 sound controller tests (was 11), comprehensive queueing and unmute tests
 
 ## Build Configuration
 
@@ -70,21 +77,27 @@ Status: SUCCESS
 ```
 
 ### Test Coverage ✅
-**128 tests - All Passing**
+**119 native tests - All Passing**
 
-#### Native Unit Tests (114 tests)
+#### Native Unit Tests (119 tests)
 | Test Suite | Count | Duration | Status |
 |------------|-------|----------|--------|
-| State Machine | 20 tests | ~2.0s | ✅ PASSED |
-| Light Controller | 9 tests | ~2.2s | ✅ PASSED |
-| Sound Controller | 11 tests | ~2.0s | ✅ PASSED |
-| SignalK Integration | 74 tests | ~2.3s | ✅ PASSED |
-| **Native Total** | **114 tests** | **~8.5s** | **✅ ALL PASSED** |
+| State Machine | 20 tests | ~1.7s | ✅ PASSED |
+| Light Controller | 9 tests | ~1.8s | ✅ PASSED |
+| Sound Controller | 16 tests | ~2.4s | ✅ PASSED |
+| SignalK Integration | 74 tests | ~1.8s | ✅ PASSED |
+| **Native Total** | **119 tests** | **~7.8s** | **✅ ALL PASSED** |
 
-#### ESP32 Embedded Tests (14 tests)
+#### ESP32 Embedded Tests (14 tests) - ⚠️ Pending Re-run
 | Test Suite | Count | Duration | Status |
 |------------|-------|----------|--------|
-| SignalK ESP32 | 14 tests | ~17.8s | ✅ PASSED |
+| SignalK ESP32 | 14 tests | ~17.8s | ⚠️ NEEDS RE-RUN |
+
+**Note**: These tests previously passed but need re-validation after recent code changes:
+- Ad-hoc signal queueing implementation  
+- Unmute immediate playback feature
+- COLREGs Rule 35 corrections
+- Platform-independent debug logging
 
 Validates: ECU initialization, state changes, COLREGs rules, timers, relay controllers on real ESP32 hardware
 The `NavigationLightsECU` facade enables dual UI support:
@@ -133,23 +146,35 @@ Base: `electrical.switches.navigationLights.*`
 | `.horn.active` | boolean | 100ms | Horn active status |
 | `.heartbeat` | int | 60s | ECU heartbeat toggle (0/1) |
 
-## Deployment Ready ✅
+## Deployment Ready ⚠️ (Pending Hardware Validation)
 
 ### Completed Integration Testing
-- ✅ All 128 tests passing (114 native + 14 ESP32 embedded)
+- ✅ All 119 native unit tests passing
 - ✅ Firmware builds successfully (71.8% flash, 9.4% RAM)
-- ✅ Hardware validation on ESP32 Dev Kit C V4
-- ✅ SignalK periodic updates verified (60s heartbeat pattern)
 - ✅ COLREGs rules validated (all 18 combinations)
-- ✅ Timer and relay controller hardware tested
+- ✅ SignalK protocol implementation complete
+- ⚠️ Hardware validation pending (Phase 5)
+- ⚠️ ESP32 embedded tests need re-run with updated code
 
-### Production Deployment Steps
+### Phase 5: Hardware Integration Testing
 1. **Flash Firmware**
    ```bash
    pio run --target upload
    ```
    
-2. **Connect Hardware**
+2. **Re-run ESP32 Embedded Tests**
+   ```bash
+   pio test -e esp32test
+   ```
+   Expected: 14 tests passing (validate recent code changes)
+
+3. **Hardware Timing Validation**
+   - Measure ad-hoc queueing delay (should be 2 seconds after signal completion)
+   - Test unmute immediate playback (<100ms response expected)
+   - Measure prolonged blast duration (user reported shorter than 4-6s spec)
+   - Validate sound signal timing with stopwatch/oscilloscope
+
+4. **Relay Module Testing**
    - 8-channel opto-isolated relay module (active-low)
    - Navigation lights (masthead, port, starboard, stern)
    - NUC lights (2x all-round red, 1x all-round white)

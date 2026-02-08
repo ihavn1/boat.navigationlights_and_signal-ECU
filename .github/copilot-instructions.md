@@ -41,13 +41,16 @@ Each condition+state combination maps to specific light configurations and perio
 - **Parallel development**: Write tests alongside implementation (TDD encouraged for state machine logic)
 - **Test structure**: `test/` directory with test files per component
 - **Mock hardware**: Abstract GPIO/relay control behind interfaces for testing without hardware
+- **Platform-independent logging**: Use DEBUG_PRINT/PRINTLN/PRINTF macros that map to Serial.x on ESP32, printf on native (conditional compilation with NATIVE_BUILD flag)
 - **Test coverage priorities**:
   1. State machine transitions (all condition+state combinations)
   2. COLREGs rule mapping (verify correct lights/signals per state)
-  3. Sound signal timing (blast durations, periodic intervals)
-  4. Safety conditions (relay states on boot, invalid transitions)
-- **Run tests**: `pio test` (runs on host or target device)
+  3. Sound signal timing (blast durations, periodic intervals, queueing behavior)
+  4. Safety conditions (relay states on boot, invalid transitions, queue clearing)
+  5. Unmute immediate playback and countdown reset
+- **Run tests**: `pio test -e native` for fast native testing, `pio test -e esp32test` for hardware validation
 - **CI consideration**: Structure tests to run on native platform (x86) for fast feedback
+- **Hardware timing tests**: Some timing-dependent features (e.g., ad-hoc queueing delay) require ESP32 hardware validation due to MockTimer limitations
 
 ## COLREGs Implementation Rules
 
@@ -59,9 +62,12 @@ Each condition+state combination maps to specific light configurations and perio
 
 ### Sound Signal Requirements
 - **Periodic signals**: Auto-repeat at specified intervals (e.g., 2min), with mute/unmute capability (always start muted on boot)
+- **Unmute behavior**: When unmuting, signal plays immediately and countdown resets to full interval (for immediate COLREGs compliance)
 - **Countdown timer**: Track seconds until next periodic signal (expose via SignalK)
 - **Semi-automatic signals**: One-shot blasts triggered ad-hoc (e.g., "●" = 1 turn to starboard, "●●●●●" = danger/confusion)
-- **Timing**: Short blast ≈1s, Prolonged blast 4-6s, Pause 1s
+- **Ad-hoc queueing**: If ad-hoc signal requested while signal playing, queues and plays automatically after 2-second delay when current signal completes (prevents overlapping horn signals)
+- **Timing**: Short blast ≈1s, Prolonged blast 4-6s, Pause 1s, Queue delay 2s
+- **Rule 35 signals**: Making way = 1 prolonged blast (Rule 35a), Making no way/stopped = 2 prolonged blasts (Rule 35b)
 
 ## Critical Development Workflows
 
@@ -72,12 +78,15 @@ Each condition+state combination maps to specific light configurations and perio
 - Build: `pio run` | Flash: `pio run --target upload` | Monitor: `pio device monitor`
 
 ### Testing Workflow
-- **Framework**: Unity (PlatformIO built-in), run with `pio test` or `pio test -e native` for host testing
-- **Test directory**: `test/test_*.cpp` files (e.g., `test_state_machine.cpp`, `test_light_controller.cpp`)
-- **Safety tests**: Verify all relays inactive on boot (active-low requirement)
+- **Framework**: Unity (PlatformIO built-in), run with `pio test -e native` for fast host testing
+- **Test directory**: `test/test_*/` folders with test files and mock implementations
+- **Current status**: 119/119 tests passing (20 state machine + 9 light + 16 sound + 74 signalk)
+- **Safety tests**: Verify all relays inactive on boot (active-low requirement), queue clearing on emergency stop
 - **State transitions**: Test each condition+state combination against COLREGs table
-- **Timing tests**: Validate sound signal durations and periodic intervals
-- **Mock hardware**: Use dependency injection to test controllers without physical relays
+- **Timing tests**: Validate sound signal durations, periodic intervals, and queueing behavior (full timing validation requires ESP32 hardware)
+- **Mock hardware**: Dependency injection with MockRelayController and MockTimer for unit testing
+- **Platform-independent code**: Use `#ifndef NATIVE_BUILD` guards and DEBUG macros for Serial calls
+- **ESP32 hardware tests**: Run `pio test -e esp32test` to validate on actual hardware (14 tests, pending re-run after recent changes)
 
 ## Project-Specific Conventions
 
@@ -91,17 +100,23 @@ Each condition+state combination maps to specific light configurations and perio
 ### Safety-First Patterns
 - All relay GPIO pins configured as OUTPUT with initial state LOW before relay module init (opto-isolated module requires active-low for safety)
 - Periodic sound signals always start muted on boot/restart (must be manually unmuted)
+- Ad-hoc signals queue when signal in progress (prevents overlapping/interrupted horn signals)
+- Emergency stop clears all queues and cancels pending timers
 - Implement watchdog/heartbeat to detect firmware hangs
 - Validate state transitions before activating relays (avoid invalid light combinations)
 
-### File Organization (when implemented)
+### File Organization (implemented)
 - `src/main.cpp`: SensESP initialization, SignalK setup, main loop
+- `src/NavigationLightsECU.cpp/.h`: Top-level ECU logic coordinating all components
 - `src/state_machine.cpp/.h`: Condition+state management and COLREGs rule engine
-- `src/light_controller.cpp/.h`: Relay control for navigation lights
-- `src/sound_controller.cpp/.h`: Horn control with timing for blasts and periodic signals
+- `src/LightController.cpp/.h`: Relay control for navigation lights
+- `src/SoundController.cpp/.h`: Horn control with timing, queueing, and countdown management
+- `src/signalk_integration.cpp/.h`: SignalK consumer/producer functions for bidirectional communication
+- `src/ESP32RelayController.cpp/.h`: ESP32 GPIO implementation of IRelayController
+- `src/ESP32Timer.cpp/.h`: ESP32 FreeRTOS timer implementation of ITimer
 - `src/interfaces/`: Hardware abstraction interfaces (IRelayController, ITimer) for testability
-- `test/test_*.cpp`: Unity unit tests for each component
-- `platformio.ini`: ESP32 configuration, SensESP dependency, test environment setup
+- `test/test_*/`: Unity unit tests per component with mock implementations
+- `platformio.ini`: ESP32 and native test environment configurations
 
 ## External Dependencies & Integration
 
@@ -126,13 +141,25 @@ Each condition+state combination maps to specific light configurations and perio
 - Platform docs: SensESP GitHub repo, ESP32 Arduino core docs
 - COLREGs reference: Convention on International Regulations for Preventing Collisions at Sea, 1972
 
-## Development Priorities
-1. Implement state machine with COLREGs rule mapping (with unit tests)
-2. Light relay control with safety (active-low, boot state validation) + tests
-3. Sound signal timing engine (short/prolonged blasts, periodic repeats) + tests
-4. SignalK integration (bidirectional state sync)
-5. Countdown timer for periodic signals
-6. Mute/unmute functionality for periodic signals
-7. (Optional) BLE fallback UI
+## Current Project Status
 
-**Note**: Write unit tests in parallel with each component - use TDD for state machine logic
+### Completed Features ✅
+1. ✅ State machine with COLREGs rule mapping (20 tests passing)
+2. ✅ Light relay control with safety (9 tests passing)
+3. ✅ Sound signal timing engine with queueing (16 tests passing)
+4. ✅ SignalK integration with bidirectional communication (74 tests passing)
+5. ✅ Countdown timer for periodic signals
+6. ✅ Mute/unmute functionality with immediate playback
+7. ✅ Ad-hoc signal queueing system (2-second delay after signal completion)
+8. ✅ Platform-independent debug logging for native tests
+9. ✅ All 119 unit tests passing on native platform
+
+### Pending Work ⚠️
+1. **Hardware Integration Testing**: Validate queueing timing and prolonged blast duration on ESP32 hardware
+2. **ESP32 Test Re-run**: Re-validate 14 embedded tests after recent changes (ad-hoc queueing, unmute immediate playback, Rule 35 corrections)
+3. **SensESP Integration**: Complete main.cpp with SensESP setup and SignalK client configuration
+4. **Hardware Wiring**: Connect relay module, verify GPIO mapping from HARDWARE.md
+5. **Maritime Field Testing**: Validate COLREGs compliance in actual conditions
+6. **(Optional) BLE fallback UI**: Android app for offline control
+
+**Note**: All core logic validated via TDD - 119 unit tests covering state machine, light control, sound control, and SignalK integration

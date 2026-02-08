@@ -1,9 +1,11 @@
 # Navigation Lights and Signal ECU - Project Status
 
+**Last Updated**: February 8, 2026
+
 ## Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
 
-## Implementation Status: **100% Complete** ✅ 
+## Implementation Status: **Phase 4 Complete, Phase 5 In Progress** 🚧 
 
 ### ✅ Phase 1: Project Foundation (100%)
 - [platformio.ini](platformio.ini) - ESP32dev and native test environments
@@ -23,12 +25,12 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 ### ✅ Phase 3: Hardware Controllers (100%)
 - [src/ESP32RelayController.h](src/ESP32RelayController.h) / [.cpp](src/ESP32RelayController.cpp) - GPIO implementation with active-low safety
 - [src/LightController.h](src/LightController.h) / [.cpp](src/LightController.cpp) - Light control logic
-- [src/SoundController.h](src/SoundController.h) / [.cpp](src/SoundController.cpp) - Sound signal timing
+- [src/SoundController.h](src/SoundController.h) / [.cpp](src/SoundController.cpp) - Sound signal timing with queueing
 - [test/test_light_controller/](test/test_light_controller/) - **9 tests passing**
-- [test/test_sound_controller/](test/test_sound_controller/) - **11 tests passing** (1 skipped)
+- [test/test_sound_controller/](test/test_sound_controller/) - **16 tests passing** (includes unmute immediate playback + ad-hoc queueing)
 
-### ✅ Phase 4: SignalK Integration (100%) - COMPLETE
-- ✅ [src/ESP32Timer.h](src/ESP32Timer.h) / [.cpp](src/ESP32Timer.cpp) - Production timer
+### ✅ Phase 4: SignalK Integration (100%) - CODE COMPLETE
+- ✅ [src/ESP32Timer.h](src/ESP32Timer.h) / [.cpp](src/ESP32Timer.cpp) - Production timer with platform-independent debug logging
 - ✅ [src/NavigationLightsECU.h](src/NavigationLightsECU.h) / [.cpp](src/NavigationLightsECU.cpp) - UI-agnostic facade
 - ✅ [src/main.cpp](src/main.cpp) - Complete hardware initialization + SignalK setup
 - ✅ [src/signalk_integration.h](src/signalk_integration.h) / [.cpp](src/signalk_integration.cpp) - SensESP v3 API complete
@@ -37,44 +39,70 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
   - **Reconnection Handling**: Auto-republishes all values 2s after connection
   - 5 input paths (PUT requests) + 13 output paths (status publishing)
 - ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **74 tests passing** (conversions, integration, edge cases)
-- ✅ [test/test_signalk_esp32/](test/test_signalk_esp32/) - **14 ESP32 embedded tests passing** (hardware validation)
+
+**Recent Feature Additions**:
+- ✅ Ad-hoc signal queueing (2-second delay after signal completion)
+- ✅ Unmute immediate playback (signals play immediately when unmuted)
+- ✅ Platform-independent debug logging (NATIVE_BUILD flag + DEBUG macros)
+- ✅ COLREGs Rule 35 corrections (making way = 1 blast, stopped = 2 blasts)
 
 **Current Build**: `az-delivery-devkit-v4` environment with SensESP v3.2.2
 - RAM: **9.4%** (50052 / 532480 bytes)
 - Flash: **71.8%** (1411669 / 1966080 bytes) with min_spiffs.csv partition
 - Status: **BUILD SUCCESSFUL** ✅
-- **Hardware Validated**: All tests pass on ESP32 Dev Kit C V4
 
-### ⏳ Phase 5: Optional Enhancements (0%)
+### 🚧 Phase 5: Hardware Integration Testing (In Progress)
+- ⏳ Flash firmware to ESP32 Dev Kit C V4
+- ⏳ Re-run 14 ESP32 embedded tests after recent code changes
+- ⏳ Validate ad-hoc signal queueing timing (2-second delay)
+- ⏳ Measure prolonged blast duration on real hardware
+- ⏳ Test unmute immediate playback timing
+- ⏳ Verify all 18 COLREGs light combinations on actual relays
+- ⏳ Connect to SignalK server and validate bidirectional communication
+- ⏳ Test periodic updates and reconnection handling
+
+**Hardware Required**: ESP32 Dev Kit C V4 + 8-channel opto-isolated relay module (active-low)
+
+### ⏳ Phase 6: Maritime Field Testing (0%)
+- Install on test vessel
+- Validate in actual maritime conditions
+- Test visibility compliance (light visibility at required distances)
+- Test sound signal audibility
+
+### ⏳ Phase 7: Optional Enhancements (0%)
 - BLE fallback UI (when WiFi unavailable)
 - Web configuration portal
 - OTA firmware updates
 
 ## Test Coverage
 
-**Total: 128 tests - All Passing ✅**
+**Total: 119 tests - All Passing ✅** (Native platform only)
 
-### Native Tests (114 tests, ~8.5s)
+### Native Tests (119 tests, ~7.8s)
 | Test Suite | Tests | Files | Status |
 |------------|-------|-------|--------|
 | State Machine | 20 | [test_state_machine.cpp](test/test_state_machine/test_state_machine.cpp) | ✅ PASSED |
 | Light Controller | 9 | [test_light_controller.cpp](test/test_light_controller/test_light_controller.cpp) | ✅ PASSED |
-| Sound Controller | 11 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
+| Sound Controller | 16 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
 | SignalK Integration | 74 | [test_signalk_integration.cpp](test/test_signalk_integration/test_signalk_integration.cpp) | ✅ PASSED |
 
-### ESP32 Embedded Tests (14 tests, ~17.8s)
+### ESP32 Embedded Tests (14 tests, ~17.8s) - ⚠️ Pending Re-validation
 | Test Suite | Tests | Files | Status |
 |------------|-------|-------|--------|
-| SignalK ESP32 | 14 | [test_signalk_esp32.cpp](test/test_signalk_esp32/test_signalk_esp32.cpp) | ✅ PASSED |
+| SignalK ESP32 | 14 | [test_signalk_esp32.cpp](test/test_signalk_esp32/test_signalk_esp32.cpp) | ⚠️ NEEDS RE-RUN |
 
-**Hardware Validation**: All embedded tests pass on ESP32 Dev Kit C V4 with real GPIO, timers, and relay control.
+**Note**: These tests previously passed but need re-running after recent code changes:
+- Ad-hoc signal queueing implementation
+- Unmute immediate playback feature
+- COLREGs Rule 35 corrections
+- Platform-independent debug logging
 
-### Unit Tests: **114 tests** - All Passing ✅
+### Unit Tests: **119 tests** - All Passing ✅
 | Suite | Tests | Status |
 |-------|-------|--------|
 | State Machine | 20 | ✅ All Passing |
 | Light Controller | 9 | ✅ All Passing |
-| Sound Controller | 11 | ✅ All Passing |
+| Sound Controller | 16 | ✅ All Passing |
 | SignalK Integration | 74 | ✅ All Passing |
 
 **SignalK Test Coverage** (74 tests):
@@ -82,21 +110,19 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - **Integration Tests** (12 tests): MockECU interactions, callbacks, state transitions
 - **Edge Cases** (20 tests): Empty/null strings, case sensitivity, whitespace, typos, rapid changes, callback safety
 
-### ESP32 Embedded Tests: **15 tests** (requires hardware)
-| Suite | Tests | Status |
-|-------|-------|--------|
-| SignalK ESP32 | 15 | ⏳ Pending Hardware |
+**Sound Controller Test Coverage** (16 tests):
+- **Initial State** (2 tests): Horn inactive, countdown at zero
+- **Periodic Signals** (7 tests): Mute/unmute, countdown, immediate playback on unmute
+- **Ad-hoc Signals** (4 tests): Immediate playback, queueing behavior
+- **Emergency** (2 tests): Stop all sound, queue clearing
+- **Safety** (1 test): No signal when pattern is NONE
 
-**ESP32 Test Coverage**:
-- ECU initialization and safe defaults
-- COLREGs light combinations on hardware
-- Hardware timer callbacks
-- Relay controller pin initialization
-- Ad-hoc signal triggering with real timing
+**Note**: Ad-hoc queueing tests verify behavioral correctness. Full timing validation (2-second delay) requires ESP32 hardware.
 
-### Hardware Validation: **Pending**
-- Awaits ESP32 Dev Kit C V4 + opto-isolated relay module
-- COLREGs logic fully tested in software
+### Hardware Validation: **Phase 5 - In Progress** 🚧
+- ESP32 Dev Kit C V4 + opto-isolated relay module required
+- COLREGs logic fully validated in unit tests (119 passing)
+- Hardware timing tests pending (queueing delay, prolonged blast duration)
 
 ## Architecture Highlights
 
@@ -150,24 +176,29 @@ Both UIs control the same underlying controllers.
 
 ## Next Steps
 
-### Immediate: Hardware Testing
-1. Flash firmware to ESP32 Dev Kit C V4
-2. Connect opto-isolated relay module
-3. Validate COLREGs light patterns
-4. Test sound signal timing
-5. Verify safety defaults (all OFF on boot)
+### Phase 5: Hardware Integration Testing (Current Focus)
+1. **Flash and Test**: Load firmware on ESP32 Dev Kit C V4
+2. **Re-run ESP32 Tests**: Validate 14 embedded tests with updated code
+3. **Timing Validation**:
+   - Ad-hoc queueing: Verify 2-second delay after signal completion
+   - Unmute immediate playback: Measure response time (<100ms expected)
+   - Prolonged blast duration: Measure actual duration (user reported shorter than 4-6s)
+4. **Relay Testing**: Connect 8-channel opto-isolated relay module, verify active-low control
+5. **COLREGs Validation**: Test all 18 light combinations on actual hardware
+6. **SignalK Server Integration**: Connect to real SignalK server, test bidirectional communication
 
-### Short-term: Complete SignalK Integration
-1. Study SensESP v3 API documentation and examples
-2. Implement PUT request listeners (condition, boat state, signals)
-3. Implement SKOutput publishers (status, countdown, lights)
-4. Test with SignalK server
-5. Validate bidirectional communication
+### Phase 6: Maritime Field Testing
+1. Install on test vessel
+2. Validate in actual maritime conditions (darkness, restricted visibility)
+3. Test light visibility at required distances
+4. Test sound signal audibility
+5. Verify state transitions during actual vessel operation
 
-### Medium-term: Optional Enhancements
+### Phase 7: Optional Enhancements (Future)
 1. BLE fallback UI for when WiFi unavailable
 2. Web configuration portal (WiFi credentials, SignalK server)
 3. Watchdog timer for firmware hang detection
+4. OTA firmware updates
 
 ## Development Workflow
 
@@ -207,11 +238,11 @@ pio test -e native
 └── Project Proposal Navigation Lights and Signaling ECU.md
 ```
 
-## Known Issues
+## Known Issues & Notes
 
-1. **SignalK Integration Incomplete**: SensESP v3 API changes require study + testing
-2. **One Skipped Test**: Callback lifecycle issue in sound controller test
-3. **Native Tests Not Running**: MinGW not in PATH (tests passed previously)
+1. **Hardware Timing Validation Pending**: MockTimer in unit tests cannot accurately simulate asynchronous timer callbacks. Full timing validation of ad-hoc queueing (2-second delay) requires ESP32 hardware testing.
+2. **Prolonged Blast Duration**: User reported prolonged blasts appear shorter than expected (4-6 seconds). Needs measurement on real hardware.
+3. **ESP32 Tests Pending Re-run**: 14 embedded tests previously passed but need re-validation after recent code changes.
 
 ## Dependencies
 
@@ -229,19 +260,23 @@ pio test -e native
 
 ## Summary
 
-**The core ECU functionality is production-ready:**
-- ✅ COLREGs state machine fully tested (40 unit tests)
-- ✅ Hardware controllers implemented with safety features
+**Phase 4 Code Complete - Ready for Hardware Integration:**
+- ✅ COLREGs state machine fully tested (20 unit tests)
+- ✅ Hardware controllers implemented with safety features (25 unit tests for light + sound)
+- ✅ SignalK integration complete (74 unit tests)
 - ✅ UI-agnostic architecture supporting multiple control interfaces
-- ✅ Build successful (21.8% flash, 6.6% RAM)
-- ⏸️ SignalK integration deferred (requires API study + hardware testing)
+- ✅ Build successful (71.8% flash, 9.4% RAM)
+- ✅ All 119 native unit tests passing
+- ✅ Recent features: Ad-hoc queueing, unmute immediate playback, platform-independent logging
 
-**Recommended path forward:**
-1. Hardware validation first (programmatic control)
-2. Then complete SignalK integration with actual server
+**Current Status: Phase 5 - Hardware Integration Testing**
+- 🚧 ESP32 hardware testing required
+- 🚧 Timing validation (queueing delay, prolonged blast duration)
+- 🚧 SignalK server integration testing
+- 🚧 Full COLREGs validation on actual relays
 
-The firmware is ready to control navigation lights and sound signals according to COLREGs - only the UI communication layer (SignalK/BLE) remains to be finalized.
+**The firmware is code-complete and ready for hardware validation.**
 
 ---
 
-*Last updated: Phase 4 completion (SignalK integration 75%)*
+*Last updated: February 8, 2026 - Phase 4 complete, Phase 5 in progress*

@@ -68,6 +68,8 @@ The rules for lantern use and signaling are summarized in the table below.
 
 **Other audio signals** that are not dependent on the conditions, but which may be desired to be given in a given situation. These signals are hereinafter referred to as semi-automatic signals. These can be given ad hoc and will not automatically repeat.
 
+**Ad-hoc Signal Queueing**: If an ad-hoc signal is requested while another signal (periodic or ad-hoc) is currently playing, the new signal will be queued and automatically played after a 2-second delay once the current signal completes. This prevents overlapping horn signals and maintains clear, distinct COLREGs-compliant signaling. Only one ad-hoc signal can be queued at a time.
+
 | Situation/Cause | Sound signal |
 | ----- | :---: |
 | **I turn to Starboard** | **●** |
@@ -107,7 +109,7 @@ The system must be controllable by selecting the conditions under which the boat
 
 It is desirable to be able to track how much time is left until the periodic signals are sounded next time. This status must be a simple count down 1 sec counter that counts  down until the next period starts. This status should be accessible via SignalK telegram and the local interface.
 
-The other ad hoc sound signals are described in the table Other sound signals must be able to be activated separately and only emitted once for each activation.
+The other ad hoc sound signals are described in the table Other sound signals must be able to be activated separately and only emitted once for each activation. If an ad-hoc signal is triggered while another signal is playing, it will be queued and automatically played after a 2-second delay when the current signal completes.
 
 ### Main UI
 

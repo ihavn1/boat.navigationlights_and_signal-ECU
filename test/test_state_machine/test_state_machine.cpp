@@ -208,7 +208,7 @@ void test_restricted_visibility_moored_no_signal(void) {
 }
 
 void test_restricted_visibility_underway_no_way_signal(void) {
-    // Rule 35(c): Power-driven vessel underway but stopped - prolonged blast every 2min
+    // Rule 35(b): Power-driven vessel underway but stopped (making no way) - 2 prolonged blasts every 2min
     state_machine->setCondition(Condition::RESTRICTED_VISIBILITY);
     state_machine->setBoatState(BoatState::UNDERWAY_NO_WAY);
     
@@ -223,7 +223,7 @@ void test_restricted_visibility_underway_no_way_signal(void) {
 }
 
 void test_restricted_visibility_underway_making_way_signal(void) {
-    // Rule 35(a): Power-driven vessel making way - prolonged blast every 2min
+    // Rule 35(a): Power-driven vessel making way through the water - 1 prolonged blast every 2min
     state_machine->setCondition(Condition::RESTRICTED_VISIBILITY);
     state_machine->setBoatState(BoatState::UNDERWAY_MAKING_WAY);
     
@@ -233,7 +233,7 @@ void test_restricted_visibility_underway_making_way_signal(void) {
     TEST_ASSERT_TRUE(lights.starboard_sidelight);
     TEST_ASSERT_TRUE(lights.sternlight);
     
-    TEST_ASSERT_EQUAL(SoundSignalPattern::PROLONGED_PROLONGED_2MIN, state_machine->getPeriodicSoundSignal());
+    TEST_ASSERT_EQUAL(SoundSignalPattern::PROLONGED_2MIN, state_machine->getPeriodicSoundSignal());
     TEST_ASSERT_EQUAL(120, state_machine->getPeriodicSignalIntervalSeconds());
 }
 

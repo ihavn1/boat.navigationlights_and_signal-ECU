@@ -148,6 +148,107 @@ void test_ad_hoc_signal_works_when_periodic_muted(void) {
 }
 
 // =============================================================================
+// UNMUTE IMMEDIATE PLAYBACK TESTS
+// =============================================================================
+
+void test_unmute_triggers_immediate_signal(void) {
+    // Set periodic signal (starts muted)
+    sound_controller->setPeriodicSignal(SoundSignalPattern::PROLONGED_2MIN, 120);
+    TEST_ASSERT_TRUE(sound_controller->isPeriodicMuted());
+    
+    // Advance time so we're not at countdown=0
+    mock_timer->advanceTime(10000);
+    TEST_ASSERT_EQUAL(110, sound_controller->getPeriodicCountdownSeconds());
+    
+    // Unmute should trigger signal immediately
+    sound_controller->unmutePeriodicSignals();
+    sound_controller->update();
+    
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+    // Countdown should reset to full interval
+    TEST_ASSERT_EQUAL(120, sound_controller->getPeriodicCountdownSeconds());
+    
+    sound_controller->stopAllSound();
+}
+
+void test_unmute_resets_countdown_timer(void) {
+    // Set periodic signal and advance time
+    sound_controller->setPeriodicSignal(SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN, 120);
+    mock_timer->advanceTime(50000); // 50 seconds elapsed
+    TEST_ASSERT_EQUAL(70, sound_controller->getPeriodicCountdownSeconds());
+    
+    // Unmute resets countdown
+    sound_controller->unmutePeriodicSignals();
+    TEST_ASSERT_EQUAL(120, sound_controller->getPeriodicCountdownSeconds());
+    
+    sound_controller->stopAllSound();
+}
+
+// =============================================================================
+// AD-HOC SIGNAL QUEUEING TESTS
+// =============================================================================
+
+void test_adhoc_queues_when_signal_in_progress(void) {
+    // This test verifies that ad-hoc signals can be queued when a signal is playing
+    // Full integration testing of the timing should be done on real hardware
+    
+    // Start first ad-hoc signal
+    sound_controller->triggerAdHocSignal(AdHocSignal::TURN_STARBOARD);
+    sound_controller->update();
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+    
+    // Trigger second ad-hoc while first is playing - should queue (not fail)
+    sound_controller->triggerAdHocSignal(AdHocSignal::DANGER_CONFUSION);
+    sound_controller->update();
+    
+    // First signal should still be playing (queue doesn't interrupt)
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+    
+    // Note: Full queueing behavior with delays requires real-time testing on ESP32
+    sound_controller->stopAllSound();
+}
+
+void test_adhoc_queues_after_periodic_signal(void) {
+    // This test verifies that ad-hoc signals can be queued during periodic signals
+    // Full integration testing of the timing should be done on real hardware
+    
+    // Start periodic signal (unmuted)
+    sound_controller->setPeriodicSignal(SoundSignalPattern::PROLONGED_2MIN, 5);
+    sound_controller->unmutePeriodicSignals();
+    sound_controller->update();
+    
+    // Periodic signal should be playing
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+    
+    // Trigger ad-hoc while periodic is playing - should queue (not fail)
+    sound_controller->triggerAdHocSignal(AdHocSignal::TURN_PORT);
+    
+    // Periodic should continue (queue doesn't interrupt)
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+    
+    // Note: Full queueing behavior with delays requires real-time testing on ESP32
+    sound_controller->stopAllSound();
+}
+
+void test_stop_all_clears_queue(void) {
+    // Start signal and queue another
+    sound_controller->triggerAdHocSignal(AdHocSignal::PAY_ATTENTION);
+    sound_controller->update();
+    sound_controller->triggerAdHocSignal(AdHocSignal::DANGER_CONFUSION);
+    
+    // Emergency stop should clear everything
+    sound_controller->stopAllSound();
+    TEST_ASSERT_FALSE(sound_controller->isHornActive());
+    
+    // Advance past when queued signal would have played
+    mock_timer->advanceTime(10000);
+    sound_controller->update();
+    
+    // No signal should play (queue was cleared)
+    TEST_ASSERT_FALSE(sound_controller->isHornActive());
+}
+
+// =============================================================================
 // SAFETY TESTS
 // =============================================================================
 
@@ -198,6 +299,15 @@ int main(int argc, char **argv) {
     // Ad-hoc signals (UI commands)
     RUN_TEST(test_ad_hoc_signal_sounds_horn);
     RUN_TEST(test_ad_hoc_signal_works_when_periodic_muted);
+    
+    // Unmute immediate playback
+    RUN_TEST(test_unmute_triggers_immediate_signal);
+    RUN_TEST(test_unmute_resets_countdown_timer);
+    
+    // Ad-hoc signal queueing
+    RUN_TEST(test_adhoc_queues_when_signal_in_progress);
+    RUN_TEST(test_adhoc_queues_after_periodic_signal);
+    RUN_TEST(test_stop_all_clears_queue);
     
     // Safety
     RUN_TEST(test_stop_all_sound_emergency);

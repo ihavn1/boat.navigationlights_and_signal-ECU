@@ -68,6 +68,7 @@ pio test -e native && pio test -e esp32test
 - ✅ NUC lights (2× red all-round vertical)
 - ✅ Anchorage light (all-round white)
 - ✅ Sound signals (short/prolonged blasts, periodic patterns)
+- ✅ Ad-hoc signal queueing (auto-plays after 2s delay if signal in progress)
 
 ### SignalK Integration
 - ✅ Bidirectional communication (PUT requests + delta publishing)
@@ -79,7 +80,7 @@ pio test -e native && pio test -e esp32test
 
 ### Safety Features
 - ✅ Active-low relay control (OFF on boot/crash)
-- ✅ Periodic signals always start muted
+- ✅ Periodic signals always start muted (unmute triggers immediate playback)
 - ✅ Emergency stop function
 - ✅ Safe defaults (Day, Moored, all lights OFF)
 

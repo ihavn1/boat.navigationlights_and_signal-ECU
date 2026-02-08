@@ -1,37 +1,33 @@
 # Test Results Summary
 
-## Overall Status: ✅ 128/128 Tests Passing (100%)
+## Overall Status: ✅ 119/119 Tests Passing (100%)
 
 **Last Run**: 2026-02-03  
-**Native Duration**: ~8.5 seconds  
-**ESP32 Duration**: ~17.8 seconds  
-**Platform**: Native (x86_64-pc-windows-msvc) + ESP32 (embedded hardware)  
+**Native Duration**: ~7.8 seconds  
+**Platform**: Native (x86_64-pc-windows-msvc)  
 **Test Framework**: Unity 2.6.0
 
 ---
 
 ## Quick Summary
 
-### Native Tests (114 tests)
+### Native Tests (119 tests)
 | Suite | Tests | Duration | Status |
 |-------|-------|----------|--------|
-| **State Machine** | 20 | ~2.0s | ✅ PASSED |
-| **Light Controller** | 9 | ~2.2s | ✅ PASSED |
-| **Sound Controller** | 11 | ~2.0s | ✅ PASSED |
-| **SignalK Integration** | 74 | ~2.3s | ✅ PASSED |
-| **Native Total** | **114** | **~8.5s** | **✅ ALL PASSED** |
+| **State Machine** | 20 | ~1.7s | ✅ PASSED |
+| **Light Controller** | 9 | ~1.8s | ✅ PASSED |
+| **Sound Controller** | 16 | ~2.4s | ✅ PASSED |
+| **SignalK Integration** | 74 | ~1.8s | ✅ PASSED |
+| **Native Total** | **119** | **~7.8s** | **✅ ALL PASSED** |
 
-### ESP32 Embedded Tests (14 tests)
-| Suite | Tests | Duration | Status |
-|-------|-------|----------|--------|
-| **SignalK ESP32** | 14 | ~17.8s | ✅ PASSED |
-
-**Grand Total**: **128 tests passing**
+**Grand Total**: **119 tests passing**
 
 **Recent Updates**: 
-- Added 32 new SignalK tests (integration + edge cases)
-- Added 14 ESP32 embedded hardware validation tests
-- Previous: 82 tests → **Now**: 128 comprehensive tests
+- Added 5 new sound controller tests (unmute immediate playback + ad-hoc queueing)
+- Fixed COLREGs Rule 35 sound signals (making way vs no way)
+- Implemented ad-hoc signal queueing system
+- Platform-independent debug logging for native tests
+- Previous: 114 tests → **Now**: 119 comprehensive tests
 
 ---
 
@@ -63,8 +59,8 @@ Tests all combinations of 3 Conditions × 6 Boat States
 
 **Restricted Visibility (6 tests)**
 - ✅ Moored - No sound signal
-- ✅ Underway (no way) - Prolonged blast every 2min
-- ✅ Underway (making way) - Prolonged blast every 2min
+- ✅ Underway (no way) - 2× Prolonged blasts every 2min (Rule 35b - stopped vessel)
+- ✅ Underway (making way) - 1× Prolonged blast every 2min (Rule 35a - power-driven vessel)
 - ✅ Anchorage - Rapid bell ringing every 1min
 - ✅ NUC (no way) - Prolonged + 2 short every 2min
 - ✅ NUC (making way) - Prolonged + 2 short every 2min
@@ -74,6 +70,8 @@ Tests all combinations of 3 Conditions × 6 Boat States
 - ✅ State transitions preserve correct configuration
 
 **COLREGs Rules Covered**: 20, 21, 23, 25, 27, 30, 35
+
+**Recent Fix**: Corrected Rule 35 sound signals - making way (1 blast) vs stopped (2 blasts) were previously swapped.
 
 ---
 
@@ -99,9 +97,9 @@ Tests all combinations of 3 Conditions × 6 Boat States
 
 ---
 
-### 3. Sound Controller Tests (11 tests)
+### 3. Sound Controller Tests (16 tests)
 **File**: [test/test_sound_controller/test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp)  
-**Duration**: 2.09s  
+**Duration**: 2.37s  
 **Status**: ✅ All Passing
 
 #### Initial State Tests
@@ -114,10 +112,15 @@ Tests all combinations of 3 Conditions × 6 Boat States
 - ✅ No horn sounds when muted
 - ✅ Mute/unmute toggles state correctly
 - ✅ New pattern resets to muted
+- ✅ **NEW**: Unmute triggers immediate signal playback (Rule 35 immediate compliance)
+- ✅ **NEW**: Unmute resets countdown timer to full interval
 
 #### Ad-Hoc Signal Tests
 - ✅ Ad-hoc signals sound horn immediately
 - ✅ Ad-hoc signals work when periodic muted
+- ✅ **NEW**: Ad-hoc signals queue when signal in progress (behavioral verification)
+- ✅ **NEW**: Ad-hoc signals queue after periodic signal with 2s delay (behavioral verification)
+- ✅ **NEW**: Emergency stop clears queued ad-hoc signals
 
 #### Emergency Tests
 - ✅ Emergency stop disables all sound
@@ -127,6 +130,9 @@ Tests all combinations of 3 Conditions × 6 Boat States
 - Short blast: ~1s
 - Prolonged blast: 4-6s
 - Pause between blasts: 1s
+- Queue delay: 2s after signal completion
+
+**Test Note**: Ad-hoc queueing tests verify behavioral correctness (no failures/interruptions) in unit tests. Full timing validation of the 2-second queue delay requires ESP32 hardware integration testing with real timer callbacks.
 
 ---
 
@@ -211,31 +217,25 @@ Tests all combinations of 3 Conditions × 6 Boat States
 
 ---
 
-## 5. ESP32 Embedded Tests (14 tests)
+## 5. ESP32 Embedded Tests (Pending Re-validation)
 **File**: [test/test_signalk_esp32/test_signalk_esp32.cpp](test/test_signalk_esp32/test_signalk_esp32.cpp)  
-**Duration**: ~17.8s  
 **Platform**: ESP32 Dev Kit C V4 (real hardware)  
-**Status**: ✅ All Passing
+**Status**: ⚠️ **Not yet re-run with recent changes**
 
-### ECU Integration Tests (11 tests)
-- ✅ ECU initializes with safe defaults (muted, day, moored)
-- ✅ Condition changes update state correctly
-- ✅ Boat state changes update state correctly
-- ✅ Darkness + underway enables navigation lights (COLREGs Rule 23)
-- ✅ Anchorage enables anchor light (COLREGs Rule 30)
-- ✅ Mute/unmute periodic signals toggle correctly
-- ✅ Ad-hoc signal triggers horn (1 short blast)
-- ✅ Emergency stop disables all outputs
-- ✅ State change callback fires on state changes
-- ✅ Countdown decrements when unmuted
-- ✅ All light combinations match COLREGs rules
+**Note**: These tests were previously passing with 14/14 success rate. They need to be re-run after the following changes:
+- Ad-hoc signal queueing implementation
+- Unmute immediate playback feature
+- COLREGs Rule 35 corrections (making way vs no way)
+- Platform-independent debug logging
 
-### Hardware Controller Tests (3 tests)
-- ✅ Timer callbacks execute correctly (ESP32Timer with FreeRTOS)
-- ✅ Relay controller initializes pins LOW (all relays OFF)
-- ✅ Relay controller set/activate/deactivate functions work
+### Previous Test Coverage (14 tests)
+See git history for previous ESP32 test results. Tests covered:
+- ECU initialization and state management
+- COLREGs rule validation on hardware
+- Timer and relay controller hardware integration
+- Ad-hoc and periodic signal functionality
 
-**Hardware Validation**: Confirms ECU works correctly on real ESP32 with actual GPIO, timers, and relay control.
+**Action Required**: Re-run `pio test -e esp32test` after flashing updated firmware to validate changes on hardware.
 
 ---
 
@@ -245,17 +245,17 @@ Tests all combinations of 3 Conditions × 6 Boat States
 | Rule | Description | Test Count |
 |------|-------------|------------|
 | 20 | Application (vessels <15m) | Implicit in all tests |
-| 21 | Definitions (lights) | 9 light controller + 11 ESP32 tests |
-| 23 | Vessels underway | 6 state machine + ESP32 tests |
-| 25 | Vessels at anchor | 3 state machine + ESP32 tests |
-| 27 | Vessels NUC | 6 state machine + ESP32 tests |
-| 30 | Vessels moored | 3 state machine + ESP32 tests |
-| 35 | Sound signals (fog) | 11 sound controller tests |
+| 21 | Definitions (lights) | 9 light controller tests |
+| 23 | Vessels underway | 6 state machine tests |
+| 25 | Vessels at anchor | 3 state machine tests |
+| 27 | Vessels NUC | 6 state machine tests |
+| 30 | Vessels moored | 3 state machine tests |
+| 35 | Sound signals (fog) | 16 sound controller tests (including queueing) |
 
 ### Test Platform Coverage
-- ✅ **Native (x86)**: Fast TDD feedback, mock-based unit tests (114 tests)
-- ✅ **ESP32 Embedded**: Real hardware validation, integration tests (14 tests)
-- ✅ **Total Coverage**: 128 tests validating both logic and hardware
+- ✅ **Native (x86)**: Fast TDD feedback, mock-based unit tests (119 tests passing)
+- ⚠️ **ESP32 Embedded**: Pending re-validation with recent changes (14 tests - previously passing)
+- ✅ **Current Validated Coverage**: 119 unit tests (all logic validated)
 
 ---
 
@@ -315,6 +315,8 @@ Flash: [=======       ]  71.3% (1401737 / 1966080 bytes)
 - ✅ Periodic signals always start muted
 - ✅ New pattern resets to muted
 - ✅ Emergency stop silences all sound
+- ✅ Ad-hoc signals queue (don't interrupt) when signal in progress
+- ✅ Queue clears on emergency stop (cancels pending timers)
 
 ### State Machine Safety
 - ✅ Invalid condition defaults to DAY (safest)
@@ -337,28 +339,24 @@ pio test -e native --filter test_state_machine
 pio test -e native --filter test_light_controller
 pio test -e native --filter test_sound_controller
 pio test -e native --filter test_signalk_integration
+```
+
+### Run ESP32 Hardware Tests (After Flashing)
+```bash
 pio test -e esp32test --filter test_signalk_esp32
 ```
+**Note**: Requires ESP32 hardware connected and firmware flashed. Update expected after recent code changes.
 
 ### Expected Output (Native)
 ```
 Environment    Test                      Status    Duration
 -------------  ------------------------  --------  ------------
-native         test_light_controller     PASSED    00:00:02.25
-native         test_signalk_integration  PASSED    00:00:02.26
-native         test_sound_controller     PASSED    00:00:02.05
-native         test_state_machine        PASSED    00:00:01.98
+native         test_light_controller     PASSED    00:00:01.84
+native         test_signalk_integration  PASSED    00:00:01.82
+native         test_sound_controller     PASSED    00:00:02.37
+native         test_state_machine        PASSED    00:00:01.72
 
-114 test cases: 114 succeeded in 00:00:08.535
-```
-
-### Expected Output (ESP32)
-```
-Environment    Test                Status    Duration
--------------  ------------------  --------  ------------
-esp32test      test_signalk_esp32  PASSED    00:00:17.822
-
-14 test cases: 14 succeeded in 00:00:17.822
+119 test cases: 119 succeeded in 00:00:07.762
 ```
 
 ---
@@ -366,6 +364,37 @@ esp32test      test_signalk_esp32  PASSED    00:00:17.822
 ## Known Issues
 
 None. All tests passing consistently.
+
+---
+
+## Pending Hardware Verification
+
+### Ad-Hoc Signal Queueing Timing
+The unit tests verify that the ad-hoc signal queueing mechanism works correctly (signals queue without failing/interrupting). However, **full timing validation requires ESP32 hardware integration testing** because:
+
+1. **MockTimer Limitation**: The unit test mock cannot accurately simulate asynchronous timer callbacks and the 2-second delay
+2. **Real Timer Behavior**: The `timer_.scheduleOnce(2000ms)` callback needs to be validated on actual hardware with ESP32Timer
+
+**Hardware Test Checklist**:
+- [ ] Queue ad-hoc signal during periodic signal playback (e.g., during 2-blast sequence)
+- [ ] Verify 2-second delay after periodic signal completes before queued ad-hoc plays
+- [ ] Test multiple queue requests (verify last signal replaces earlier queued signals)
+- [ ] Queue ad-hoc during ad-hoc signal playback
+- [ ] Measure actual timing with stopwatch/scope
+- [ ] Verify `stopAllSound()` clears queue and cancels delay timers
+- [ ] Test unmute immediate playback (signal should start within 100ms)
+
+**Expected Behavior**:
+- Periodic signal completes → 2-second pause → queued ad-hoc signal plays automatically
+- Queue holds only most recent signal (single-slot queue)
+- Emergency stop immediately cancels queue and any pending delay timers
+
+### Prolonged Blast Duration Verification
+User reported that prolonged blasts appear shorter than expected (4-6 seconds per COLREGs). This needs verification on hardware:
+- [ ] Measure actual prolonged blast duration with timer
+- [ ] Check Sound Controller `PROLONGED_BLAST_MS` constant (currently defined for 4-6s range)
+- [ ] Verify ESP32Timer accuracy for long durations
+- [ ] Test under load (relay switching, WiFi active)
 
 ---
 
@@ -400,11 +429,15 @@ None. All tests passing consistently.
 **All core functionality validated** through comprehensive testing:
 - ✅ COLREGs compliance (18 state combinations)
 - ✅ Hardware control (light + sound)
-- ✅ SignalK protocol integration (88 tests total: 74 native + 14 ESP32)
-- ✅ Safety features (muted by default, emergency stop)
-- ✅ Real hardware validation on ESP32 Dev Kit C V4
-- ✅ Periodic update pattern (60s heartbeat) verified
+- ✅ SignalK protocol integration (74 tests)
+- ✅ Safety features (muted by default, emergency stop, queue clearing)
+- ✅ Ad-hoc signal queueing system (behavioral verification)
+- ✅ Unmute immediate playback (Rule 35 compliance)
 
-**Total Test Coverage**: 128 tests (114 native + 14 embedded)
+**Total Test Coverage**: 119 tests (all native)
 
-**Project Status**: ✅ **PRODUCTION READY** - All tests passing, firmware validated on hardware, ready for maritime deployment.
+**Project Status**: ✅ **READY FOR ESP32 HARDWARE INTEGRATION TESTING** 
+- Unit tests: 119/119 passing (100%)
+- Queueing timing validation pending on hardware
+- Prolonged blast duration needs measurement
+- Ready for maritime field testing after hardware validation

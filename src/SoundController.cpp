@@ -4,7 +4,17 @@
  */
 
 #include "SoundController.h"
+#ifndef NATIVE_BUILD
 #include <Arduino.h>
+#define DEBUG_PRINT(x) Serial.print(x)
+#define DEBUG_PRINTLN(x) Serial.println(x)
+#define DEBUG_PRINTF(fmt, ...) Serial.printf(fmt, __VA_ARGS__)
+#else
+#include <cstdio>
+#define DEBUG_PRINT(x) printf("%s", x)
+#define DEBUG_PRINTLN(x) printf("%s\n", x)
+#define DEBUG_PRINTF(fmt, ...) printf(fmt, __VA_ARGS__)
+#endif
 
 SoundController::SoundController(IRelayController& relay_controller, ITimer& timer)
     : relay_controller_(relay_controller),
@@ -15,6 +25,10 @@ SoundController::SoundController(IRelayController& relay_controller, ITimer& tim
       periodic_timer_id_(0),
       last_periodic_start_ms_(0),
       signal_in_progress_(false),
+      current_signal_is_periodic_(false),
+      has_queued_adhoc_(false),
+      queued_adhoc_signal_(AdHocSignal::TURN_STARBOARD),
+      adhoc_delay_timer_id_(0),
       sequence_index_(0),
       sequence_timer_id_(0),
       sequence_horn_active_(false),
@@ -58,6 +72,21 @@ void SoundController::mutePeriodicSignals() {
 
 void SoundController::unmutePeriodicSignals() {
     periodic_muted_ = false;
+    
+    // Reset countdown and trigger signal immediately when unmuting
+    if (current_periodic_pattern_ != SoundSignalPattern::NONE && periodic_interval_seconds_ > 0) {
+        // Cancel existing timer
+        if (periodic_timer_id_ != 0) {
+            timer_.cancel(periodic_timer_id_);
+            periodic_timer_id_ = 0;
+        }
+        
+        // Play signal immediately
+        playPeriodicSignal();
+        
+        // Reschedule for next interval
+        scheduleNextPeriodicSignal();
+    }
 }
 
 uint16_t SoundController::getPeriodicCountdownSeconds() const {
@@ -78,22 +107,33 @@ uint16_t SoundController::getPeriodicCountdownSeconds() const {
 
 void SoundController::triggerAdHocSignal(AdHocSignal signal) {
     if (signal_in_progress_) {
-        Serial.println("[HORN] Signal already in progress, ignoring new trigger");
-        return; // Don't interrupt ongoing signal
+        // Queue the ad-hoc signal to play after current signal finishes
+        has_queued_adhoc_ = true;
+        queued_adhoc_signal_ = signal;
+        DEBUG_PRINTLN("[HORN] Signal in progress, queueing ad-hoc signal");
+        return;
     }
     
     // Set flag immediately to prevent race condition
     signal_in_progress_ = true;
+    current_signal_is_periodic_ = false;
     playAdHocPattern(signal);
 }
 
 void SoundController::stopAllSound() {
     stopHorn();
     signal_in_progress_ = false;
+    current_signal_is_periodic_ = false;
+    has_queued_adhoc_ = false;  // Clear queue on stop
     
     if (periodic_timer_id_ != 0) {
         timer_.cancel(periodic_timer_id_);
         periodic_timer_id_ = 0;
+    }
+    
+    if (adhoc_delay_timer_id_ != 0) {
+        timer_.cancel(adhoc_delay_timer_id_);
+        adhoc_delay_timer_id_ = 0;
     }
 }
 
@@ -106,12 +146,12 @@ bool SoundController::isHornActive() const {
 // =============================================================================
 
 void SoundController::startHorn() {
-    Serial.println("[HORN] Horn STARTED");
+    DEBUG_PRINTLN("[HORN] Horn STARTED");
     relay_controller_.activate(RelayChannel::HORN);
 }
 
 void SoundController::stopHorn() {
-    Serial.println("[HORN] Horn STOPPED");
+    DEBUG_PRINTLN("[HORN] Horn STOPPED");
     relay_controller_.deactivate(RelayChannel::HORN);
 }
 
@@ -137,34 +177,39 @@ void SoundController::onPeriodicTimerExpired() {
 }
 
 void SoundController::playPeriodicSignal() {
+    signal_in_progress_ = true;
+    current_signal_is_periodic_ = true;  // Mark as periodic signal
+    
     std::vector<BlastStep> sequence;
     
     switch (current_periodic_pattern_) {
         case SoundSignalPattern::NONE:
+            signal_in_progress_ = false;
+            current_signal_is_periodic_ = false;
             return; // No signal to play
             
         case SoundSignalPattern::PROLONGED_2MIN:
             // ▬▬ - 1 prolonged blast (Rule 35: underway making no way, restricted visibility)
             sequence = {{true}};
-            Serial.println("[HORN] Periodic: 1 prolonged blast");
+            DEBUG_PRINTLN("[HORN] Periodic: 1 prolonged blast");
             break;
             
         case SoundSignalPattern::PROLONGED_PROLONGED_2MIN:
             // ▬▬ ▬▬ - 2 prolonged blasts (Rule 35: underway making way, restricted visibility)
             sequence = {{true}, {true}};
-            Serial.println("[HORN] Periodic: 2 prolonged blasts");
+            DEBUG_PRINTLN("[HORN] Periodic: 2 prolonged blasts");
             break;
             
         case SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN:
             // ▬▬ ● ● - 1 prolonged + 2 short blasts (Rule 35: NUC, restricted visibility)
             sequence = {{true}, {false}, {false}};
-            Serial.println("[HORN] Periodic: 1 prolonged + 2 short blasts");
+            DEBUG_PRINTLN("[HORN] Periodic: 1 prolonged + 2 short blasts");
             break;
             
         case SoundSignalPattern::SHORT_PROLONGED_SHORT:
             // ● ▬▬ ● - Short, prolonged, short (Rule 35: anchorage warning)
             sequence = {{false}, {true}, {false}};
-            Serial.println("[HORN] Periodic: Short-Prolonged-Short");
+            DEBUG_PRINTLN("[HORN] Periodic: Short-Prolonged-Short");
             break;
     }
     
@@ -211,7 +256,7 @@ void SoundController::playAdHocPattern(AdHocSignal signal) {
             break;
     }
     
-    Serial.printf("[HORN] Playing ad-hoc signal with %d blasts\n", sequence.size());
+    DEBUG_PRINTF("[HORN] Playing ad-hoc signal with %d blasts\n", (int)sequence.size());
     playSequence(sequence);
 }
 
@@ -247,8 +292,8 @@ void SoundController::playSequence(const std::vector<BlastStep>& sequence) {
     
     // Start first blast immediately
     bool is_prolonged = current_sequence_[0].is_prolonged;
-    Serial.printf("[HORN] Playing blast 1/%d (%s)\n", 
-                  sequence.size(),
+    DEBUG_PRINTF("[HORN] Playing blast 1/%d (%s)\n", 
+                  (int)sequence.size(),
                   is_prolonged ? "prolonged" : "short");
     startHorn();
     sequence_horn_active_ = true;
@@ -283,10 +328,17 @@ void SoundController::updateSequencePlayback() {
             
             // Check if sequence is complete
             if (sequence_index_ >= current_sequence_.size()) {
+                bool was_periodic = current_signal_is_periodic_;
                 signal_in_progress_ = false;
+                current_signal_is_periodic_ = false;
                 current_sequence_.clear();
                 sequence_index_ = 0;
-                Serial.println("[HORN] Sequence complete");
+                DEBUG_PRINTLN("[HORN] Sequence complete");
+                
+                // If this was a periodic signal and we have a queued ad-hoc, schedule it
+                if (was_periodic && has_queued_adhoc_) {
+                    processQueuedAdHocSignal();
+                }
             }
         }
     } else {
@@ -295,18 +347,25 @@ void SoundController::updateSequencePlayback() {
             // Check if we've played all blasts
             if (sequence_index_ >= current_sequence_.size()) {
                 // All blasts complete
+                bool was_periodic = current_signal_is_periodic_;
                 signal_in_progress_ = false;
+                current_signal_is_periodic_ = false;
                 current_sequence_.clear();
                 sequence_index_ = 0;
-                Serial.println("[HORN] Sequence complete");
+                DEBUG_PRINTLN("[HORN] Sequence complete");
+                
+                // If this was a periodic signal and we have a queued ad-hoc, schedule it
+                if (was_periodic && has_queued_adhoc_) {
+                    processQueuedAdHocSignal();
+                }
                 return;
             }
             
             // Start next blast (sequence_index was incremented after previous blast)
             bool is_prolonged = current_sequence_[sequence_index_].is_prolonged;
-            Serial.printf("[HORN] Playing blast %d/%d (%s)\n", 
-                          sequence_index_ + 1, 
-                          current_sequence_.size(),
+            DEBUG_PRINTF("[HORN] Playing blast %d/%d (%s)\n", 
+                          (int)(sequence_index_ + 1), 
+                          (int)current_sequence_.size(),
                           is_prolonged ? "prolonged" : "short");
             
             startHorn();
@@ -314,4 +373,23 @@ void SoundController::updateSequencePlayback() {
             sequence_state_start_ms_ = timer_.millis();
         }
     }
+}
+
+void SoundController::processQueuedAdHocSignal() {
+    if (!has_queued_adhoc_) {
+        return;
+    }
+    
+    AdHocSignal signal = queued_adhoc_signal_;
+    has_queued_adhoc_ = false;
+    
+    DEBUG_PRINTLN("[HORN] Playing queued ad-hoc signal after 2-second delay");
+    
+    // Schedule ad-hoc signal after 2-second delay
+    adhoc_delay_timer_id_ = timer_.scheduleOnce(2000, [this, signal]() {
+        this->signal_in_progress_ = true;
+        this->current_signal_is_periodic_ = false;
+        this->playAdHocPattern(signal);
+        this->adhoc_delay_timer_id_ = 0;
+    });
 }

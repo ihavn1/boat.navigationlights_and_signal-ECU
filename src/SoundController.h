@@ -6,6 +6,12 @@
  * Manages:
  * - Ad-hoc semi-automatic signals (one-shot blasts from UI command)
  * - Periodic signals (auto-repeating with countdown, mute/unmute from UI)
+ * 
+ * Signal Queueing:
+ * - If an ad-hoc signal is requested while a signal is playing, it will be queued
+ * - Queued ad-hoc signals play automatically after a 2-second delay when the current signal completes
+ * - Only one ad-hoc signal can be queued at a time (newest replaces previous)
+ * - Prevents overlapping horn signals and maintains COLREGs compliance
  */
 
 #ifndef SOUND_CONTROLLER_H
@@ -129,6 +135,12 @@ private:
 
     // Signal playback state
     bool signal_in_progress_;
+    bool current_signal_is_periodic_;  // Track if current signal is periodic (for queue processing)
+    
+    // Ad-hoc signal queue (only supports one queued signal)
+    bool has_queued_adhoc_;
+    AdHocSignal queued_adhoc_signal_;
+    uint32_t adhoc_delay_timer_id_;
     
     // Sequence playback for ad-hoc signals
     struct BlastStep {
@@ -157,6 +169,9 @@ private:
     // Timing helpers
     void scheduleNextPeriodicSignal();
     void onPeriodicTimerExpired();
+    
+    // Queue management
+    void processQueuedAdHocSignal();
 };
 
 #endif // SOUND_CONTROLLER_H

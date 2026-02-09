@@ -42,4 +42,12 @@
  */
 void setupSignalK(NavigationLightsECU& ecu);
 
+// String conversion functions (for SignalK and Web API)
+const char* sk_conditionToString(Condition condition);
+const char* sk_boatStateToString(BoatState state);
+const char* sk_adHocSignalToString(AdHocSignal signal);
+Condition sk_stringToCondition(const String& str);
+BoatState sk_stringToBoatState(const String& str);
+AdHocSignal sk_stringToAdHocSignal(const String& str);
+
 #endif // SIGNALK_INTEGRATION_H

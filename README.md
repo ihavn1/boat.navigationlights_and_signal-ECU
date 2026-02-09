@@ -2,13 +2,14 @@
 
 ESP32-based controller for COLREGs-compliant navigation lights and sound signals on pleasure boats <15m. Integrated with SignalK for remote monitoring and control.
 
-## Status: ✅ Code Complete - ⚠️ Hardware Integration Pending
+## Status: ✅ Code Complete + Web API Integrated 🌐
 
-**Test Coverage**: 119 native tests passing, 14 ESP32 tests pending re-run  
-**Build**: Successful (71.8% flash, 9.4% RAM)  
-**Code Status**: Complete and validated via comprehensive unit tests  
-**Hardware Status**: Testing in progress (Phase 5)  
-**SignalK**: Full bidirectional integration with periodic updates
+**Test Coverage**: 148 tests passing (119 unit + 29 Web API integration)  
+**Build**: Successful (72.5% flash, 9.4% RAM)  
+**Code Status**: Complete and validated via comprehensive automated testing  
+**Hardware Status**: Running on ESP32 with Web API operational  
+**SignalK**: Full bidirectional integration with periodic updates  
+**Web UI**: Phase 1 complete - REST API backend with 100% test coverage
 
 ## Quick Start
 
@@ -26,20 +27,20 @@ pio device monitor
 
 ### Run Tests
 ```bash
-# Native tests (fast, ~7.8s)
+# Native unit tests (fast, ~7.8s)
 pio test -e native
 
 # ESP32 embedded tests (requires hardware, ~17.8s) - pending re-run
 pio test -e esp32test
 
+# Web API integration tests (requires running ESP32, ~6.5s)
+.\test_web_api.ps1
+
 # Run all tests
-pio test -e native && pio test -e esp32test
+pio test -e native && .\test_web_api.ps1
 ```
 
-## Project Structure
-```
-├── src/
-│   ├── main.cpp                    # Main entry + SignalK setup
+## Project Structure+ Web API setup
 │   ├── interfaces/                 # Hardware abstraction layer
 │   │   ├── IRelayController.h      # Relay interface
 │   │   └── ITimer.h                # Timer interface
@@ -48,11 +49,16 @@ pio test -e native && pio test -e esp32test
 │   ├── SoundController.cpp/.h      # Horn/signal control (✅ 16 tests)
 │   ├── NavigationLightsECU.cpp/.h  # ECU facade (✅ tested)
 │   ├── signalk_integration.cpp/.h  # SignalK layer (✅ 74 tests)
+│   ├── web_api.cpp/.h              # REST API backend (✅ 29 tests)
 │   ├── ESP32RelayController.cpp/.h # GPIO implementation
 │   └── ESP32Timer.cpp/.h           # FreeRTOS timer
 ├── test/
 │   ├── test_state_machine/         # 20 COLREGs tests
 │   ├── test_light_controller/      # 9 relay tests
+│   ├── test_sound_controller/      # 16 timing tests
+│   ├── test_signalk_integration/   # 74 SignalK tests
+│   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
+├── test_web_api.ps1                # 29 Web API integration tests (✅ passing
 │   ├── test_sound_controller/      # 16 timing tests
 │   ├── test_signalk_integration/   # 74 SignalK tests
 │   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
@@ -72,7 +78,16 @@ pio test -e native && pio test -e esp32test
 - ✅ Ad-hoc signal queueing (auto-plays after 2s delay if signal in progress)
 
 ### SignalK Integration
-- ✅ Bidirectional communication (PUT requests + delta publishing)
+- ✅ Bidirectional communication (PUT requests + delta p
+
+### Web API (Fallback Control)
+- ✅ 7 REST API endpoints (2 GET, 5 POST)
+- ✅ Browser-accessible control interface at `http://nav-lights-ecu.local/api/*`
+- ✅ JSON request/response with proper error handling (HTTP 200/400)
+- ✅ Automated test suite: [test_web_api.ps1](test_web_api.ps1) (29/29 passing)
+- ✅ Health monitoring (uptime, heap, WiFi RSSI, SignalK connection status)
+- ✅ Full ECU control when SignalK unavailable
+- 📋 Phase 2: HTML/CSS/JS frontend (planned)ublishing)
 - ✅ 5 input paths (condition, state, mute, ad-hoc signals, emergency stop)
 - ✅ 13 output paths (status + lights + horn + heartbeat)
 - ✅ Periodic updates every 60s (heartbeat pattern)

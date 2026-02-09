@@ -1,17 +1,16 @@
 # Test Results Summary
 
-## Overall Status: ✅ 119/119 Tests Passing (100%)
+## Overall Status: ✅ 148/148 Tests Passing (100%)
 
-**Last Run**: 2026-02-03  
-**Native Duration**: ~7.8 seconds  
-**Platform**: Native (x86_64-pc-windows-msvc)  
-**Test Framework**: Unity 2.6.0
+**Last Run**: 2026-02-09  
+**Test Frameworks**: Unity 2.6.0 (native) + PowerShell (integration)  
+**Platforms**: Native (x86_64-pc-windows-msvc) + ESP32 Hardware
 
 ---
 
 ## Quick Summary
 
-### Native Tests (119 tests)
+### Native Unit Tests (119 tests)
 | Suite | Tests | Duration | Status |
 |-------|-------|----------|--------|
 | **State Machine** | 20 | ~1.7s | ✅ PASSED |
@@ -20,14 +19,31 @@
 | **SignalK Integration** | 74 | ~1.8s | ✅ PASSED |
 | **Native Total** | **119** | **~7.8s** | **✅ ALL PASSED** |
 
-**Grand Total**: **119 tests passing**
+### Web API Integration Tests (29 tests) 🆕
+| Suite | Tests | Duration | Status |
+|-------|-------|----------|--------|
+| **Health/Status** | 2 | ~0.5s | ✅ PASSED |
+| **Condition Control** | 4 | ~1.0s | ✅ PASSED |
+| **Boat State Control** | 7 | ~1.5s | ✅ PASSED |
+| **Mute Control** | 2 | ~0.5s | ✅ PASSED |
+| **Ad-Hoc Signals** | 9 | ~2.0s | ✅ PASSED |
+| **Emergency Stop** | 2 | ~0.5s | ✅ PASSED |
+| **Error Handling** | 3 | ~0.5s | ✅ PASSED |
+| **Integration Total** | **29** | **~6.5s** | **✅ ALL PASSED** |
 
-**Recent Updates**: 
+**Grand Total**: **148 tests passing** (119 unit + 29 integration)
+
+**Recent Updates** (February 9, 2026):
+- 🆕 **Web API Integration Tests**: 29 comprehensive REST API tests
+  - Automated PowerShell test suite ([test_web_api.ps1](test_web_api.ps1))
+  - Tests all 7 REST endpoints on actual ESP32 hardware
+  - Validates success and error responses (HTTP 200/400)
+  - 100% pass rate on first production run
 - Added 5 new sound controller tests (unmute immediate playback + ad-hoc queueing)
 - Fixed COLREGs Rule 35 sound signals (making way vs no way)
 - Implemented ad-hoc signal queueing system
 - Platform-independent debug logging for native tests
-- Previous: 114 tests → **Now**: 119 comprehensive tests
+- Evolution: 114 tests → 119 unit tests → **148 total tests**
 
 ---
 

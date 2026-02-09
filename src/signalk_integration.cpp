@@ -17,7 +17,7 @@ using namespace sensesp;
 // Note: Different from state_machine.cpp versions which use human-readable format
 // =======================================================================
 
-static const char* sk_conditionToString(Condition condition) {
+const char* sk_conditionToString(Condition condition) {
     switch (condition) {
         case Condition::DAY: return "day";
         case Condition::HOURS_OF_DARKNESS: return "hours_of_darkness";
@@ -26,13 +26,13 @@ static const char* sk_conditionToString(Condition condition) {
     }
 }
 
-static Condition sk_stringToCondition(const String& str) {
+Condition sk_stringToCondition(const String& str) {
     if (str == "hours_of_darkness") return Condition::HOURS_OF_DARKNESS;
     if (str == "restricted_visibility") return Condition::RESTRICTED_VISIBILITY;
     return Condition::DAY; // default
 }
 
-static const char* sk_boatStateToString(BoatState state) {
+const char* sk_boatStateToString(BoatState state) {
     switch (state) {
         case BoatState::MOORED: return "moored";
         case BoatState::UNDERWAY_MAKING_WAY: return "underway_making_way";
@@ -44,7 +44,7 @@ static const char* sk_boatStateToString(BoatState state) {
     }
 }
 
-static BoatState sk_stringToBoatState(const String& str) {
+BoatState sk_stringToBoatState(const String& str) {
     if (str == "underway_making_way") return BoatState::UNDERWAY_MAKING_WAY;
     if (str == "underway_no_way") return BoatState::UNDERWAY_NO_WAY;
     if (str == "anchorage") return BoatState::ANCHORAGE;
@@ -53,7 +53,7 @@ static BoatState sk_stringToBoatState(const String& str) {
     return BoatState::MOORED; // default
 }
 
-static const char* sk_adHocSignalToString(AdHocSignal signal) {
+const char* sk_adHocSignalToString(AdHocSignal signal) {
     switch (signal) {
         case AdHocSignal::TURN_STARBOARD: return "turn_starboard";
         case AdHocSignal::TURN_PORT: return "turn_port";
@@ -67,7 +67,7 @@ static const char* sk_adHocSignalToString(AdHocSignal signal) {
     }
 }
 
-static AdHocSignal sk_stringToAdHocSignal(const String& str) {
+AdHocSignal sk_stringToAdHocSignal(const String& str) {
     if (str == "turn_port") return AdHocSignal::TURN_PORT;
     if (str == "astern_propulsion") return AdHocSignal::ASTERN_PROPULSION;
     if (str == "danger_confusion") return AdHocSignal::DANGER_CONFUSION;

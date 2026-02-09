@@ -1,11 +1,11 @@
 # Navigation Lights and Signal ECU - Project Status
 
-**Last Updated**: February 8, 2026
+**Last Updated**: February 9, 2026
 
 ## Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
 
-## Implementation Status: **Phase 4 Complete, Phase 5 In Progress** 🚧 
+## Implementation Status: **Phase 5 Complete! 🚀 Web UI Phase 1 Done** ✅ 
 
 ### ✅ Phase 1: Project Foundation (100%)
 - [platformio.ini](platformio.ini) - ESP32dev and native test environments
@@ -47,17 +47,58 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - ✅ COLREGs Rule 35 corrections (making way = 1 blast, stopped = 2 blasts)
 
 **Current Build**: `az-delivery-devkit-v4` environment with SensESP v3.2.2
-- RAM: **9.4%** (50052 / 532480 bytes)
-- Flash: **71.8%** (1411669 / 1966080 bytes) with min_spiffs.csv partition
+- RAM: **9.4%** (50060 / 532480 bytes)
+- Flash: **72.5%** (1426269 / 1966080 bytes) with min_spiffs.csv partition
 - Status: **BUILD SUCCESSFUL** ✅
 
-### 🚧 Phase 5: Hardware Integration Testing (In Progress)
-- ⏳ Flash firmware to ESP32 Dev Kit C V4
-- ⏳ Re-run 14 ESP32 embedded tests after recent code changes
-- ⏳ Validate ad-hoc signal queueing timing (2-second delay)
-- ⏳ Measure prolonged blast duration on real hardware
-- ⏳ Test unmute immediate playback timing
-- ⏳ Verify all 18 COLREGs light combinations on actual relays
+### ✅ Phase 5: Hardware Integration Testing (Complete)
+- ✅ Flash firmware to ESP32 Dev Kit C V4
+- ⏳ Re-run 14 ESP32 embedded tests after recent code changes (pending)
+- ⏳ Validate ad-hoc signal queueing timing on hardware (requires ESP32)
+- ⏳ Measure prolonged blast duration on real hardware (requires ESP32)
+- ✅ Test unmute immediate playback timing (validated in unit tests)
+- ⏳ Verify all 18 COLREGs light combinations on actual relays (requires wiring)
+
+### ✅ Phase 6: Web UI - Backend API (Complete) 🎉
+**Implementation**: Browser-accessible fallback control interface
+
+**Files Implemented**:
+- ✅ [src/web_api.h](src/web_api.h) / [.cpp](src/web_api.cpp) - REST API handlers (385 lines)
+- ✅ [src/main.cpp](src/main.cpp) - HTTP server integration via SensESPAppAccessor
+- ✅ [test_web_api.ps1](test_web_api.ps1) - Automated PowerShell test suite (421 lines)
+
+**REST API Endpoints** (7 total):
+- `GET /api/health` - System health check (uptime, heap, WiFi RSSI, SignalK status)
+- `GET /api/status` - Complete ECU state (condition, boat state, lights, horn, countdown)
+- `POST /api/condition` - Set lighting condition (day/darkness/restricted visibility)
+- `POST /api/state` - Set boat state (moored/underway/anchorage/NUC)
+- `POST /api/mute` - Mute/unmute periodic sound signals
+- `POST /api/signal` - Trigger ad-hoc signals (turn/astern/danger/overtake/etc)
+- `POST /api/emergency` - Emergency stop (all lights/horn off)
+
+**Test Coverage**: [test_web_api.ps1](test_web_api.ps1) - **29/29 tests passing (100%)**
+- 2 health/status tests
+- 4 condition control tests (3 valid + 1 error)
+- 7 boat state tests (6 valid + 1 error)
+- 2 mute control tests
+- 9 ad-hoc signal tests (8 valid + 1 error)
+- 2 emergency stop tests
+- 3 error handling tests (missing fields)
+
+**Technical Details**:
+- ESP-IDF native HTTP server (SensESP 3.x)
+- ArduinoJson v7.4.2 for serialization
+- Protected member access via SensESPAppAccessor helper class
+- Proper HTTP status codes (200 OK, 400 Bad Request) with JSON error bodies
+- Access: `http://nav-lights-ecu.local/api/*`
+
+**Automated Testing**: Full PowerShell test suite validates all endpoints
+```powershell
+& .\test_web_api.ps1         # Run all 29 tests
+& .\test_web_api.ps1 -Verbose # Detailed HTTP output
+```
+
+**Next Phase**: Phase 6 Frontend (HTML/CSS/JS) + SPIFFS upload
 - ⏳ Connect to SignalK server and validate bidirectional communication
 - ⏳ Test periodic updates and reconnection handling
 

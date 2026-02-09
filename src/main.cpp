@@ -25,6 +25,7 @@
 #include "sensesp_app_builder.h"
 #include "sensesp/system/led_blinker.h"
 #include "signalk_integration.h"
+#include "web_api.h"
 
 // Project includes
 #include "ESP32RelayController.h"
@@ -34,6 +35,16 @@
 #include "NavigationLightsECU.h"
 
 using namespace sensesp;
+
+// Helper to access protected http_server_ member
+namespace {
+    class SensESPAppAccessor : public SensESPApp {
+    public:
+        static HTTPServer* getHttpServer(SensESPApp* app) {
+            return static_cast<SensESPAppAccessor*>(app)->http_server_.get();
+        }
+    };
+}
 
 // GPIO pin definitions
 // Production: Active-LOW opto-isolated relay module (LOW=ON, HIGH=OFF)
@@ -108,8 +119,13 @@ void setup() {
     // Setup SignalK integration
     setupSignalK(*ecu);
     
+    // Setup Web API for fallback UI
+    HTTPServer* http_server = SensESPAppAccessor::getHttpServer(sensesp_app.get());
+    setupWebAPI(http_server, ecu);
+    
     Serial.println("\nSystem initialized successfully");
     Serial.println("Connect to http://nav-lights-ecu.local for configuration");
+    Serial.println("Web API available at http://nav-lights-ecu.local/api/status");
 }
 
 void loop() {

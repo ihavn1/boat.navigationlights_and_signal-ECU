@@ -178,9 +178,9 @@ void test_ecu_adhoc_signal_triggers_horn() {
     // Horn should be active (1 short blast)
     TEST_ASSERT_TRUE(test_ecu->isHornActive());
     
-    // Wait for blast to complete (1s + margin)
+    // Wait for blast to complete (1s + margin) and process updates
     delay(1500);
-    timer->update();  // Process timer callbacks
+    test_ecu->update();  // Process sound controller and timer callbacks
     
     TEST_ASSERT_FALSE(test_ecu->isHornActive());
     

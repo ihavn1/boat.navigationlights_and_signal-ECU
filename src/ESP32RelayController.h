@@ -3,7 +3,7 @@
  * @brief ESP32 GPIO-based implementation of relay controller
  * 
  * Controls opto-isolated relay module via GPIO pins (active-low operation).
- * UI-agnostic: Can be controlled from SignalK (main UI) or BLE (fallback UI).
+ * UI-agnostic: Can be controlled from SignalK (main UI) or web UI (fallback).
  */
 
 #ifndef ESP32_RELAY_CONTROLLER_H

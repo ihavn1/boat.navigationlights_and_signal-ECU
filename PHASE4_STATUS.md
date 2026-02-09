@@ -15,20 +15,11 @@
 
 ### 2. NavigationLightsECU Facade ✅
 - Created [NavigationLightsECU.h](src/NavigationLightsECU.h) and [NavigationLightsECU.cpp](src/NavigationLightsECU.cpp)
-- **UI-Agnostic Design**: Single facade for both SignalK (main UI) and BLE (fallback UI)
-- Coordinates state machine, light controller, and sound controller
-- Exposes unified API for:
-  - Condition/state control
-  - Sound signal control (mute/unmute, ad-hoc signals)
-  - Status queries (lights, countdown, horn active)
-  - State change callbacks (for SignalK publishing)
-
-### 3. Main Application Wiring ✅
-- Updated [main.cpp](src/main.cpp) with complete hardware initialization:
+- ✅ [src/main.cpp](src/main.cpp) with complete hardware initialization:
   - GPIO pin mapping (8 relay channels)
   - Controller instantiation (relay, timer, light, sound, ECU)
   - Safety defaults (all relays OFF, periodic signals muted)
-- Build successful: **21.8% flash, 6.6% RAM**
+- ✅ Build successful: **21.8% flash, 6.6% RAM**
 
 ### 4. SignalK Integration (Complete) ✅
 - Implemented [signalk_integration.h](src/signalk_integration.h) and [signalk_integration.cpp](src/signalk_integration.cpp) with SensESP v3 API
@@ -101,10 +92,10 @@ Status: SUCCESS
 
 Validates: ECU initialization, state changes, COLREGs rules, timers, relay controllers on real ESP32 hardware
 The `NavigationLightsECU` facade enables dual UI support:
-- **Main UI**: SignalK over WiFi (to be implemented)
-- **Fallback UI**: BLE (future enhancement)
+- **Main UI**: SignalK over WiFi (implemented)
+- **Fallback UI**: Web-based control page (future enhancement - accessible at `/lights` when SignalK unavailable)
 
-Both UIs control the same underlying controllers via the facade's unified API.
+Both UIs control the same underlying controllers via the facade's unified API. The web fallback UI will use custom HTTP endpoints on SensESP's AsyncWebServer to provide direct browser-based control from any device on the boat's WiFi network.
 
 ### COLREGs Compliance ✅
 All COLREGs logic tested and verified:
@@ -192,17 +183,26 @@ Base: `electrical.switches.navigationLights.*`
    - Validate COLREGs light patterns
    - Test sound signal timing
 
-### Optional: Phase 5 Enhancements
-- BLE fallback UI for offline control
-- OTA firmware updat100% Complete ✅
+### Optional: Phase 6 Enhancements
+- Custom web fallback UI (HTTP control page at `/lights` for when SignalK unavailable)
+- OTA firmware updates
+- Data logging and diagnostics
+
+## Phase 4: 100% Complete ✅
 - ✅ SignalK integration with SensESP v3 API complete
 - ✅ 82 total tests passing (42 new SignalK tests)
 - ✅ Build successful (71.3% flash, 15.3% RAM)
 - ✅ Bidirectional communication (5 inputs, 12 outputs)
 - ✅ All conversion functions validated
 - ✅ Ready for hardware deployment
-- Mirror SignalK control surface
-- Use same `NavigationLightsECU` facade (UI-agnostic design)
+
+### Future: Web-Based Fallback UI
+- Custom HTTP endpoints for direct browser control when SignalK unavailable
+- Accessible at `http://nav-lights-ecu.local/lights` from any device on boat WiFi
+- Mirrors SignalK control surface (condition, state, mute, ad-hoc signals)
+- Uses same `NavigationLightsECU` facade (UI-agnostic design)
+- Responsive HTML/JavaScript interface for mobile and desktop
+- Parallel operation with SensESP configuration UI
 
 ## File Structure
 
@@ -227,15 +227,18 @@ test/
 
 ## Summary
 
-**Phase 4 Status**: 75% Complete
+**Phase 4 Status**: 100% Complete ✅
 - ✅ Core controllers fully functional (ESP32Timer, NavigationLightsECU, main.cpp)
-- ✅ Build successful (21.8% flash, 6.6% RAM)
-- ✅ UI-agnostic architecture ready for dual UI (SignalK + BLE)
-- ⏸️ SignalK integration deferred (requires SensESP v3 API study + hardware testing)
+- ✅ SignalK integration with SensESP v3 API complete
+- ✅ Build successful (71.8% flash, 9.4% RAM)
+- ✅ UI-agnostic architecture ready for dual UI (SignalK + web fallback)
+- ✅ 119 native tests passing, all conversion functions validated
+- ✅ Ready for hardware deployment and field testing
 
-**Recommendation**: 
-1. Proceed to hardware testing with programmatic control (manual state changes in code)
-2. Validate COLREGs behavior on actual ESP32 + relay module
-3. Then complete SignalK integration with actual server for testing
+**Current Focus**: Phase 5 - Hardware Integration Testing
+1. Flash firmware to ESP32 Dev Kit C V4
+2. Re-run embedded tests with recent code changes
+3. Validate timing on real hardware (queueing, unmute, prolonged blasts)
+4. Connect to SignalK server for integration testing
 
-The core ECU functionality is **production-ready** - only the UI communication layer remains.
+The firmware is **code-complete** and ready for hardware validation.

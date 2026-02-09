@@ -3,7 +3,7 @@
  * @brief Controller for navigation lights based on state machine
  * 
  * UI-agnostic design: Accepts light configuration from any source
- * (SignalK main UI or BLE fallback UI) and applies it to relay hardware.
+ * (SignalK main UI or web fallback UI) and applies it to relay hardware.
  */
 
 #ifndef LIGHT_CONTROLLER_H
@@ -21,7 +21,7 @@
  * 
  * Can be controlled from:
  * - SignalK (main UI): Updates state machine, controller applies changes
- * - BLE (fallback UI): Same interface, different source
+ * - Web UI (fallback): Same interface, different source
  */
 class LightController {
 public:
@@ -38,7 +38,7 @@ public:
      * @param config Desired light configuration from state machine
      * 
      * Updates only changed relays for efficiency.
-     * UI-agnostic: config can come from SignalK or BLE.
+     * UI-agnostic: config can come from SignalK or web UI.
      */
     void applyConfiguration(const LightConfiguration& config);
 

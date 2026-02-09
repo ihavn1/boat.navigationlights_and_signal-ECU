@@ -8,7 +8,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 ### Hardware Stack
 - **MCU**: AZ-Delivery ESP32 Dev Kit C V4
 - **Outputs**: Opto-isolated relay module (active-low control) for navigation lights (masthead, sidelights, sternlight, all-round, NUC lights) and horn
-- **Communication**: WiFi (SignalK), optional Bluetooth BLE (fallback UI)
+- **Communication**: WiFi only (SignalK primary, web UI fallback)
 
 ### Software Stack
 - **Framework**: SensESP (ESP32 framework wrapping SignalK)
@@ -132,8 +132,14 @@ Each condition+state combination maps to specific light configurations and perio
 - Document any non-standard paths in code comments with rationale
 
 ### Fallback UI Option
-- Android BLE app as backup when WiFi/SignalK unavailable
-- BLE service should mirror SignalK control surface (condition, state, signals)
+- Web-based control UI hosted on ESP32 as backup when SignalK unavailable
+- Accessible at `http://nav-lights-ecu.local/lights` from any device on boat's WiFi network
+- Custom HTTP endpoints on SensESP's AsyncWebServer
+- Responsive HTML/JavaScript interface mirroring SignalK control surface
+- Works in parallel with SensESP configuration UI
+- No app installation required - browser-only access
+- Emergency AP mode: `http://192.168.4.1/lights` if WiFi down
+- Scalable pattern for multiple ECUs on boat
 
 ## Key Files & References
 - [HARDWARE.md](../HARDWARE.md) - **Complete GPIO pin mapping, reserved pins, wiring diagrams**
@@ -160,6 +166,6 @@ Each condition+state combination maps to specific light configurations and perio
 3. **SensESP Integration**: Complete main.cpp with SensESP setup and SignalK client configuration
 4. **Hardware Wiring**: Connect relay module, verify GPIO mapping from HARDWARE.md
 5. **Maritime Field Testing**: Validate COLREGs compliance in actual conditions
-6. **(Optional) BLE fallback UI**: Android app for offline control
+6. **(Optional) Web fallback UI**: Custom HTTP control page for when SignalK unavailable
 
 **Note**: All core logic validated via TDD - 119 unit tests covering state machine, light control, sound control, and SignalK integration

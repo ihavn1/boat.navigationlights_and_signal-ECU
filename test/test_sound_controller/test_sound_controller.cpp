@@ -3,7 +3,7 @@
  * @brief Unit tests for SoundController
  * 
  * Tests sound signal timing, mute/unmute, and ad-hoc signals.
- * UI-agnostic: Tests work same whether commands come from SignalK or BLE.
+ * UI-agnostic: Tests work same whether commands come from SignalK or web UI.
  */
 
 #include <unity.h>

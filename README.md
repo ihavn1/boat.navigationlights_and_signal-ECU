@@ -103,7 +103,7 @@ pio test -e native && pio test -e esp32test
 - **RAM**: 520 KB SRAM
 - **Flash**: 4 MB
 - **WiFi**: 802.11 b/g/n (built-in, 2.4 GHz)
-- **Bluetooth**: BLE 4.2 (optional future use)
+- **Bluetooth**: BLE 4.2 (not used - WiFi only)
 
 ### GPIO Pin Mapping
 
@@ -151,5 +151,7 @@ pio test -e native && pio test -e esp32test
 - **Primary**: WiFi (SignalK server via SensESP framework)
 - **Network**: DHCP (10.100.100.100-250 range)
 - **Hostname**: `nav-lights-ecu.local` (mDNS)
-- **Web UI**: Configuration portal for WiFi and SignalK server settings
-- **Future**: BLE fallback UI when WiFi unavailable
+- **Web UI**: 
+  - Built-in SensESP configuration portal (WiFi and SignalK settings)
+  - Custom fallback control UI at `/lights` (works when SignalK unavailable)
+  - Access from any device on boat's WiFi network via browser

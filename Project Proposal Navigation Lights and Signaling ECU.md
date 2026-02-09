@@ -119,9 +119,24 @@ Every time the conditions or the bots state change this must be announced with S
 
 ### Fallback UI
 
-It must be possible to add a local user interface for controlling the ECU, so that all the functions and states can be accessed if the SignalK connection is down.
+A local web-based user interface running on the ECU itself must be provided for controlling the ECU when the SignalK connection is down. This fallback UI must be accessible from any device on the boat's WiFi network via web browser.
 
-Option: This fallback UI could be an Android app that communicates with the ECU via Bluetooth BLE.
+**Implementation**: Custom HTTP server endpoints on the ESP32 (via SensESP's built-in AsyncWebServer) serving a responsive HTML/JavaScript control page. The fallback UI provides the same functionality as the SignalK interface:
+- Condition selection (Day / Hours of darkness / Restricted visibility)
+- Boat state selection (Moored / Underway / Anchorage / NUC)
+- Mute/unmute periodic signals
+- Ad-hoc signal triggering (semi-automatic sound signals)
+- Real-time status display (countdown timer, active lights, horn status)
+
+**Access modes**:
+- Normal: `http://nav-lights-ecu.local/lights` (when connected to boat WiFi)
+- Emergency AP: `http://192.168.4.1/lights` (when ESP32 creates its own access point)
+
+This approach provides:
+- Universal access (any browser-capable device: phones, tablets, laptops)
+- No app installation required
+- Parallel operation with standard SensESP configuration UI
+- Scalable pattern for other boat ECUs
 
 ## Security
 

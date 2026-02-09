@@ -4,7 +4,7 @@
  * 
  * UI-Agnostic Architecture:
  * - Main UI: SignalK (WiFi) for normal operation
- * - Fallback UI: BLE (future) when WiFi unavailable
+ * - Fallback UI: Web-based control (future) when SignalK unavailable
  * Both UIs control the same underlying controllers via this facade.
  */
 
@@ -21,7 +21,7 @@
  * @brief Facade coordinating state machine, light controller, and sound controller
  * 
  * Single Responsibility: Coordinate components and expose unified interface
- * UI-agnostic: Methods can be called from SignalK handlers or BLE commands
+ * UI-agnostic: Methods can be called from SignalK handlers or web UI handlers
  */
 class NavigationLightsECU {
 public:
@@ -42,7 +42,7 @@ public:
     void update();
 
     // =======================================================================
-    // CONDITION & STATE CONTROL (from UI: SignalK or BLE)
+    // CONDITION & STATE CONTROL (from UI: SignalK or web UI)
     // =======================================================================
 
     /**
@@ -73,7 +73,7 @@ public:
     std::string getStateDescription() const { return state_machine_.getStateDescription(); }
 
     // =======================================================================
-    // SOUND SIGNAL CONTROL (from UI: SignalK or BLE)
+    // SOUND SIGNAL CONTROL (from UI: SignalK or web UI)
     // =======================================================================
 
     /**
@@ -111,7 +111,7 @@ public:
     void emergencyStop();
 
     // =======================================================================
-    // STATUS QUERY (for UI updates: SignalK or BLE)
+    // STATUS QUERY (for UI updates: SignalK or web UI)
     // =======================================================================
 
     /**

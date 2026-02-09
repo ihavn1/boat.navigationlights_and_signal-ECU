@@ -70,9 +70,10 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - Test sound signal audibility
 
 ### ⏳ Phase 7: Optional Enhancements (0%)
-- BLE fallback UI (when WiFi unavailable)
-- Web configuration portal
+- Custom web fallback UI (control page when SignalK unavailable)
+- Enhanced web configuration portal
 - OTA firmware updates
+- Data logging to SPIFFS
 
 ## Test Coverage
 
@@ -128,10 +129,10 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 
 ### UI-Agnostic Design ⭐
 `NavigationLightsECU` facade enables dual UI support:
-- **Main UI**: SignalK over WiFi (pending API integration)
-- **Fallback UI**: BLE (future enhancement)
+- **Main UI**: SignalK over WiFi (standard operation, integrated with boat's SignalK server)
+- **Fallback UI**: Web-based control page (future enhancement, accessible at `/lights` when SignalK unavailable)
 
-Both UIs control the same underlying controllers.
+Both UIs control the same underlying controllers via the facade's unified API.
 
 ### SOLID Principles Applied
 - **Single Responsibility**: Separate state machine, light control, sound control
@@ -195,10 +196,11 @@ Both UIs control the same underlying controllers.
 5. Verify state transitions during actual vessel operation
 
 ### Phase 7: Optional Enhancements (Future)
-1. BLE fallback UI for when WiFi unavailable
-2. Web configuration portal (WiFi credentials, SignalK server)
+1. Custom web fallback UI (HTTP control page at `/lights` for when SignalK unavailable)
+2. Enhanced web configuration portal (WiFi credentials, SignalK server)
 3. Watchdog timer for firmware hang detection
 4. OTA firmware updates
+5. Data logging to SPIFFS (diagnostic history)
 
 ## Development Workflow
 

@@ -13,8 +13,8 @@
 - **Input Voltage**: 5V via USB or VIN pin
 
 ### Wireless Capabilities
-- **WiFi**: 802.11 b/g/n, 2.4 GHz only
-- **Bluetooth**: BLE 4.2 (not currently used)
+- **WiFi**: 802.11 b/g/n, 2.4 GHz only (SignalK + web UI)
+- **Bluetooth**: BLE 4.2 (not used - WiFi-only design)
 - **Antenna**: Built-in PCB trace antenna
 
 ---
@@ -258,7 +258,7 @@ For bench testing without relays:
 - **Oil Pressure Sensor**: Analog input GPIO 32/33
 - **Engine Temperature**: I2C temp sensor on GPIO 21/22
 - **Bilge Alarm**: Digital input GPIO 34/35
-- **BLE Beacon**: Use built-in BLE for proximity detection
+- **Bluetooth**: ESP32 has BLE 4.2 capability (currently unused)
 
 ### Additional Relays
 If more than 8 channels needed:

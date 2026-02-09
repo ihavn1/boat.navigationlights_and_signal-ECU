@@ -2,7 +2,7 @@
  * @file SoundController.h
  * @brief Controller for sound signals (horn) based on COLREGs
  * 
- * UI-agnostic design: Can be controlled from SignalK (main UI) or BLE (fallback UI).
+ * UI-agnostic design: Can be controlled from SignalK (main UI) or web UI (fallback).
  * Manages:
  * - Ad-hoc semi-automatic signals (one-shot blasts from UI command)
  * - Periodic signals (auto-repeating with countdown, mute/unmute from UI)
@@ -49,7 +49,7 @@ enum class AdHocSignal : uint8_t {
  * 
  * Single Responsibility: Sound signal timing and horn control
  * Open/Closed: Easy to add new signal patterns
- * UI-agnostic: Commands from SignalK or BLE trigger same methods
+ * UI-agnostic: Commands from SignalK or web UI trigger same methods
  */
 class SoundController {
 public:
@@ -81,14 +81,14 @@ public:
     /**
      * @brief Mute periodic signals
      * Countdown continues, horn stays silent.
-     * UI command: can come from SignalK or BLE.
+     * UI command: can come from SignalK or web UI.
      */
     void mutePeriodicSignals();
 
     /**
      * @brief Unmute periodic signals
      * Horn will sound on next countdown expiry.
-     * UI command: can come from SignalK or BLE.
+     * UI command: can come from SignalK or web UI.
      */
     void unmutePeriodicSignals();
 
@@ -107,7 +107,7 @@ public:
      * @brief Trigger ad-hoc semi-automatic signal
      * @param signal Type of signal to emit (one-shot)
      * 
-     * UI command: operator selects from interface (SignalK or BLE).
+     * UI command: operator selects from interface (SignalK or web UI).
      * Signal plays once immediately, regardless of mute state.
      */
     void triggerAdHocSignal(AdHocSignal signal);

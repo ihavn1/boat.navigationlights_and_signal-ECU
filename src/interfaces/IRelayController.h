@@ -23,7 +23,8 @@ enum class RelayChannel : uint8_t {
     ALLROUND_WHITE = 4,      // 360° white light (anchorage, Rule 30)
     ALLROUND_RED_UPPER = 5,  // Upper red light for NUC (Rule 27)
     ALLROUND_RED_LOWER = 6,  // Lower red light for NUC (Rule 27)
-    HORN = 7                 // Sound signaling device
+    YELLOW_TOWING_LIGHT = 7, // Yellow light above sternlight (towing, Rule 24)
+    HORN = 8                 // Sound signaling device
 };
 
 /**

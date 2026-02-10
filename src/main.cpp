@@ -13,7 +13,8 @@
  * - GPIO 12: All-round White (Relay 5)
  * - GPIO 13: All-round Red Upper (Relay 6)
  * - GPIO 15: All-round Red Lower (Relay 7)
- * - GPIO 4: Horn (Relay 8)
+ * - GPIO 32: Yellow Towing Light (Relay 8)
+ * - GPIO 4: Horn (Relay 9)
  * 
  * Active-LOW control (production): HIGH=OFF, LOW=ON
  * Active-HIGH testing mode: Set ACTIVE_HIGH_RELAYS in platformio.ini
@@ -57,6 +58,7 @@ const uint8_t PIN_STERNLIGHT = 14;
 const uint8_t PIN_ALLROUND_WHITE = 12;
 const uint8_t PIN_ALLROUND_RED_UPPER = 13;
 const uint8_t PIN_ALLROUND_RED_LOWER = 15;
+const uint8_t PIN_YELLOW_TOWING_LIGHT = 32;
 const uint8_t PIN_HORN = 4;
 
 // Global objects (need to persist across loop iterations)
@@ -126,6 +128,7 @@ void setup() {
         PIN_ALLROUND_WHITE,
         PIN_ALLROUND_RED_UPPER,
         PIN_ALLROUND_RED_LOWER,
+        PIN_YELLOW_TOWING_LIGHT,
         PIN_HORN
     );
     relay_controller->begin();

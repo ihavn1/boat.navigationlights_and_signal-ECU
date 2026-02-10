@@ -19,6 +19,7 @@ void LightController::applyConfiguration(const LightConfiguration& config) {
     updateRelay(RelayChannel::ALLROUND_WHITE, config.allround_white, current_config_.allround_white);
     updateRelay(RelayChannel::ALLROUND_RED_UPPER, config.allround_red_upper, current_config_.allround_red_upper);
     updateRelay(RelayChannel::ALLROUND_RED_LOWER, config.allround_red_lower, current_config_.allround_red_lower);
+    updateRelay(RelayChannel::YELLOW_TOWING_LIGHT, config.yellow_towing_light, current_config_.yellow_towing_light);
     
     // Store new configuration
     current_config_ = config;
@@ -36,7 +37,8 @@ bool LightController::anyLightsActive() const {
            current_config_.sternlight ||
            current_config_.allround_white ||
            current_config_.allround_red_upper ||
-           current_config_.allround_red_lower;
+           current_config_.allround_red_lower ||
+           current_config_.yellow_towing_light;
 }
 
 void LightController::updateRelay(RelayChannel channel, bool should_be_active, bool currently_active) {

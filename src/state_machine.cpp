@@ -89,6 +89,15 @@ LightConfiguration StateMachine::computeLightsForDarkness() const {
             config.sternlight = true;
             // Note: No masthead light when NUC
             break;
+            
+        case BoatState::TOWING:
+            // Rule 24: Vessel towing shows normal underway lights + yellow towing light
+            config.masthead_light = true;
+            config.port_sidelight = true;
+            config.starboard_sidelight = true;
+            config.sternlight = true;
+            config.yellow_towing_light = true;
+            break;
     }
     
     return config;
@@ -143,6 +152,10 @@ SoundSignalPattern StateMachine::computeSignalForRestrictedVisibility() const {
         case BoatState::NUC_MAKING_WAY:
             // Rule 35(c): NUC vessel - 1 prolonged + 2 short blasts every 2min
             return SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN;
+            
+        case BoatState::TOWING:
+            // Rule 35(c): Vessel towing - 1 prolonged + 2 short blasts every 2min (same as NUC)
+            return SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN;
     }
     
     return SoundSignalPattern::NONE;
@@ -196,6 +209,7 @@ const char* boatStateToString(BoatState state) {
         case BoatState::ANCHORAGE: return "Anchorage";
         case BoatState::NUC_NO_WAY: return "NUC (No Way)";
         case BoatState::NUC_MAKING_WAY: return "NUC (Making Way)";
+        case BoatState::TOWING: return "Towing";
         default: return "Unknown";
     }
 }

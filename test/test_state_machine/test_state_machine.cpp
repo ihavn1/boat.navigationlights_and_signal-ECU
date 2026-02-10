@@ -281,6 +281,65 @@ void test_restricted_visibility_nuc_making_way_signal(void) {
 }
 
 // =============================================================================
+// TOWING STATE TESTS (Rule 24)
+// =============================================================================
+
+void test_day_towing_no_lights(void) {
+    // Rule 24: Towing vessel in daylight - no lights required
+    state_machine->setCondition(Condition::DAY);
+    state_machine->setBoatState(BoatState::TOWING);
+    
+    LightConfiguration lights = state_machine->getRequiredLights();
+    TEST_ASSERT_FALSE(lights.masthead_light);
+    TEST_ASSERT_FALSE(lights.port_sidelight);
+    TEST_ASSERT_FALSE(lights.starboard_sidelight);
+    TEST_ASSERT_FALSE(lights.sternlight);
+    TEST_ASSERT_FALSE(lights.yellow_towing_light);
+    
+    TEST_ASSERT_EQUAL(SoundSignalPattern::NONE, state_machine->getPeriodicSoundSignal());
+}
+
+void test_darkness_towing_navigation_plus_yellow(void) {
+    // Rule 24: Towing vessel in darkness - shows all normal underway lights + yellow towing light
+    state_machine->setCondition(Condition::HOURS_OF_DARKNESS);
+    state_machine->setBoatState(BoatState::TOWING);
+    
+    LightConfiguration lights = state_machine->getRequiredLights();
+    // All normal navigation lights for making way
+    TEST_ASSERT_TRUE(lights.masthead_light);
+    TEST_ASSERT_TRUE(lights.port_sidelight);
+    TEST_ASSERT_TRUE(lights.starboard_sidelight);
+    TEST_ASSERT_TRUE(lights.sternlight);
+    // Plus yellow towing light above sternlight
+    TEST_ASSERT_TRUE(lights.yellow_towing_light);
+    // No NUC or anchorage lights
+    TEST_ASSERT_FALSE(lights.allround_white);
+    TEST_ASSERT_FALSE(lights.allround_red_upper);
+    TEST_ASSERT_FALSE(lights.allround_red_lower);
+    
+    TEST_ASSERT_EQUAL(SoundSignalPattern::NONE, state_machine->getPeriodicSoundSignal());
+}
+
+void test_restricted_visibility_towing_lights_and_signal(void) {
+    // Rule 24 + Rule 35(c): Towing vessel in restricted visibility
+    // Shows all navigation lights + yellow towing + sound signal
+    state_machine->setCondition(Condition::RESTRICTED_VISIBILITY);
+    state_machine->setBoatState(BoatState::TOWING);
+    
+    LightConfiguration lights = state_machine->getRequiredLights();
+    // All normal navigation lights (same as darkness)
+    TEST_ASSERT_TRUE(lights.masthead_light);
+    TEST_ASSERT_TRUE(lights.port_sidelight);
+    TEST_ASSERT_TRUE(lights.starboard_sidelight);
+    TEST_ASSERT_TRUE(lights.sternlight);
+    TEST_ASSERT_TRUE(lights.yellow_towing_light);
+    
+    // Rule 35(c): Towing vessel sounds 1 prolonged + 2 short blasts every 2min
+    TEST_ASSERT_EQUAL(SoundSignalPattern::PROLONGED_SHORT_SHORT_2MIN, state_machine->getPeriodicSoundSignal());
+    TEST_ASSERT_EQUAL(120, state_machine->getPeriodicSignalIntervalSeconds());
+}
+
+// =============================================================================
 // STATE TRANSITION TESTS
 // =============================================================================
 
@@ -334,6 +393,11 @@ int main(int argc, char **argv) {
     RUN_TEST(test_restricted_visibility_anchorage_warning_signal);
     RUN_TEST(test_restricted_visibility_nuc_no_way_signal);
     RUN_TEST(test_restricted_visibility_nuc_making_way_signal);
+    
+    // Towing state tests
+    RUN_TEST(test_day_towing_no_lights);
+    RUN_TEST(test_darkness_towing_navigation_plus_yellow);
+    RUN_TEST(test_restricted_visibility_towing_lights_and_signal);
     
     // State transition tests
     RUN_TEST(test_initial_state);

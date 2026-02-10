@@ -13,6 +13,7 @@ ESP32RelayController::ESP32RelayController(
     uint8_t allround_white_pin,
     uint8_t allround_red_upper_pin,
     uint8_t allround_red_lower_pin,
+    uint8_t yellow_towing_pin,
     uint8_t horn_pin
 ) {
     pin_map_[static_cast<uint8_t>(RelayChannel::MASTHEAD_LIGHT)] = masthead_pin;
@@ -22,10 +23,11 @@ ESP32RelayController::ESP32RelayController(
     pin_map_[static_cast<uint8_t>(RelayChannel::ALLROUND_WHITE)] = allround_white_pin;
     pin_map_[static_cast<uint8_t>(RelayChannel::ALLROUND_RED_UPPER)] = allround_red_upper_pin;
     pin_map_[static_cast<uint8_t>(RelayChannel::ALLROUND_RED_LOWER)] = allround_red_lower_pin;
+    pin_map_[static_cast<uint8_t>(RelayChannel::YELLOW_TOWING_LIGHT)] = yellow_towing_pin;
     pin_map_[static_cast<uint8_t>(RelayChannel::HORN)] = horn_pin;
     
     // Initialize all relay states to OFF
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         relay_states_[i] = false;
     }
 }
@@ -35,14 +37,14 @@ bool ESP32RelayController::begin() {
     // BEFORE relay module is powered up
 #ifdef ACTIVE_HIGH_RELAYS
     // Active-high mode for testing: LOW = OFF
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         pinMode(pin_map_[i], OUTPUT);
         digitalWrite(pin_map_[i], LOW); // Ensure all relays OFF
         delay(10); // Small delay to ensure pin stabilizes
     }
 #else
     // Production active-low mode: HIGH = OFF
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         pinMode(pin_map_[i], OUTPUT);
         digitalWrite(pin_map_[i], HIGH); // Ensure all relays OFF
         delay(10); // Small delay to ensure pin stabilizes
@@ -84,12 +86,12 @@ bool ESP32RelayController::isActive(RelayChannel channel) const {
 void ESP32RelayController::deactivateAll() {
     // Emergency/safety function: turn off all relays immediately
 #ifdef ACTIVE_HIGH_RELAYS
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         digitalWrite(pin_map_[i], LOW); // Active-high: LOW = OFF
         relay_states_[i] = false;
     }
 #else
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 9; i++) {
         digitalWrite(pin_map_[i], HIGH); // Active-low: HIGH = OFF
         relay_states_[i] = false;
     }

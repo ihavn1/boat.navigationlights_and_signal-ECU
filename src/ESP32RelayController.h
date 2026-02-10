@@ -30,6 +30,7 @@ public:
      * @param allround_white_pin GPIO for all-round white light relay
      * @param allround_red_upper_pin GPIO for upper NUC red light relay
      * @param allround_red_lower_pin GPIO for lower NUC red light relay
+     * @param yellow_towing_pin GPIO for yellow towing light relay
      * @param horn_pin GPIO for horn relay
      */
     ESP32RelayController(
@@ -40,6 +41,7 @@ public:
         uint8_t allround_white_pin,
         uint8_t allround_red_upper_pin,
         uint8_t allround_red_lower_pin,
+        uint8_t yellow_towing_pin,
         uint8_t horn_pin
     );
 
@@ -53,10 +55,10 @@ public:
 
 private:
     // GPIO pin assignments
-    uint8_t pin_map_[8];
+    uint8_t pin_map_[9];
     
     // Track relay states (true = active/ON, false = inactive/OFF)
-    bool relay_states_[8];
+    bool relay_states_[9];
 
     // Helper to get pin for a channel
     uint8_t getPin(RelayChannel channel) const;

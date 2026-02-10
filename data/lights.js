@@ -528,7 +528,8 @@ function formatStateLabel(state) {
         'underway_no_way': 'Underway (No Way)',
         'anchorage': 'Anchorage',
         'nuc_making_way': 'NUC (Making Way)',
-        'nuc_no_way': 'NUC (No Way)'
+        'nuc_no_way': 'NUC (No Way)',
+        'towing': 'Towing'
     };
     return labels[state] || state;
 }

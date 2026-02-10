@@ -298,6 +298,13 @@ header {
                 0 0 40px var(--color-light-green);
 }
 
+.light-icon.yellow.on {
+    background: var(--color-light-amber);
+    border-color: var(--color-light-amber);
+    box-shadow: 0 0 20px var(--color-light-amber),
+                0 0 40px var(--color-light-amber);
+}
+
 .light-indicator span {
     font-size: 0.75rem;
     text-align: center;

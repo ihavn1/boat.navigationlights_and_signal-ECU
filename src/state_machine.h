@@ -32,7 +32,8 @@ enum class BoatState : uint8_t {
     UNDERWAY_MAKING_WAY = 2,      // Underway and making way through water
     ANCHORAGE = 3,                // At anchor
     NUC_NO_WAY = 4,              // Not Under Command, not making way (Rule 27)
-    NUC_MAKING_WAY = 5           // Not Under Command, making way (Rule 27)
+    NUC_MAKING_WAY = 5,          // Not Under Command, making way (Rule 27)
+    TOWING = 6                    // Towing another vessel (Rule 24)
 };
 
 /**
@@ -47,6 +48,7 @@ struct LightConfiguration {
     bool allround_white = false;       // 360° white light (anchorage, Rule 30)
     bool allround_red_upper = false;   // Upper red NUC light (Rule 27)
     bool allround_red_lower = false;   // Lower red NUC light (Rule 27)
+    bool yellow_towing_light = false;  // Yellow 135° aft light above sternlight (Rule 24)
 
     bool operator==(const LightConfiguration& other) const {
         return masthead_light == other.masthead_light &&
@@ -55,7 +57,8 @@ struct LightConfiguration {
                sternlight == other.sternlight &&
                allround_white == other.allround_white &&
                allround_red_upper == other.allround_red_upper &&
-               allround_red_lower == other.allround_red_lower;
+               allround_red_lower == other.allround_red_lower &&
+               yellow_towing_light == other.yellow_towing_light;
     }
 };
 

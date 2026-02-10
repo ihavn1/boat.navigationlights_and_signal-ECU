@@ -131,6 +131,7 @@ esp_err_t handleGetStatus(httpd_req_t* req) {
     lightsObj["allroundWhite"] = lights.allround_white;
     lightsObj["allroundRedUpper"] = lights.allround_red_upper;
     lightsObj["allroundRedLower"] = lights.allround_red_lower;
+    lightsObj["yellowTowingLight"] = lights.yellow_towing_light;
     
     // Horn status
     JsonObject hornObj = doc.createNestedObject("horn");
@@ -231,7 +232,8 @@ esp_err_t handlePostState(httpd_req_t* req) {
         strcmp(valueStr, "underway_no_way") != 0 && 
         strcmp(valueStr, "anchorage") != 0 && 
         strcmp(valueStr, "nuc_making_way") != 0 && 
-        strcmp(valueStr, "nuc_no_way") != 0) {
+        strcmp(valueStr, "nuc_no_way") != 0 && 
+        strcmp(valueStr, "towing") != 0) {
         return sendJsonError(req, 400, "Invalid boat state value");
     }
     

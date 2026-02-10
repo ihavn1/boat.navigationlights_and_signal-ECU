@@ -4,12 +4,13 @@ ESP32-based controller for COLREGs-compliant navigation lights and sound signals
 
 ## Status: ✅ Code Complete + Web UI Ready for Upload 🌐
 
-**Test Coverage**: 148 tests passing (119 unit + 29 Web API integration)  
-**Build**: Successful (72.5% flash, 9.4% RAM)  
+**Test Coverage**: 153 tests passing (124 unit + 29 Web API integration)  
+**Build**: Successful (72.7% flash, 9.4% RAM)  
 **Code Status**: Complete and validated via comprehensive automated testing  
 **Hardware Status**: Running on ESP32 with Web API operational  
 **SignalK**: Full bidirectional integration with periodic updates  
-**Web UI**: Phases 6-7 complete - Backend API + responsive frontend (ready for Phase 8 SPIFFS upload)
+**Web UI**: Phases 6-8 complete - Backend API + responsive frontend deployed  
+**Latest**: Towing state added (COLREGs Rule 24) with full test coverage
 
 ## Quick Start
 
@@ -68,10 +69,10 @@ pio test -e native && .\test_web_api.ps1
 │   ├── ESP32RelayController.cpp/.h # GPIO implementation
 │   └── ESP32Timer.cpp/.h           # FreeRTOS timer
 ├── test/
-│   ├── test_state_machine/         # 20 COLREGs tests
+│   ├── test_state_machine/         # 23 COLREGs tests (includes towing)
 │   ├── test_light_controller/      # 9 relay tests
 │   ├── test_sound_controller/      # 16 timing tests
-│   ├── test_signalk_integration/   # 74 SignalK tests
+│   ├── test_signalk_integration/   # 76 SignalK tests (includes towing)
 │   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
 ├── test_web_api.ps1                # 29 Web API integration tests (✅ passing
 │   ├── test_sound_controller/      # 16 timing tests
@@ -84,9 +85,10 @@ pio test -e native && .\test_web_api.ps1
 ## Features
 
 ### COLREGs Compliance
-- ✅ Rules 20, 21, 23, 25, 27, 30, 35 implemented
-- ✅ 18 condition/state combinations validated
+- ✅ Rules 20, 21, 23, 24, 25, 27, 30, 35 implemented
+- ✅ 21 condition/state combinations validated (7 boat states × 3 conditions)
 - ✅ Navigation lights (masthead, sidelights, sternlight)
+- ✅ Yellow towing light (Rule 24 - above sternlight)
 - ✅ NUC lights (2× red all-round vertical)
 - ✅ Anchorage light (all-round white)
 - ✅ Sound signals (short/prolonged blasts, periodic patterns)
@@ -128,6 +130,7 @@ pio test -e native && .\test_web_api.ps1
 - [PROJECT_STATUS.md](PROJECT_STATUS.md) - Overall project status
 - [PHASE4_STATUS.md](PHASE4_STATUS.md) - SignalK integration details
 - [TEST_RESULTS.md](TEST_RESULTS.md) - Complete test documentation
+- [docs/TOWING_STATE.md](docs/TOWING_STATE.md) - Towing state implementation (COLREGs Rule 24)
 - [.github/copilot-instructions.md](.github/copilot-instructions.md) - Development guidelines
 - [Project Proposal Navigation Lights and Signaling ECU.md](Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md) - COLREGs requirements
 
@@ -144,7 +147,7 @@ pio test -e native && .\test_web_api.ps1
 
 ### GPIO Pin Mapping
 
-#### Relay Outputs (8 channels)
+#### Relay Outputs (9 channels)
 | GPIO | Function | Relay | COLREGs Purpose | Polarity |
 |------|----------|-------|-----------------|----------|
 | **GPIO 25** | Masthead Light | CH1 | Rule 23 - Power-driven vessel | Active-LOW* |
@@ -154,7 +157,8 @@ pio test -e native && .\test_web_api.ps1
 | **GPIO 12** | All-round White | CH5 | Rule 30 - Anchorage | Active-LOW* |
 | **GPIO 13** | All-round Red Upper | CH6 | Rule 27 - NUC (upper) | Active-LOW* |
 | **GPIO 15** | All-round Red Lower | CH7 | Rule 27 - NUC (lower) | Active-LOW* |
-| **GPIO 4** | Horn | CH8 | Rule 35 - Sound signals | Active-LOW* |
+| **GPIO 32** | Yellow Towing Light | CH8 | Rule 24 - Towing (above stern) | Active-LOW* |
+| **GPIO 4** | Horn | CH9 | Rule 35 - Sound signals | Active-LOW* |
 
 **Active-LOW** = Production mode (HIGH=OFF, LOW=ON) for opto-isolated relay safety  
 *Set `ACTIVE_HIGH_RELAYS` in [platformio.ini](platformio.ini) for testing with active-HIGH hardware*
@@ -174,14 +178,14 @@ pio test -e native && .\test_web_api.ps1
 - **GPIO 6-11**: Connected to internal SPI flash (DO NOT USE)
 
 ### Relay Module
-- **Type**: 8-channel opto-isolated relay module
+- **Type**: 9 or 16-channel opto-isolated relay module (upgraded from 8-channel for towing light)
 - **Control Logic**: Active-LOW (production) / Active-HIGH (testing)
 - **Safety**: All relays OFF on power-up, boot, or crash
 - **Switching**: Minimized - only changes on state transitions
 
 ### Outputs
 - **Navigation Lights**: Masthead, port sidelight, starboard sidelight, sternlight
-- **Special Lights**: All-round white (anchorage), 2× all-round red (NUC - Not Under Command)
+- **Special Lights**: All-round white (anchorage), 2× all-round red (NUC - Not Under Command), yellow towing light (Rule 24)
 - **Sound Signal**: Horn/buzzer for COLREGs sound patterns
 
 ### Communication

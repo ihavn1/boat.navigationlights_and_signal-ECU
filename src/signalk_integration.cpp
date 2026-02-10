@@ -40,6 +40,7 @@ const char* sk_boatStateToString(BoatState state) {
         case BoatState::ANCHORAGE: return "anchorage";
         case BoatState::NUC_MAKING_WAY: return "nuc_making_way";
         case BoatState::NUC_NO_WAY: return "nuc_no_way";
+        case BoatState::TOWING: return "towing";
         default: return "moored";
     }
 }
@@ -50,6 +51,7 @@ BoatState sk_stringToBoatState(const String& str) {
     if (str == "anchorage") return BoatState::ANCHORAGE;
     if (str == "nuc_making_way") return BoatState::NUC_MAKING_WAY;
     if (str == "nuc_no_way") return BoatState::NUC_NO_WAY;
+    if (str == "towing") return BoatState::TOWING;
     return BoatState::MOORED; // default
 }
 
@@ -94,6 +96,7 @@ static ObservableValue<bool>* stern_value = nullptr;
 static ObservableValue<bool>* allround_white_value = nullptr;
 static ObservableValue<bool>* allround_red_upper_value = nullptr;
 static ObservableValue<bool>* allround_red_lower_value = nullptr;
+static ObservableValue<bool>* yellow_towing_light_value = nullptr;
 static ObservableValue<bool>* horn_value = nullptr;
 static ObservableValue<int>* heartbeat_value = nullptr;
 
@@ -145,6 +148,9 @@ static void updateAllObservableValues(NavigationLightsECU& ecu) {
     Serial.print("    allround_red_lower: "); Serial.println(lights.allround_red_lower);
     allround_red_lower_value->set(lights.allround_red_lower);
     
+    Serial.print("    yellow_towing_light: "); Serial.println(lights.yellow_towing_light);
+    yellow_towing_light_value->set(lights.yellow_towing_light);
+    
     // Horn status
     bool horn = ecu.isHornActive();
     Serial.print("  horn.active: "); Serial.println(horn ? "true" : "false");
@@ -177,6 +183,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
     allround_white_value = new ObservableValue<bool>(initial_lights.allround_white);
     allround_red_upper_value = new ObservableValue<bool>(initial_lights.allround_red_upper);
     allround_red_lower_value = new ObservableValue<bool>(initial_lights.allround_red_lower);
+    yellow_towing_light_value = new ObservableValue<bool>(initial_lights.yellow_towing_light);
     horn_value = new ObservableValue<bool>(ecu.isHornActive());
     heartbeat_value = new ObservableValue<int>(0);  // Start at 0, will toggle
     
@@ -368,6 +375,12 @@ void setupSignalK(NavigationLightsECU& ecu) {
         lights_prefix + "allroundRedLower",
         "/nav/lights/red_lower",
         new SKMetadata("", "All-round red lower")
+    ));
+    
+    yellow_towing_light_value->connect_to(new SKOutput<bool>(
+        lights_prefix + "yellowTowingLight",
+        "/nav/lights/yellow_towing",
+        new SKMetadata("", "Yellow towing light")
     ));
     
     horn_value->connect_to(new SKOutput<bool>(

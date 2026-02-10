@@ -21,7 +21,7 @@
 
 ## GPIO Pin Assignment
 
-### Relay Control Outputs (8 Channels)
+### Relay Control Outputs (9 Channels)
 
 All relay outputs use **active-LOW logic** by default for production use with opto-isolated relay modules. This ensures relays are safely OFF (HIGH state) on boot, reset, or firmware crash.
 
@@ -34,7 +34,8 @@ All relay outputs use **active-LOW logic** by default for production use with op
 | **GPIO 12** | D12 | All-round White | CH5 | Rule 30 | Anchorage light (visible 360°) |
 | **GPIO 13** | D13 | All-round Red Upper | CH6 | Rule 27(a) | NUC upper red light (vertical) |
 | **GPIO 15** | D15 | All-round Red Lower | CH7 | Rule 27(a) | NUC lower red light (vertical) |
-| **GPIO 4** | D4 | Horn / Sound Signal | CH8 | Rule 35 | Sound signal device |
+| **GPIO 32** | D32 | Yellow Towing Light | CH8 | Rule 24 | Yellow light above sternlight (towing) |
+| **GPIO 4** | D4 | Horn / Sound Signal | CH9 | Rule 35 | Sound signal device |
 
 #### Relay Logic Modes
 
@@ -130,16 +131,16 @@ If future expansion is needed, these pins are available:
 ## Relay Module Connection
 
 ### Recommended Module
-- **Type**: 8-channel opto-isolated relay module
+- **Type**: 8 or 16-channel opto-isolated relay module (9 channels required)
 - **Control Logic**: Active-LOW trigger (standard for most modules)
 - **Isolation**: Optical isolation between MCU and relay coils
 - **Relay Type**: SPDT (Single Pole Double Throw) or SPST
-- **Common Models**: SainSmart 8-channel, HiLetgo 8-relay, etc.
+- **Common Models**: SainSmart 16-channel, HiLetgo 16-relay, or use two 8-channel modules
 
 ### Wiring Schematic
 
 ```
-ESP32 Dev Kit C V4          8-Channel Relay Module
+ESP32 Dev Kit C V4          9+ Channel Relay Module
 ┌─────────────────┐         ┌──────────────────────┐
 │                 │         │                      │
 │  GPIO 25  ──────┼─────────┤ IN1  (Masthead)      │
@@ -149,7 +150,8 @@ ESP32 Dev Kit C V4          8-Channel Relay Module
 │  GPIO 12  ──────┼─────────┤ IN5  (All-round Wht) │
 │  GPIO 13  ──────┼─────────┤ IN6  (Red Upper)     │
 │  GPIO 15  ──────┼─────────┤ IN7  (Red Lower)     │
-│  GPIO 4   ──────┼─────────┤ IN8  (Horn)          │
+│  GPIO 32  ──────┼─────────┤ IN8  (Yellow Towing) │
+│  GPIO 4   ──────┼─────────┤ IN9  (Horn)          │
 │                 │         │                      │
 │  GND      ──────┼─────────┤ GND                  │
 │  5V (VIN) ──────┼─────────┤ VCC  (if module      │

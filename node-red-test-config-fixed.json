@@ -299,7 +299,7 @@
         "payload": "true",
         "payloadType": "bool",
         "x": 160,
-        "y": 500,
+        "y": 520,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -328,7 +328,7 @@
         "payload": "false",
         "payloadType": "bool",
         "x": 170,
-        "y": 540,
+        "y": 560,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -357,7 +357,7 @@
         "payload": "turn_starboard",
         "payloadType": "str",
         "x": 170,
-        "y": 600,
+        "y": 620,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -386,7 +386,7 @@
         "payload": "turn_port",
         "payloadType": "str",
         "x": 160,
-        "y": 640,
+        "y": 660,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -415,7 +415,7 @@
         "payload": "astern_propulsion",
         "payloadType": "str",
         "x": 190,
-        "y": 680,
+        "y": 700,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -444,7 +444,7 @@
         "payload": "danger_confusion",
         "payloadType": "str",
         "x": 200,
-        "y": 720,
+        "y": 740,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -473,7 +473,7 @@
         "payload": "pay_attention",
         "payloadType": "str",
         "x": 170,
-        "y": 760,
+        "y": 780,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -502,7 +502,7 @@
         "payload": "overtake_starboard",
         "payloadType": "str",
         "x": 200,
-        "y": 800,
+        "y": 820,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -531,7 +531,7 @@
         "payload": "overtake_port",
         "payloadType": "str",
         "x": 200,
-        "y": 840,
+        "y": 860,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -560,7 +560,7 @@
         "payload": "agreement_overtaken",
         "payloadType": "str",
         "x": 210,
-        "y": 880,
+        "y": 900,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -589,7 +589,7 @@
         "payload": "true",
         "payloadType": "bool",
         "x": 150,
-        "y": 940,
+        "y": 960,
         "wires": [
             [
                 "a1b2c3d4e5f6g7h8"
@@ -609,7 +609,7 @@
         "finalize": "",
         "libs": [],
         "x": 450,
-        "y": 500,
+        "y": 520,
         "wires": [
             [
                 "0ef60adc19e07b73",
@@ -1060,7 +1060,7 @@
         "type": "debug",
         "z": "f1a2b3c4d5e6f7g8",
         "name": "debug 2",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1072,7 +1072,36 @@
         "wires": []
     },
     {
-        "id": "cc4b5c9844ca9b65",
+        "id": "c454063f7ade5849",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "State: Towing",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.boatState",
+        "payload": "towing",
+        "payloadType": "str",
+        "x": 130,
+        "y": 480,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
+        "id": "2a233758b1270d49",
         "type": "global-config",
         "env": [],
         "modules": {

@@ -194,6 +194,48 @@ function updateLightsUI(lights) {
             indicator.classList.toggle('off', !isOn);
         }
     });
+    
+    // Update boat diagram
+    updateBoatDiagram(lights);
+}
+
+/**
+ * Update boat diagram SVG lights
+ */
+function updateBoatDiagram(lights) {
+    applyLightsToBoatDiagram(lights);
+}
+
+/**
+ * Apply light states to boat diagram SVG elements
+ */
+function applyLightsToBoatDiagram(lights) {
+    // Map light names to SVG element IDs
+    const lightMap = {
+        'masthead': 'masthead-light',
+        'portSidelight': 'port-sidelight',
+        'starboardSidelight': 'starboard-sidelight',
+        'sternlight': 'sternlight',
+        'allroundWhite': 'allround-white',
+        'allroundRedUpper': 'nuc-upper',
+        'allroundRedLower': 'nuc-lower',
+        'yellowTowingLight': 'yellow-towing-light'
+    };
+    
+    // Update each light in the diagram
+    Object.keys(lightMap).forEach(lightName => {
+        const svgId = lightMap[lightName];
+        const element = document.getElementById(svgId);
+        
+        if (element) {
+            const isOn = lights[lightName];
+            if (isOn) {
+                element.classList.add('active');
+            } else {
+                element.classList.remove('active');
+            }
+        }
+    });
 }
 
 /**

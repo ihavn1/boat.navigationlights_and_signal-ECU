@@ -254,6 +254,56 @@ header {
    Lights Display
    ============================================================================ */
 
+/* Boat Diagram Styles */
+.boat-diagram-container {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+#boatDiagram {
+    max-width: 400px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Control individual lights in SVG - all lights hidden by default */
+#boatDiagram .light {
+    opacity: 0.2;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Active lights with glow effects */
+#boatDiagram .light.active {
+    opacity: 1;
+}
+
+/* Specific light glow effects when active */
+#boatDiagram #port-sidelight.active {
+    filter: drop-shadow(0 0 8px #ff4444) drop-shadow(0 0 12px #ff4444);
+}
+
+#boatDiagram #starboard-sidelight.active {
+    filter: drop-shadow(0 0 8px #44ff44) drop-shadow(0 0 12px #44ff44);
+}
+
+#boatDiagram #yellow-towing-light.active {
+    filter: drop-shadow(0 0 8px #ffbb33) drop-shadow(0 0 12px #ffbb33);
+}
+
+#boatDiagram #masthead-light.active,
+#boatDiagram #sternlight.active,
+#boatDiagram #allround-white.active {
+    filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 12px #ffffff);
+}
+
+#boatDiagram #nuc-upper.active,
+#boatDiagram #nuc-lower.active {
+    filter: drop-shadow(0 0 8px #ff4444) drop-shadow(0 0 12px #ff4444);
+}
+
 .lights-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));

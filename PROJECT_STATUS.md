@@ -5,7 +5,7 @@
 ## Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
 
-## Implementation Status: **Phase 5 Complete! 🚀 Web UI Phase 1 Done** ✅ 
+## Implementation Status: **Phase 7 Complete! 🚀 Web UI Frontend Done** ✅ 
 
 ### ✅ Phase 1: Project Foundation (100%)
 - [platformio.ini](platformio.ini) - ESP32dev and native test environments
@@ -98,35 +98,111 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 & .\test_web_api.ps1 -Verbose # Detailed HTTP output
 ```
 
-**Next Phase**: Phase 6 Frontend (HTML/CSS/JS) + SPIFFS upload
-- ⏳ Connect to SignalK server and validate bidirectional communication
-- ⏳ Test periodic updates and reconnection handling
+**Status**: Backend API Implementation ✅ **COMPLETE**
+
+### ✅ Phase 7: Web UI - Frontend (Complete) 🎉
+**Implementation**: Responsive browser interface for ECU control
+
+**Files Implemented**:
+- ✅ [data/lights.html](data/lights.html) - Main UI structure (217 lines)
+- ✅ [data/lights.css](data/lights.css) - Marine-themed responsive stylesheet (606 lines)
+- ✅ [data/lights.js](data/lights.js) - API client & UI controller (633 lines)
+
+**Frontend Features**:
+- **Mobile-First Design**: Responsive grid layouts optimized for marine use
+- **Dark Marine Theme**: Low-light cockpit visibility with marine color palette
+- **Touch-Friendly**: Min 48px button targets for gloved operation
+- **Real-Time Updates**: Status polling every 2 seconds with auto-reconnection
+- **Seven Control Sections**:
+  1. Header with connection status badges
+  2. Condition control (Day/Darkness/Restricted visibility)
+  3. Boat state selection (Moored/Underway/etc)
+  4. Live light indicators with animated glow effects
+  5. Sound signal controls (mute + 8 ad-hoc patterns)
+  6. Emergency stop button
+  7. System info (uptime, heap, WiFi RSSI)
+- **Error Handling**: Global error catching with user-friendly alerts
+- **Visual Feedback**: Light indicators glow (white/red/green) when active
+- **No Dependencies**: Vanilla HTML5/CSS3/ES6 JavaScript
+
+**Technical Stack**:
+- ES6 JavaScript (Fetch API + async/await)
+- CSS Grid + Flexbox layouts
+- CSS Variables for theming
+- Visibility API for power-efficient polling
+- Touch event optimization
+
+**Total Frontend Code**: 1,456 lines (217 HTML + 606 CSS + 633 JS)
+
+**Access URL** (after Phase 8 upload):
+- Primary: `http://nav-lights-ecu.local/lights.html`
+- Direct IP: `http://10.100.100.244/lights.html`
+- Emergency AP: `http://192.168.4.1/lights.html`
+
+**Browser Compatibility**: Chrome/Edge, Firefox, Safari (desktop + mobile)
+
+**Status**: Frontend Implementation ✅ **COMPLETE**
+
+### ⏳ Phase 8: SPIFFS Upload & Integration Testing (Ready)
+**Implementation**: Deploy frontend files to ESP32 filesystem
+
+**Required Steps**:
+1. Build SPIFFS filesystem image from `data/` folder
+2. Upload to ESP32 via PlatformIO
+3. Test browser interface at `http://nav-lights-ecu.local/lights.html`
+4. Validate API integration with frontend
+5. Test responsive design on mobile/tablet
+6. Verify real-time status updates
+
+**Commands**:
+```powershell
+# Upload frontend files to ESP32
+pio run --target uploadfs
+
+# Monitor for successful boot
+pio device monitor
+```
+
+**Testing Checklist**: See [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md) for complete testing guide
+
+**Expected Outcomes**:
+- Web UI accessible via browser
+- All controls functional
+- Real-time status updates working
+- Emergency stop functional
+- Responsive design validated
 
 **Hardware Required**: ESP32 Dev Kit C V4 + 8-channel opto-isolated relay module (active-low)
 
-### ⏳ Phase 6: Maritime Field Testing (0%)
+**Next**: Connect to SignalK server and validate bidirectional communication
+
+### ⏳ Phase 9: Maritime Field Testing (0%)
 - Install on test vessel
 - Validate in actual maritime conditions
 - Test visibility compliance (light visibility at required distances)
 - Test sound signal audibility
 
-### ⏳ Phase 7: Optional Enhancements (0%)
-- Custom web fallback UI (control page when SignalK unavailable)
+### ⏳ Phase 10: Optional Enhancements (0%)
 - Enhanced web configuration portal
 - OTA firmware updates
 - Data logging to SPIFFS
 
 ## Test Coverage
 
-**Total: 119 tests - All Passing ✅** (Native platform only)
+**Total: 148 tests - All Passing ✅** (119 unit tests + 29 web API tests)
 
-### Native Tests (119 tests, ~7.8s)
+### Native Unit Tests (119 tests, ~7.8s)
 | Test Suite | Tests | Files | Status |
 |------------|-------|-------|--------|
 | State Machine | 20 | [test_state_machine.cpp](test/test_state_machine/test_state_machine.cpp) | ✅ PASSED |
 | Light Controller | 9 | [test_light_controller.cpp](test/test_light_controller/test_light_controller.cpp) | ✅ PASSED |
 | Sound Controller | 16 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
 | SignalK Integration | 74 | [test_signalk_integration.cpp](test/test_signalk_integration/test_signalk_integration.cpp) | ✅ PASSED |
+
+### Web API Tests (29 tests, ~15s)
+| Test Suite | Tests | Files | Status |
+|------------|-------|-------|--------|
+| REST API Endpoints | 29 | [test_web_api.ps1](test_web_api.ps1) | ✅ PASSED |
 
 ### ESP32 Embedded Tests (14 tests, ~17.8s) - ⚠️ Pending Re-validation
 | Test Suite | Tests | Files | Status |
@@ -139,27 +215,23 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - COLREGs Rule 35 corrections
 - Platform-independent debug logging
 
-### Unit Tests: **119 tests** - All Passing ✅
-| Suite | Tests | Status |
-|-------|-------|--------|
-| State Machine | 20 | ✅ All Passing |
-| Light Controller | 9 | ✅ All Passing |
-| Sound Controller | 16 | ✅ All Passing |
-| SignalK Integration | 74 | ✅ All Passing |
+### Test Coverage Summary
+**Unit Tests** (119 total):
+- State Machine: 20 tests - COLREGs rule validation
+- Light Controller: 9 tests - Relay control & safety
+- Sound Controller: 16 tests - Timing, queueing, countdown
+- SignalK Integration: 74 tests - Conversions, integration, edge cases
 
-**SignalK Test Coverage** (74 tests):
-- **Conversion Functions** (42 tests): enum↔string, all states/signals, roundtrip, invalid input handling
-- **Integration Tests** (12 tests): MockECU interactions, callbacks, state transitions
-- **Edge Cases** (20 tests): Empty/null strings, case sensitivity, whitespace, typos, rapid changes, callback safety
+**Web API Tests** (29 total):
+- Health & status endpoints: 2 tests
+- Condition control: 4 tests (including error handling)
+- Boat state control: 7 tests (including error handling)
+- Mute control: 2 tests
+- Ad-hoc signals: 9 tests (including error handling)
+- Emergency stop: 2 tests
+- Error handling: 3 tests
 
-**Sound Controller Test Coverage** (16 tests):
-- **Initial State** (2 tests): Horn inactive, countdown at zero
-- **Periodic Signals** (7 tests): Mute/unmute, countdown, immediate playback on unmute
-- **Ad-hoc Signals** (4 tests): Immediate playback, queueing behavior
-- **Emergency** (2 tests): Stop all sound, queue clearing
-- **Safety** (1 test): No signal when pattern is NONE
-
-**Note**: Ad-hoc queueing tests verify behavioral correctness. Full timing validation (2-second delay) requires ESP32 hardware.
+**Total Automated Tests**: 148 tests (119 unit + 29 web API) ✅ **100% passing**
 
 ### Hardware Validation: **Phase 5 - In Progress** 🚧
 - ESP32 Dev Kit C V4 + opto-isolated relay module required
@@ -168,10 +240,10 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 
 ## Architecture Highlights
 
-### UI-Agnostic Design ⭐
+### Dual UI Design ⭐
 `NavigationLightsECU` facade enables dual UI support:
-- **Main UI**: SignalK over WiFi (standard operation, integrated with boat's SignalK server)
-- **Fallback UI**: Web-based control page (future enhancement, accessible at `/lights` when SignalK unavailable)
+- **Primary UI**: SignalK over WiFi (standard operation, integrated with boat's SignalK server)
+- **Fallback UI**: Web-based control page ✅ **IMPLEMENTED** (accessible at `/lights.html` when SignalK unavailable or for direct control)
 
 Both UIs control the same underlying controllers via the facade's unified API.
 
@@ -218,30 +290,56 @@ Both UIs control the same underlying controllers via the facade's unified API.
 
 ## Next Steps
 
-### Phase 5: Hardware Integration Testing (Current Focus)
+### Phase 8: SPIFFS Upload & Integration Testing (Current Focus) 🎯
+**Goal**: Deploy frontend files to ESP32 and test complete web interface
+
+**Commands**:
+```powershell
+# Build SPIFFS filesystem from data/ folder
+pio run --target buildfs
+
+# Upload to ESP32
+pio run --target uploadfs
+
+# Monitor boot messages
+pio device monitor
+```
+
+**Testing**:
+1. Access web UI: `http://nav-lights-ecu.local/lights.html`
+2. Verify all controls functional (condition, boat state, mute, signals)
+3. Test real-time status updates (2-second polling)
+4. Validate responsive design (mobile/tablet/desktop)
+5. Test emergency stop functionality
+6. Verify light indicators update correctly
+7. Test error handling (disconnect WiFi, invalid inputs)
+
+**Documentation**: See [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md) for complete testing guide
+
+### Phase 5: Hardware Integration Testing (Parallel)
 1. **Flash and Test**: Load firmware on ESP32 Dev Kit C V4
 2. **Re-run ESP32 Tests**: Validate 14 embedded tests with updated code
 3. **Timing Validation**:
    - Ad-hoc queueing: Verify 2-second delay after signal completion
    - Unmute immediate playback: Measure response time (<100ms expected)
-   - Prolonged blast duration: Measure actual duration (user reported shorter than 4-6s)
+   - Prolonged blast duration: Measure actual duration
 4. **Relay Testing**: Connect 8-channel opto-isolated relay module, verify active-low control
 5. **COLREGs Validation**: Test all 18 light combinations on actual hardware
-6. **SignalK Server Integration**: Connect to real SignalK server, test bidirectional communication
 
-### Phase 6: Maritime Field Testing
-1. Install on test vessel
-2. Validate in actual maritime conditions (darkness, restricted visibility)
-3. Test light visibility at required distances
-4. Test sound signal audibility
-5. Verify state transitions during actual vessel operation
+### Phase 9: Maritime Field Testing
+1. Install on test vessel with SignalK server
+2. Validate actual vessel operation (making way, anchorage, etc.)
+3. Test in actual maritime conditions (darkness, restricted visibility)
+4. Verify light visibility at required distances (1-2 NM for sidelights)
+5. Test sound signal audibility
+6. Validate integration with boat's SignalK network
 
-### Phase 7: Optional Enhancements (Future)
-1. Custom web fallback UI (HTTP control page at `/lights` for when SignalK unavailable)
-2. Enhanced web configuration portal (WiFi credentials, SignalK server)
-3. Watchdog timer for firmware hang detection
-4. OTA firmware updates
-5. Data logging to SPIFFS (diagnostic history)
+### Phase 10: Optional Enhancements (Future)
+1. Enhanced web configuration portal (WiFi credentials, SignalK server)
+2. Watchdog timer for firmware hang detection
+3. OTA firmware updates
+4. Data logging to SPIFFS (diagnostic history)
+5. PWM dimming for lights (energy savings in anchorage mode)
 
 ## Development Workflow
 

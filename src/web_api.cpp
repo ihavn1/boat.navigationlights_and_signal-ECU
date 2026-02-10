@@ -10,6 +10,7 @@
 #include "sensesp_app.h"  // For sensesp_app global
 #include <ArduinoJson.h>
 #include <WiFi.h>
+#include <SPIFFS.h>
 #include <esp_http_server.h>
 
 using namespace sensesp;
@@ -387,4 +388,76 @@ void setupWebAPI(HTTPServer* server, NavigationLightsECU* ecu) {
     Serial.println("  POST /api/mute");
     Serial.println("  POST /api/signal");
     Serial.println("  POST /api/emergency");
+    Serial.println();
+    Serial.println("Frontend UI available at:");
+    Serial.println("  http://nav-lights-ecu.local/lights.html");
+}
+
+/**
+ * @brief Static file handler for SPIFFS
+ */
+esp_err_t handleStaticFile(httpd_req_t* req) {
+    String path = String(req->uri);
+    
+    // Security: prevent directory traversal
+    if (path.indexOf("..") >= 0) {
+        httpd_resp_send_404(req);
+        return ESP_OK;
+    }
+    
+    // Open file from SPIFFS
+    File file = SPIFFS.open(path, "r");
+    if (!file) {
+        httpd_resp_send_404(req);
+        return ESP_OK;
+    }
+    
+    // Set content type based on extension
+    const char* content_type = "text/plain";
+    if (path.endsWith(".html")) content_type = "text/html";
+    else if (path.endsWith(".css")) content_type = "text/css";
+    else if (path.endsWith(".js")) content_type = "application/javascript";
+    else if (path.endsWith(".json")) content_type = "application/json";
+    
+    httpd_resp_set_type(req, content_type);
+    
+    // Send file in chunks
+    const size_t chunk_size = 1024;
+    uint8_t buffer[chunk_size];
+    while (file.available()) {
+        size_t bytes_read = file.read(buffer, chunk_size);
+        if (httpd_resp_send_chunk(req, (const char*)buffer, bytes_read) != ESP_OK) {
+            file.close();
+            return ESP_FAIL;
+        }
+    }
+    
+    file.close();
+    httpd_resp_send_chunk(req, nullptr, 0); // Signal end
+    return ESP_OK;
+}
+
+/**
+ * @brief Setup static file serving from SPIFFS
+ */
+void setupStaticFiles(sensesp::HTTPServer* server) {
+    Serial.println("Registering static file handlers...");
+    
+    // Register handlers for web UI files
+    auto lights_html_handler = std::make_shared<sensesp::HTTPRequestHandler>(
+        1 << HTTP_GET, "/lights.html", handleStaticFile);
+    server->add_handler(lights_html_handler);
+    
+    auto lights_css_handler = std::make_shared<sensesp::HTTPRequestHandler>(
+        1 << HTTP_GET, "/lights.css", handleStaticFile);
+    server->add_handler(lights_css_handler);
+    
+    auto lights_js_handler = std::make_shared<sensesp::HTTPRequestHandler>(
+        1 << HTTP_GET, "/lights.js", handleStaticFile);
+    server->add_handler(lights_js_handler);
+    
+    Serial.println("Static file handlers registered:");
+    Serial.println("  GET  /lights.html");
+    Serial.println("  GET  /lights.css");
+    Serial.println("  GET  /lights.js");
 }

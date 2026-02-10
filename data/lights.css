@@ -1,0 +1,601 @@
+/* ============================================================================
+   Navigation Lights ECU - Stylesheet
+   Mobile-first responsive design for marine environment
+   ============================================================================ */
+
+/* CSS Variables for theming */
+:root {
+    /* Marine color palette */
+    --color-primary: #0066cc;
+    --color-primary-dark: #004c99;
+    --color-secondary: #00796b;
+    --color-danger: #d32f2f;
+    --color-danger-dark: #b71c1c;
+    --color-warning: #f57c00;
+    --color-success: #388e3c;
+    
+    /* Neutral colors */
+    --color-bg: #121212;
+    --color-surface: #1e1e1e;
+    --color-surface-raised: #2a2a2a;
+    --color-text: #e0e0e0;
+    --color-text-secondary: #aaaaaa;
+    --color-border: #404040;
+    
+    /* Light colors for indicators */
+    --color-light-white: #ffffff;
+    --color-light-red: #ff4444;
+    --color-light-green: #44ff44;
+    --color-light-amber: #ffbb33;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+/* ============================================================================
+   Typography
+   ============================================================================ */
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-text);
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text);
+}
+
+h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: var(--spacing-lg) 0 var(--spacing-md);
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   Header
+   ============================================================================ */
+
+header {
+    background: var(--color-surface-raised);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.status-bar {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.connected {
+    background: var(--color-success);
+    color: white;
+}
+
+.status-badge.disconnected {
+    background: var(--color-danger);
+    color: white;
+}
+
+/* ============================================================================
+   Alert Banner
+   ============================================================================ */
+
+.alert-banner {
+    background: var(--color-danger);
+    color: white;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    animation: slideDown 0.3s ease-out;
+}
+
+.alert-banner.hidden {
+    display: none;
+}
+
+.alert-banner.success {
+    background: var(--color-success);
+}
+
+.alert-banner.warning {
+    background: var(--color-warning);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================================================
+   Card Sections
+   ============================================================================ */
+
+.card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================================
+   Button Groups
+   ============================================================================ */
+
+.button-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.condition-btn,
+.state-btn {
+    padding: var(--spacing-md);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.condition-btn:hover,
+.state-btn:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.condition-btn:active,
+.state-btn:active {
+    transform: translateY(0);
+}
+
+.condition-btn.active,
+.state-btn.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.3);
+}
+
+.condition-btn:disabled,
+.state-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.current-value {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.current-value span {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+/* ============================================================================
+   Lights Display
+   ============================================================================ */
+
+.lights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.light-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.light-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid var(--color-border);
+    background: var(--color-surface-raised);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.light-icon.on {
+    background: var(--color-light-white);
+    border-color: var(--color-light-white);
+    box-shadow: 0 0 20px var(--color-light-white),
+                0 0 40px var(--color-light-white);
+}
+
+.light-icon.red.on {
+    background: var(--color-light-red);
+    border-color: var(--color-light-red);
+    box-shadow: 0 0 20px var(--color-light-red),
+                0 0 40px var(--color-light-red);
+}
+
+.light-icon.green.on {
+    background: var(--color-light-green);
+    border-color: var(--color-light-green);
+    box-shadow: 0 0 20px var(--color-light-green),
+                0 0 40px var(--color-light-green);
+}
+
+.light-indicator span {
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   Sound Controls
+   ============================================================================ */
+
+.mute-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+}
+
+#muteBtn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    min-width: 150px;
+}
+
+.mute-icon {
+    font-size: 1.5rem;
+}
+
+.countdown {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+.horn-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.horn-status.active {
+    background: var(--color-warning);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.horn-icon {
+    font-size: 1.5rem;
+}
+
+.signal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.signal-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.signal-btn small {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: normal;
+}
+
+.signal-btn:hover {
+    border-color: var(--color-warning);
+    background: var(--color-warning);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.signal-btn:active {
+    transform: scale(0.95);
+}
+
+.signal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+
+.btn-secondary {
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-secondary);
+    background: var(--color-secondary);
+    color: white;
+}
+
+.btn-secondary.active {
+    border-color: var(--color-success);
+    background: var(--color-success);
+    color: white;
+}
+
+.btn-emergency {
+    width: 100%;
+    padding: var(--spacing-lg);
+    font-size: 1.25rem;
+    font-weight: 700;
+    border: 3px solid var(--color-danger);
+    border-radius: var(--radius-md);
+    background: var(--color-danger);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.btn-emergency:hover {
+    background: var(--color-danger-dark);
+    border-color: var(--color-danger-dark);
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-emergency:active {
+    transform: scale(0.98);
+}
+
+.emergency-note {
+    text-align: center;
+    margin-top: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   System Info
+   ============================================================================ */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.info-item span:last-child {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+footer {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-md);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+}
+
+footer p {
+    margin: var(--spacing-xs) 0;
+}
+
+footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   Responsive Design
+   ============================================================================ */
+
+@media (max-width: 600px) {
+    .container {
+        padding: var(--spacing-sm);
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .button-group {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .lights-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .signal-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mute-control {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #muteBtn {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 400px) {
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .lights-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================================================
+   Loading & Disabled States
+   ============================================================================ */
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }

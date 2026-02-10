@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Navigation Lights Control</title>
+    <link rel="stylesheet" href="lights.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>⚓ Navigation Lights ECU</h1>
+            <div class="status-bar">
+                <span id="connectionStatus" class="status-badge disconnected">Connecting...</span>
+                <span id="signalkStatus" class="status-badge">SignalK: Unknown</span>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        <div id="alertBanner" class="alert-banner hidden"></div>
+
+        <!-- Condition Selection -->
+        <section class="card">
+            <h2>Lighting Condition</h2>
+            <div class="button-group">
+                <button class="condition-btn" data-value="day">
+                    ☀️ Day
+                </button>
+                <button class="condition-btn" data-value="hours_of_darkness">
+                    🌙 Darkness
+                </button>
+                <button class="condition-btn" data-value="restricted_visibility">
+                    🌫️ Restricted
+                </button>
+            </div>
+            <div class="current-value">Current: <span id="currentCondition">-</span></div>
+        </section>
+
+        <!-- Boat State Selection -->
+        <section class="card">
+            <h2>Boat State</h2>
+            <div class="button-group">
+                <button class="state-btn" data-value="moored">
+                    🔗 Moored
+                </button>
+                <button class="state-btn" data-value="underway_making_way">
+                    🚢 Underway
+                </button>
+                <button class="state-btn" data-value="underway_no_way">
+                    ⚓ No Way
+                </button>
+                <button class="state-btn" data-value="anchorage">
+                    ⚓ Anchorage
+                </button>
+                <button class="state-btn" data-value="nuc_making_way">
+                    ⚠️ NUC (Way)
+                </button>
+                <button class="state-btn" data-value="nuc_no_way">
+                    ⚠️ NUC (Stop)
+                </button>
+            </div>
+            <div class="current-value">Current: <span id="currentState">-</span></div>
+        </section>
+
+        <!-- Lights Status Display -->
+        <section class="card">
+            <h2>Active Lights</h2>
+            <div class="lights-grid">
+                <div class="light-indicator" data-light="masthead">
+                    <div class="light-icon off"></div>
+                    <span>Masthead</span>
+                </div>
+                <div class="light-indicator" data-light="portSidelight">
+                    <div class="light-icon off red"></div>
+                    <span>Port</span>
+                </div>
+                <div class="light-indicator" data-light="starboardSidelight">
+                    <div class="light-icon off green"></div>
+                    <span>Starboard</span>
+                </div>
+                <div class="light-indicator" data-light="sternlight">
+                    <div class="light-icon off"></div>
+                    <span>Stern</span>
+                </div>
+                <div class="light-indicator" data-light="allroundWhite">
+                    <div class="light-icon off"></div>
+                    <span>All-Round</span>
+                </div>
+                <div class="light-indicator" data-light="allroundRedUpper">
+                    <div class="light-icon off red"></div>
+                    <span>NUC Upper</span>
+                </div>
+                <div class="light-indicator" data-light="allroundRedLower">
+                    <div class="light-icon off red"></div>
+                    <span>NUC Lower</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sound Signals -->
+        <section class="card">
+            <h2>Sound Signals</h2>
+            
+            <!-- Periodic Signals Control -->
+            <div class="mute-control">
+                <button id="muteBtn" class="btn-secondary">
+                    <span class="mute-icon">🔇</span>
+                    <span class="mute-text">Periodic Muted</span>
+                </button>
+                <div class="countdown">
+                    Next signal: <span id="countdown">--</span>s
+                </div>
+            </div>
+
+            <!-- Horn Status -->
+            <div class="horn-status" id="hornStatus">
+                <span class="horn-icon">📣</span>
+                <span>Horn: <strong id="hornState">Idle</strong></span>
+            </div>
+
+            <!-- Ad-Hoc Signals -->
+            <h3>Ad-Hoc Signals</h3>
+            <div class="signal-grid">
+                <button class="signal-btn" data-signal="turn_starboard" title="● = 1 short blast">
+                    ↪️ Turn Right
+                    <small>●</small>
+                </button>
+                <button class="signal-btn" data-signal="turn_port" title="●● = 2 short blasts">
+                    ↩️ Turn Left
+                    <small>●●</small>
+                </button>
+                <button class="signal-btn" data-signal="astern_propulsion" title="●●● = 3 short blasts">
+                    ⬅️ Astern
+                    <small>●●●</small>
+                </button>
+                <button class="signal-btn" data-signal="danger_confusion" title="●●●●● = 5+ short blasts">
+                    ⚠️ Danger
+                    <small>●●●●●</small>
+                </button>
+                <button class="signal-btn" data-signal="pay_attention" title="— = 1 prolonged blast">
+                    👀 Attention
+                    <small>—</small>
+                </button>
+                <button class="signal-btn" data-signal="overtake_starboard" title="—● = prolonged + short">
+                    ⤴️ Overtake R
+                    <small>—●</small>
+                </button>
+                <button class="signal-btn" data-signal="overtake_port" title="—●● = prolonged + 2 short">
+                    ⤵️ Overtake L
+                    <small>—●●</small>
+                </button>
+                <button class="signal-btn" data-signal="agreement_overtaken" title="—●●● = prolonged + 3 short">
+                    ✓ Agree
+                    <small>—●●●</small>
+                </button>
+            </div>
+        </section>
+
+        <!-- Emergency Stop -->
+        <section class="card emergency-section">
+            <button id="emergencyBtn" class="btn-emergency">
+                🛑 EMERGENCY STOP
+            </button>
+            <p class="emergency-note">Turns off all lights and horn immediately</p>
+        </section>
+
+        <!-- System Info -->
+        <section class="card info-section">
+            <h2>System Information</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Uptime:</span>
+                    <span id="uptime">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Free Heap:</span>
+                    <span id="freeHeap">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">WiFi RSSI:</span>
+                    <span id="wifiRSSI">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>COLREGs Navigation Lights Controller</p>
+            <p><a href="/">SensESP Dashboard</a> | <a href="/config">Configuration</a></p>
+        </footer>
+    </div>
+
+    <script src="lights.js"></script>
+</body>
+</html>

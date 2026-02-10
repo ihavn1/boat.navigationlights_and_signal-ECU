@@ -22,6 +22,7 @@
  */
 
 #include <Arduino.h>
+#include <SPIFFS.h>
 #include "sensesp_app_builder.h"
 #include "sensesp/system/led_blinker.h"
 #include "signalk_integration.h"
@@ -86,6 +87,29 @@ void setup() {
 #endif
     Serial.println("========================================");
     
+    // Initialize SPIFFS for web UI files
+    Serial.println("\nInitializing SPIFFS...");
+    if (!SPIFFS.begin(true)) {
+        Serial.println("ERROR: SPIFFS mount failed!");
+        Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
+    } else {
+        Serial.println("SPIFFS mounted successfully");
+        // List files for debugging
+        File root = SPIFFS.open("/");
+        if (root) {
+            File file = root.openNextFile();
+            Serial.println("Files in SPIFFS:");
+            while (file) {
+                Serial.print("  ");
+                Serial.print(file.name());
+                Serial.print(" (");
+                Serial.print(file.size());
+                Serial.println(" bytes)");
+                file = root.openNextFile();
+            }
+        }
+    }
+    
     // Initialize SensESP application
     SensESPAppBuilder builder;
     sensesp_app = (&builder)
@@ -122,6 +146,7 @@ void setup() {
     // Setup Web API for fallback UI
     HTTPServer* http_server = SensESPAppAccessor::getHttpServer(sensesp_app.get());
     setupWebAPI(http_server, ecu);
+    setupStaticFiles(http_server);
     
     Serial.println("\nSystem initialized successfully");
     Serial.println("Connect to http://nav-lights-ecu.local for configuration");

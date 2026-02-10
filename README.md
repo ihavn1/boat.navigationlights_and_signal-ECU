@@ -2,14 +2,14 @@
 
 ESP32-based controller for COLREGs-compliant navigation lights and sound signals on pleasure boats <15m. Integrated with SignalK for remote monitoring and control.
 
-## Status: ✅ Code Complete + Web API Integrated 🌐
+## Status: ✅ Code Complete + Web UI Ready for Upload 🌐
 
 **Test Coverage**: 148 tests passing (119 unit + 29 Web API integration)  
 **Build**: Successful (72.5% flash, 9.4% RAM)  
 **Code Status**: Complete and validated via comprehensive automated testing  
 **Hardware Status**: Running on ESP32 with Web API operational  
 **SignalK**: Full bidirectional integration with periodic updates  
-**Web UI**: Phase 1 complete - REST API backend with 100% test coverage
+**Web UI**: Phases 6-7 complete - Backend API + responsive frontend (ready for Phase 8 SPIFFS upload)
 
 ## Quick Start
 
@@ -24,6 +24,21 @@ pio run --target upload
 # Monitor serial output
 pio device monitor
 ```
+
+### Upload Web UI Files (Phase 8)
+```powershell
+# Build SPIFFS filesystem from data/ folder
+pio run --target buildfs
+
+# Upload frontend files to ESP32
+pio run --target uploadfs
+
+# Monitor boot messages
+pio device monitor
+```
+
+**Access web UI**: `http://nav-lights-ecu.local/lights.html`  
+**Complete testing guide**: [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md)
 
 ### Run Tests
 ```bash
@@ -80,14 +95,21 @@ pio test -e native && .\test_web_api.ps1
 ### SignalK Integration
 - ✅ Bidirectional communication (PUT requests + delta p
 
-### Web API (Fallback Control)
-- ✅ 7 REST API endpoints (2 GET, 5 POST)
-- ✅ Browser-accessible control interface at `http://nav-lights-ecu.local/api/*`
-- ✅ JSON request/response with proper error handling (HTTP 200/400)
-- ✅ Automated test suite: [test_web_api.ps1](test_web_api.ps1) (29/29 passing)
-- ✅ Health monitoring (uptime, heap, WiFi RSSI, SignalK connection status)
-- ✅ Full ECU control when SignalK unavailable
-- 📋 Phase 2: HTML/CSS/JS frontend (planned)ublishing)
+### Web UI (Fallback Control) 🌐
+- ✅ **Backend API**: 7 REST endpoints (`/api/*`) with 29/29 tests passing
+- ✅ **Frontend**: Responsive web interface (HTML/CSS/JS) - ready for upload
+- ✅ **Mobile-First Design**: Touch-friendly controls, dark marine theme
+- ✅ **Real-Time Updates**: 2-second polling with auto-reconnection
+- ✅ **Complete Control**: Condition, boat state, mute, ad-hoc signals, emergency stop
+- ✅ **System Monitoring**: Uptime, heap, WiFi RSSI, connection status
+- 📋 **Phase 8 Next**: SPIFFS upload to deploy frontend files
+
+**Access URL** (after SPIFFS upload):
+- Primary: `http://nav-lights-ecu.local/lights.html`
+- Direct IP: `http://10.100.100.244/lights.html`
+- Emergency AP: `http://192.168.4.1/lights.html`
+
+**Testing**: See [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md) for upload and testing guideublishing)
 - ✅ 5 input paths (condition, state, mute, ad-hoc signals, emergency stop)
 - ✅ 13 output paths (status + lights + horn + heartbeat)
 - ✅ Periodic updates every 60s (heartbeat pattern)

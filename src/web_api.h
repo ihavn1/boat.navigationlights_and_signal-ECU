@@ -28,4 +28,10 @@
  */
 void setupWebAPI(sensesp::HTTPServer* server, NavigationLightsECU* ecu);
 
+/**
+ * @brief Setup static file serving from SPIFFS
+ * @param server SensESP's HTTPServer instance
+ */
+void setupStaticFiles(sensesp::HTTPServer* server);
+
 #endif // WEB_API_H

@@ -229,7 +229,7 @@ Tests all combinations of 3 Conditions × 6 Boat States
 - ✅ Short blast (~1s)
 - ✅ Prolonged blast (4-6s)
 - ✅ Multiple blast sequences (ad-hoc signals)
-- ✅ Countdown timer (tracks time to next periodic signal)
+- ✅ Countdown timer with visual progress bar (tracks time to next periodic signal)
 
 ---
 

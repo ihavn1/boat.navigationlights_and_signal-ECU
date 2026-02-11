@@ -99,17 +99,20 @@ pio test -e native && .\test_web_api.ps1
 
 ### Web UI (Fallback Control) 🌐
 - ✅ **Backend API**: 7 REST endpoints (`/api/*`) with 29/29 tests passing
-- ✅ **Frontend**: Responsive web interface (HTML/CSS/JS) - ready for upload
+- ✅ **Frontend**: Responsive web interface (HTML/CSS/JS) - deployed
 - ✅ **Mobile-First Design**: Touch-friendly controls, dark marine theme
 - ✅ **Real-Time Updates**: 2-second polling with auto-reconnection
 - ✅ **Complete Control**: Condition, boat state, mute, ad-hoc signals, emergency stop
+- ✅ **Visual Feedback**: Progress bar for periodic signal countdown, animated backgrounds
 - ✅ **System Monitoring**: Uptime, heap, WiFi RSSI, connection status
-- 📋 **Phase 8 Next**: SPIFFS upload to deploy frontend files
+- ✅ **Phase 8 Complete**: Frontend deployed with starboard boat diagram and COLREGs day shapes
 
-**Access URL** (after SPIFFS upload):
-- Primary: `http://nav-lights-ecu.local/lights.html`
-- Direct IP: `http://10.100.100.244/lights.html`
-- Emergency AP: `http://192.168.4.1/lights.html`
+**Access URL**:
+- Primary: `http://nav-lights-ecu.local/lights`
+- Direct IP: `http://10.100.100.244/lights`
+- Emergency AP: `http://192.168.4.1/lights`
+
+**Features**: Animated day/night/fog backgrounds, starboard boat diagram with navigation lights, black ball day shapes (COLREGs Rules 27 & 30), visual progress bar for periodic signal timing
 
 **Testing**: See [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md) for upload and testing guideublishing)
 - ✅ 5 input paths (condition, state, mute, ad-hoc signals, emergency stop)

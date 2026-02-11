@@ -147,7 +147,8 @@ Response: { "success": true, "stopped": true }
 │  └─────────┘ └─────────┘          │
 │                                     │
 │  Sound Signals                      │
-│  Periodic: [Muted ✓] [120s ⏱️]    │ <- Toggle + Countdown
+│  Periodic: [Muted ✓]               │ <- Toggle
+│  Next signal: 120s [▓▓▓░░░░░] 0%  │ <- Countdown + Progress Bar
 │                                     │
 │  Ad-Hoc Signals                     │
 │  ┌────┐┌────┐┌────┐┌────┐         │
@@ -908,7 +909,7 @@ void test_json_status_generation() {
 ### Should Have
 - ✅ Connection status indicator
 - ✅ Active lights display
-- ✅ Countdown timer visible
+- ✅ Countdown timer with visual progress bar
 - ✅ Error messages for failed commands
 - ✅ Works in emergency AP mode
 

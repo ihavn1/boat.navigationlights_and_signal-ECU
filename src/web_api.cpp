@@ -392,7 +392,18 @@ void setupWebAPI(HTTPServer* server, NavigationLightsECU* ecu) {
     Serial.println("  POST /api/emergency");
     Serial.println();
     Serial.println("Frontend UI available at:");
+    Serial.println("  http://nav-lights-ecu.local/lights");
     Serial.println("  http://nav-lights-ecu.local/lights.html");
+}
+
+/**
+ * @brief Redirect handler for /lights -> /lights.html  
+ */
+esp_err_t handleLightsRedirect(httpd_req_t* req) {
+    httpd_resp_set_status(req, "301 Moved Permanently");
+    httpd_resp_set_hdr(req, "Location", "/lights.html");
+    httpd_resp_send(req, nullptr, 0);
+    return ESP_OK;
 }
 
 /**
@@ -420,8 +431,16 @@ esp_err_t handleStaticFile(httpd_req_t* req) {
     else if (path.endsWith(".css")) content_type = "text/css";
     else if (path.endsWith(".js")) content_type = "application/javascript";
     else if (path.endsWith(".json")) content_type = "application/json";
+    else if (path.endsWith(".svg")) content_type = "image/svg+xml";
+    else if (path.endsWith(".png")) content_type = "image/png";
+    else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) content_type = "image/jpeg";
+    else if (path.endsWith(".gif")) content_type = "image/gif";
     
     httpd_resp_set_type(req, content_type);
+    
+    // Disable caching for development - always fetch fresh files
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    httpd_resp_set_hdr(req, "Pragma", "no-cache");
     
     // Send file in chunks
     const size_t chunk_size = 1024;
@@ -445,6 +464,11 @@ esp_err_t handleStaticFile(httpd_req_t* req) {
 void setupStaticFiles(sensesp::HTTPServer* server) {
     Serial.println("Registering static file handlers...");
     
+    // Register redirect from /lights to /lights.html
+    auto lights_redirect_handler = std::make_shared<sensesp::HTTPRequestHandler>(
+        1 << HTTP_GET, "/lights", handleLightsRedirect);
+    server->add_handler(lights_redirect_handler);
+    
     // Register handlers for web UI files
     auto lights_html_handler = std::make_shared<sensesp::HTTPRequestHandler>(
         1 << HTTP_GET, "/lights.html", handleStaticFile);
@@ -458,8 +482,14 @@ void setupStaticFiles(sensesp::HTTPServer* server) {
         1 << HTTP_GET, "/lights.js", handleStaticFile);
     server->add_handler(lights_js_handler);
     
+    auto logo_handler = std::make_shared<sensesp::HTTPRequestHandler>(
+        1 << HTTP_GET, "/iha-logo.png", handleStaticFile);
+    server->add_handler(logo_handler);
+    
     Serial.println("Static file handlers registered:");
+    Serial.println("  GET  /lights (redirect)");
     Serial.println("  GET  /lights.html");
     Serial.println("  GET  /lights.css");
     Serial.println("  GET  /lights.js");
+    Serial.println("  GET  /iha-logo.png");
 }

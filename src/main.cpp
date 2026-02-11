@@ -89,35 +89,21 @@ void setup() {
 #endif
     Serial.println("========================================");
     
-    // Initialize SensESP application FIRST (it handles its own filesystem for config)
+    // Initialize SensESP application FIRST (it manages LittleFS for config storage)
     SensESPAppBuilder builder;
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
         ->enable_ota("boat-ecu")
         ->get_app();
     
-    // NOW initialize SPIFFS for web UI files (after SensESP has initialized its storage)
-    // CRITICAL: Use begin(false) to prevent auto-formatting which would wipe config!
-    Serial.println("\nInitializing SPIFFS for web UI...");
-    if (!SPIFFS.begin(false)) {
-        Serial.println("ERROR: SPIFFS mount failed!");
+    // NOW initialize SPIFFS for web UI files (AFTER SensESP has initialized LittleFS)
+    // This way: SensESP config in LittleFS, Web UI files in SPIFFS - no conflicts!
+    Serial.println("\nInitializing SPIFFS for web UI files...");
+    if (!SPIFFS.begin(false)) {  // false = don't auto-format
+        Serial.println("WARNING: SPIFFS mount failed - web UI not available");
         Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
     } else {
         Serial.println("SPIFFS mounted successfully");
-        // List files for debugging
-        File root = SPIFFS.open("/");
-        if (root) {
-            File file = root.openNextFile();
-            Serial.println("Files in SPIFFS:");
-            while (file) {
-                Serial.print("  ");
-                Serial.print(file.name());
-                Serial.print(" (");
-                Serial.print(file.size());
-                Serial.println(" bytes)");
-                file = root.openNextFile();
-            }
-        }
     }
     
     // Initialize hardware layer

@@ -10,7 +10,10 @@
     <div class="container">
         <!-- Header -->
         <header>
-            <h1>⚓ Navigation Lights ECU</h1>
+            <div class="header-title">
+                <h1>⚓ Navigation Lights ECU</h1>
+                <img src="iha-logo.png" alt="IHA" class="logo" />
+            </div>
             <div class="status-bar">
                 <span id="connectionStatus" class="status-badge disconnected">Connecting...</span>
                 <span id="signalkStatus" class="status-badge">SignalK: Unknown</span>
@@ -45,19 +48,19 @@
                     🔗 Moored
                 </button>
                 <button class="state-btn" data-value="underway_making_way">
-                    🚢 Underway
+                    🚢 Making Way
                 </button>
                 <button class="state-btn" data-value="underway_no_way">
-                    ⚓ No Way
+                    🚢 Making No Way
                 </button>
                 <button class="state-btn" data-value="anchorage">
                     ⚓ Anchorage
                 </button>
                 <button class="state-btn" data-value="nuc_making_way">
-                    ⚠️ NUC (Way)
+                    ⚠️ NUC Way
                 </button>
                 <button class="state-btn" data-value="nuc_no_way">
-                    ⚠️ NUC (Stop)
+                    ⚠️ NUC No Way
                 </button>
                 <button class="state-btn" data-value="towing">
                     🚢 Towing
@@ -70,97 +73,71 @@
         <section class="card">
             <h2>Active Lights</h2>
             
-            <!-- Boat Diagram -->
-            <div class="boat-diagram-container">
-                <svg id="boatDiagram" width="100%" height="150" viewBox="0 0 106.88881 38.814194" xmlns="http://www.w3.org/2000/svg">
+            <!-- Boat Diagram - Starboard Side View -->
+            <div id="boatDiagramContainer" class="boat-diagram-container condition-day">
+                <!-- Navigation Lights Boat Diagram (FROM DRAWINGS: Boat from starboard side.svg) -->
+                <svg id="boatDiagram" width="100%" height="auto" viewBox="0 0 665.9491 246.73282" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
                   <!-- Boat Hull -->
-                  <g id="hull" transform="translate(-34.655456,-96.867321)">
-                    <path style="fill:none;stroke:#88ccff;stroke-width:0.4;stroke-opacity:0.8" d="m 34.739074,116.06933 c 39.574553,32.19409 104.344476,13.23393 104.344476,13.23393 v -12.97943 l 0.12725,-0.12725" />
-                    <path style="fill:none;stroke:#88ccff;stroke-width:0.4;stroke-opacity:0.8" d="M 34.739074,116.05142 C 74.313627,83.857325 139.08355,102.81749 139.08355,102.81749 v 12.97943 l 0.12725,0.12725" />
-                    <path style="fill:none;stroke:#88ccff;stroke-width:0.15;stroke-opacity:0.5" d="m 77.785022,114.85752 29.377008,0.62037 0.0275,1.13094 -29.36053,0.62037" />
+                  <g id="hull" transform="translate(-123.54927,-364.42355)">
+                    <path style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.851843;stroke-opacity:1"
+                          d="m 578.66716,611.04457 c 10.3073,-0.1399 36.3737,-0.67098 57.92534,-1.18018 l 39.18478,-0.92581 3.40738,-2.69585 c 8.3259,-6.5873 14.84746,-12.9776 24.94358,-24.44152 22.73415,-25.81412 32.32173,-36.56041 40.72308,-45.64467 l 8.68522,-9.3912 -1.60692,-1.98446 c -1.80547,-2.22967 -1.50306,-3.4989 0.72736,-3.05268 0.81943,0.16392 4.09972,0.75055 7.28952,1.30362 4.52255,0.78414 6.09226,1.45215 7.12847,3.03361 1.68163,2.56647 0.89166,3.59622 -4.80606,6.26489 -2.3561,1.10353 -4.15615,2.13408 -4.00013,2.2901 0.15602,0.15602 2.40964,-0.44776 5.00804,-1.34174 2.5984,-0.89399 7.74041,-2.26786 11.42669,-3.05308 3.68628,-0.78521 8.52314,-2.00222 10.74858,-2.70446 l 4.04626,-1.2768 v -4.19077 c 0,-4.58417 -0.85571,-5.15863 -3.99377,-2.68108 -1.13688,0.89757 -1.96772,2.63497 -2.12961,4.45323 -0.38516,4.32611 -2.58082,3.92336 -3.48305,-0.63888 -0.40877,-2.06702 -1.19792,-3.62033 -1.83928,-3.62033 -0.61783,0 -1.60054,-0.575 -2.18378,-1.27777 -1.40534,-1.69333 -17.455,-1.69474 -26.40714,-0.003 -11.33402,2.14271 -19.59561,3.26452 -20.12715,2.73296 -0.28519,-0.28518 4.54793,-7.38809 10.74025,-15.78425 l 11.25877,-15.26574 4.38808,-0.52722 c 2.41345,-0.28974 8.22138,-0.53364 12.90652,-0.54179 10.43056,-0.0181 17.46278,-0.80243 17.46278,-1.94763 0,-1.04607 -175.22384,-0.22757 -226.00365,1.05571 l -33.91302,0.85703 -6.97545,-4.80742 c -9.76209,-6.72794 -21.88271,-15.89894 -21.88271,-16.55743 0,-0.30354 2.06544,-0.80994 4.58987,-1.12534 4.94005,-0.61722 7.94745,-2.20344 7.02069,-3.70297 -0.31654,-0.51217 -2.91079,-2.34982 -5.76501,-4.08367 -5.74336,-3.4889 -12.30232,-4.75676 -38.95609,-7.53028 -11.88034,-1.23624 -13.33908,-1.57065 -15.7591,-3.61283 l -2.66687,-2.25048 -44.29585,0.72058 c -24.36271,0.39632 -47.3309,0.74261 -51.04041,0.76954 l -6.74456,0.049 -5.51918,-7.96499 c -4.3595,-6.29139 -8.24124,-11.90061 -10.11609,-13.97 -0.95507,-1.05415 -4.15729,-5.55827 -7.11606,-10.00915 -2.95877,-4.45088 -14.75537,-23.16304 -15.55905,-23.63349 -2.36861,-1.38653 -1.43958,-0.86207 -3.63998,-1.57255 -2.94004,-0.94931 -2.58511,2.04104 0.9032,7.47315 1.89282,2.94758 16.47727,26.57076 21.60352,34.76975 10.31566,16.49898 10.25406,16.01536 2.05389,16.12514 -2.9917,0.04 -5.81108,0.75311 -8.51843,2.15441 -3.5588,1.84199 -5.6694,2.17798 -17.5056,2.78677 -10.37567,0.53366 -13.64606,0.98078 -14.2759,1.95173 -1.09321,1.68527 -1.96192,5.06859 -1.43637,5.59414 0.23211,0.23211 7.24986,1.75213 15.59501,3.37782 17.06717,3.32481 21.66867,4.44601 21.66867,5.27983 0,0.31621 -3.08927,8.34973 -6.86504,17.85227 -6.83599,17.20426 -6.85884,17.28782 -5.40053,19.75656 1.23712,2.09426 1.3017,2.87229 0.41588,5.01084 -0.57675,1.39239 -1.30898,5.16582 -1.62717,8.3854 l -0.57855,5.85376 -43.86992,1.45378 c -24.12846,0.79958 -50.76986,1.75791 -59.2031,2.12961 l -15.33318,0.67583 -0.27124,2.55553 c -0.19166,1.80572 -1.92237,4.23036 -5.89871,8.26379 -3.09511,3.13956 -5.94385,5.51274 -6.33054,5.27376 -0.3867,-0.239 -0.70308,5.6e-4 -0.70308,0.53234 0,0.53178 -3.06333,5.04677 -6.80741,10.03331 -8.32165,11.08317 -12.43178,18.84425 -12.72368,24.02594 -0.11879,2.10831 -0.34078,3.96096 -0.49332,4.117 -0.15255,0.15603 -7.21121,0.75206 -15.68593,1.32451 -8.47471,0.57245 -15.80259,1.43484 -16.28417,1.91642 -2.97427,2.97426 4.56585,5.26429 23.88368,7.25378 4.9194,0.50664 9.36372,1.03291 9.87627,1.1695 0.51255,0.13659 1.41653,2.53197 2.00884,5.32307 0.59231,2.7911 1.32294,5.4464 1.62362,5.90065 0.92129,1.39186 130.54024,2.91705 268.87729,3.16382 71.21409,0.12703 137.91341,0.1165 148.22071,-0.0234 z" />
                   </g>
                   
-                  <!-- Port Sidelight (Red) -->
-                  <g id="port-sidelight" class="light" transform="translate(-34.655456,-96.867321)">
-                    <path style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.264999" d="m 80.340962,156.04992 c 0,0 2.190822,-5.47509 2.190822,-5.47509 -2.055331,0.10844 -4.442102,0.23436 -5.576017,0.98853 -1.133916,0.75418 -1.887015,2.71661 -2.535534,4.40652 0,0 5.920729,0.08 5.920729,0.08 z" transform="matrix(0.88253108,0.00770173,0.00770173,-0.88253108,3.6407263,267.80489)" />
+                  <!-- Starboard Sidelight (Green visible from starboard view - represents BOTH lights) -->
+                  <g id="starboard-sidelight" class="light" transform="translate(-123.54927,-364.42355)">
+                    <path style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+                          d="m 80.340962,156.04992 c 0,0 2.190822,-5.47509 2.190822,-5.47509 -2.055331,0.10844 -4.442102,0.23436 -5.576017,0.98853 -1.133916,0.75418 -1.887015,2.71661 -2.535534,4.40652 0,0 5.920729,0.08 5.920729,0.08 z"
+                          transform="matrix(-3.3355506,0.0291089,-0.0291089,-3.3355506,766.23809,1008.966)" />
                   </g>
                   
-                  <!-- Starboard Sidelight (Green) -->
-                  <g id="starboard-sidelight" class="light" transform="translate(-34.655456,-96.867321)">
-                    <path style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.264999" d="m 80.340962,156.04992 c 0,0 2.190822,-5.47509 2.190822,-5.47509 -2.055331,0.10844 -4.442102,0.23436 -5.576017,0.98853 -1.133916,0.75418 -1.887015,2.71661 -2.535534,4.40652 0,0 5.920729,0.08 5.920729,0.08 z" transform="matrix(0.88253108,-0.00770173,0.00770173,0.88253108,3.6407263,-35.256063)" />
-                  </g>
+                  <!-- Port Sidelight (Hidden on starboard side, controlled by JavaScript) -->
+                  <g id="port-sidelight" class="light" style="display:none"></g>
                   
                   <!-- Yellow Towing Light -->
-                  <g id="yellow-towing-light" class="light" transform="translate(-34.655456,-96.867321)">
-                    <g transform="translate(25.400262,-58.88479)">
-                      <path style="fill:#ffbb33;fill-opacity:1;stroke:#000000;stroke-width:0.264999" transform="matrix(-0.3448455,0.81240508,0.81240508,0.3448455,7.3082704,55.898472)" d="m 80.289267,156.02068 c 0,0 -5.826272,-0.0637 -5.826272,-0.0637 1.14864,1.82819 2.424074,3.85818 3.885584,4.48605 1.461509,0.62786 3.834491,0.16523 5.971568,-0.25141 z" />
+                  <g id="yellow-towing-light" class="light" transform="translate(-123.54927,-364.42355)">
+                    <g transform="matrix(-3.7795276,0,0,3.7795276,588.46865,-151.2932)">
+                      <path style="fill:#ffbb33;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+                            d="m 80.289267,156.02068 c 0,0 -5.826272,-0.0637 -5.826272,-0.0637 1.14864,1.82819 2.424074,3.85818 3.885584,4.48605 1.461509,0.62786 3.834491,0.16523 5.971568,-0.25141 z"
+                            transform="matrix(-0.3448455,0.81240508,0.81240508,0.3448455,7.3082704,55.898472)" />
                     </g>
                   </g>
                   
-                  <!-- Sternlight (White) -->
-                  <g id="sternlight" class="light" transform="translate(-34.655456,-96.867321)">
-                    <g transform="translate(30.792454,-58.876836)">
-                      <path style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999" transform="matrix(-0.3448455,0.81240508,0.81240508,0.3448455,7.3082704,55.890518)" d="m 80.289267,156.02068 c 0,0 -5.826272,-0.0637 -5.826272,-0.0637 1.14864,1.82819 2.424074,3.85818 3.885584,4.48605 1.461509,0.62786 3.834491,0.16523 5.971568,-0.25141 z" />
+                  <!-- Sternlight (White - Rear) -->
+                  <g id="sternlight" class="light" transform="translate(-123.54927,-364.42355)">
+                    <g transform="matrix(-3.7795276,0,0,3.7795276,588.46865,-109.14489)">
+                      <path style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+                            d="m 80.289267,156.02068 c 0,0 -5.826272,-0.0637 -5.826272,-0.0637 1.14864,1.82819 2.424074,3.85818 3.885584,4.48605 1.461509,0.62786 3.834491,0.16523 5.971568,-0.25141 z"
+                            transform="matrix(-0.3448455,0.81240508,0.81240508,0.3448455,7.3082704,55.890518)" />
                     </g>
                   </g>
                   
-                  <!-- Masthead Light (White) -->
-                  <g id="masthead-light" class="light" transform="translate(-34.655456,-96.867321)">
-                    <g transform="matrix(0.69029854,0,0,0.69029854,37.246843,-3.1555726)">
-                      <path style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999" transform="matrix(0.344477,-0.82948639,-0.81153694,-0.35209609,177.88668,298.63419)" d="m 84.266884,160.17474 c 0,0 5.591329,0.0401 5.591329,0.0401 -0.683798,1.55909 -1.293028,2.94816 -2.759663,4.00063 -1.466636,1.05247 -3.213845,1.35439 -4.832871,0.65684 -1.619025,-0.69756 -2.844583,-2.36171 -3.125461,-4.06979 -0.280878,-1.70807 0.426426,-3.19552 1.163416,-4.7454 z" />
+                  <!-- Masthead Light (White - Top forward) -->
+                  <g id="masthead-light" class="light" transform="translate(-123.54927,-364.42355)">
+                    <g transform="matrix(-2.6090024,0,0,2.6090024,510.24559,-45.081248)">
+                      <path style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+                            d="m 84.266884,160.17474 c 0,0 5.591329,0.0401 5.591329,0.0401 -0.683798,1.55909 -1.293028,2.94816 -2.759663,4.00063 -1.466636,1.05247 -3.213845,1.35439 -4.832871,0.65684 -1.619025,-0.69756 -2.844583,-2.36171 -3.125461,-4.06979 -0.280878,-1.70807 0.426426,-3.19552 1.163416,-4.7454 z"
+                            transform="matrix(0.344477,-0.82948639,-0.81153694,-0.35209609,177.88668,298.63419)" />
                     </g>
                   </g>
                   
-                  <!-- NUC Upper -->
-                  <g id="nuc-upper" class="light" transform="translate(-34.655456,-96.867321)">
-                    <circle style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.212965" cx="95.353035" cy="115.86769" r="3.2021229" />
+                  <!-- NUC Upper (Red all-round) -->
+                  <g id="nuc-upper" class="light" transform="translate(-123.54927,-364.42355)">
+                    <circle style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.804907"
+                            cx="464.24286" cy="378.44653" r="12.102512" />
                   </g>
                   
-                  <!-- NUC Lower -->
-                  <g id="nuc-lower" class="light" transform="translate(-34.655456,-96.867321)">
-                    <circle style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.212965" cx="82.775291" cy="115.86769" r="3.2021229" />
+                  <!-- NUC Lower (Red all-round) -->
+                  <g id="nuc-lower" class="light" transform="translate(-123.54927,-364.42355)">
+                    <circle style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.804907"
+                            cx="464.24286" cy="410.03522" r="12.102512" />
                   </g>
                   
-                  <!-- All-round White -->
-                  <g id="allround-white" class="light" transform="translate(-34.655456,-96.867321)">
-                    <circle style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.212965" cx="102.6357" cy="115.86769" r="3.2021229" />
+                  <!-- All-round White (Anchorage) -->
+                  <g id="allround-white" class="light" transform="translate(-123.54927,-364.42355)">
+                    <circle style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.804907"
+                            cx="298.0325" cy="376.92853" r="12.102512" />
                   </g>
                 </svg>
-            </div>
-            
-            <div class="lights-grid">
-                <div class="light-indicator" data-light="masthead">
-                    <div class="light-icon off"></div>
-                    <span>Masthead</span>
-                </div>
-                <div class="light-indicator" data-light="portSidelight">
-                    <div class="light-icon off red"></div>
-                    <span>Port</span>
-                </div>
-                <div class="light-indicator" data-light="starboardSidelight">
-                    <div class="light-icon off green"></div>
-                    <span>Starboard</span>
-                </div>
-                <div class="light-indicator" data-light="sternlight">
-                    <div class="light-icon off"></div>
-                    <span>Stern</span>
-                </div>
-                <div class="light-indicator" data-light="allroundWhite">
-                    <div class="light-icon off"></div>
-                    <span>All-Round</span>
-                </div>
-                <div class="light-indicator" data-light="allroundRedUpper">
-                    <div class="light-icon off red"></div>
-                    <span>NUC Upper</span>
-                </div>
-                <div class="light-indicator" data-light="allroundRedLower">
-                    <div class="light-icon off red"></div>
-                    <span>NUC Lower</span>
-                </div>
-                <div class="light-indicator" data-light="yellowTowingLight">
-                    <div class="light-icon off yellow"></div>
-                    <span>Towing</span>
-                </div>
             </div>
         </section>
 

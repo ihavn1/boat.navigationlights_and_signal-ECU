@@ -164,6 +164,15 @@ function updateConditionUI(condition) {
     
     const label = formatConditionLabel(condition);
     document.getElementById('currentCondition').textContent = label;
+    
+    // Update boat diagram background based on condition
+    const boatContainer = document.getElementById('boatDiagramContainer');
+    if (boatContainer) {
+        // Remove all condition classes
+        boatContainer.classList.remove('condition-day', 'condition-hours_of_darkness', 'condition-restricted_visibility');
+        // Add current condition class
+        boatContainer.classList.add('condition-' + condition);
+    }
 }
 
 /**
@@ -213,8 +222,6 @@ function applyLightsToBoatDiagram(lights) {
     // Map light names to SVG element IDs
     const lightMap = {
         'masthead': 'masthead-light',
-        'portSidelight': 'port-sidelight',
-        'starboardSidelight': 'starboard-sidelight',
         'sternlight': 'sternlight',
         'allroundWhite': 'allround-white',
         'allroundRedUpper': 'nuc-upper',
@@ -236,6 +243,18 @@ function applyLightsToBoatDiagram(lights) {
             }
         }
     });
+    
+    // Special handling: visible starboard sidelight represents both port and starboard
+    // Illuminate it when either sidelight is active
+    const starboardElement = document.getElementById('starboard-sidelight');
+    if (starboardElement) {
+        const sidelightsOn = lights['portSidelight'] || lights['starboardSidelight'];
+        if (sidelightsOn) {
+            starboardElement.classList.add('active');
+        } else {
+            starboardElement.classList.remove('active');
+        }
+    }
 }
 
 /**
@@ -566,11 +585,11 @@ function formatConditionLabel(condition) {
 function formatStateLabel(state) {
     const labels = {
         'moored': 'Moored',
-        'underway_making_way': 'Underway (Making Way)',
-        'underway_no_way': 'Underway (No Way)',
+        'underway_making_way': 'Underway - Making Way',
+        'underway_no_way': 'Underway - Making No Way',
         'anchorage': 'Anchorage',
-        'nuc_making_way': 'NUC (Making Way)',
-        'nuc_no_way': 'NUC (No Way)',
+        'nuc_making_way': 'NUC - Making Way',
+        'nuc_no_way': 'NUC - Making No Way',
         'towing': 'Towing'
     };
     return labels[state] || state;

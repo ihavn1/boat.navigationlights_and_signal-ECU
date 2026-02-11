@@ -108,6 +108,19 @@ header {
     box-shadow: var(--shadow-md);
 }
 
+.header-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.logo {
+    height: 50px;
+    width: auto;
+    filter: brightness(0) invert(1) brightness(0.88);
+}
+
 .status-bar {
     display: flex;
     gap: var(--spacing-sm);
@@ -261,6 +274,20 @@ header {
     background: var(--color-surface-raised);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
+    transition: background 0.8s ease;
+}
+
+/* Animated backgrounds based on lighting condition */
+.boat-diagram-container.condition-day {
+    background: linear-gradient(to bottom, #e0e8f0 0%, #c8d5e0 50%, #b0c0d0 100%);
+}
+
+.boat-diagram-container.condition-hours_of_darkness {
+    background: linear-gradient(to bottom, #1a2d42 0%, #2a3d52 50%, #1d2f42 100%);
+}
+
+.boat-diagram-container.condition-restricted_visibility {
+    background: linear-gradient(to bottom, #6b7c8c 0%, #8a9ba8 50%, #6b7c8c 100%);
 }
 
 #boatDiagram {
@@ -589,6 +616,10 @@ footer a:hover {
     
     h1 {
         font-size: 1.5rem;
+    }
+    
+    .logo {
+        height: 35px;
     }
     
     .button-group {

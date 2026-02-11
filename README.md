@@ -26,19 +26,26 @@ pio run --target upload
 pio device monitor
 ```
 
-### Upload Web UI Files (Phase 8)
+### Upload Web UI Files
 ```powershell
 # Build SPIFFS filesystem from data/ folder
+# (contains lights.html, lights.css, lights.js, iha-logo.png)
 pio run --target buildfs
 
-# Upload frontend files to ESP32
+# Upload web files to ESP32 SPIFFS partition
 pio run --target uploadfs
 
-# Monitor boot messages
+# Monitor boot messages to verify filesystem mount
 pio device monitor
 ```
 
-**Access web UI**: `http://nav-lights-ecu.local/lights.html`  
+**Web UI Files** (data/ folder):
+- `lights.html` - Main UI (16.4KB) with boat diagram and COLREGs day shapes
+- `lights.css` - Styling (16.8KB) with animated backgrounds
+- `lights.js` - Frontend logic (20.8KB) with progress bar and real-time updates
+- `iha-logo.png` - Company logo (18.4KB)
+
+**Access web UI**: `http://nav-lights-ecu.local/lights` (or `http://10.100.100.244/lights`)  
 **Complete testing guide**: [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md)
 
 ### Run Tests
@@ -56,7 +63,11 @@ pio test -e esp32test
 pio test -e native && .\test_web_api.ps1
 ```
 
-## Project Structure+ Web API setup
+## Project Structure
+
+```
+boat.navigationlights_and_signal-ECU/
+├── src/                           # C++ source code
 │   ├── interfaces/                 # Hardware abstraction layer
 │   │   ├── IRelayController.h      # Relay interface
 │   │   └── ITimer.h                # Timer interface
@@ -67,19 +78,23 @@ pio test -e native && .\test_web_api.ps1
 │   ├── signalk_integration.cpp/.h  # SignalK layer (✅ 74 tests)
 │   ├── web_api.cpp/.h              # REST API backend (✅ 29 tests)
 │   ├── ESP32RelayController.cpp/.h # GPIO implementation
-│   └── ESP32Timer.cpp/.h           # FreeRTOS timer
-├── test/
+│   ├── ESP32Timer.cpp/.h           # FreeRTOS timer
+│   └── main.cpp                    # SensESP initialization
+├── data/                          # Web UI files (uploaded to SPIFFS)
+│   ├── lights.html                 # Main UI (16.4KB)
+│   ├── lights.css                  # Styles with animations (16.8KB)
+│   ├── lights.js                   # Frontend logic (20.8KB)
+│   └── iha-logo.png                # Company logo (18.4KB)
+├── test/                          # Unit and integration tests
 │   ├── test_state_machine/         # 23 COLREGs tests (includes towing)
 │   ├── test_light_controller/      # 9 relay tests
 │   ├── test_sound_controller/      # 16 timing tests
 │   ├── test_signalk_integration/   # 76 SignalK tests (includes towing)
 │   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
-├── test_web_api.ps1                # 29 Web API integration tests (✅ passing
-│   ├── test_sound_controller/      # 16 timing tests
-│   ├── test_signalk_integration/   # 74 SignalK tests
-│   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
-├── platformio.ini                  # Build configuration
-└── Project Proposal...md           # COLREGs requirements
+├── test_web_api.ps1               # 29 Web API integration tests (✅ passing)
+├── platformio.ini                 # Build configuration + custom partitions
+├── partitions_custom.csv          # Flash layout (LittleFS + SPIFFS separation)
+└── Project Proposal...md          # COLREGs requirements
 ```
 
 ## Features

@@ -24,6 +24,8 @@
 
 #include <Arduino.h>
 #include <SPIFFS.h>
+#include <LittleFS.h>
+#include <esp_partition.h>
 #include "sensesp_app_builder.h"
 #include "sensesp/system/led_blinker.h"
 #include "signalk_integration.h"
@@ -89,7 +91,19 @@ void setup() {
 #endif
     Serial.println("========================================");
     
+    // Check partition table
+    Serial.println("\nPartition Information:");
+    esp_partition_iterator_t pi = esp_partition_find(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, NULL);
+    if (pi != NULL) {
+        do {
+            const esp_partition_t* p = esp_partition_get(pi);
+            Serial.printf("  %s: size=%dKB, address=0x%x\n", p->label, p->size/1024, p->address);
+        } while ((pi = esp_partition_next(pi)) != NULL);
+        esp_partition_iterator_release(pi);
+    }
+    
     // Initialize SensESP application FIRST (it manages LittleFS for config storage)
+    Serial.println("\nInitializing SensESP (will use 'littlefs' partition for config)...");
     SensESPAppBuilder builder;
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
@@ -97,13 +111,25 @@ void setup() {
         ->get_app();
     
     // NOW initialize SPIFFS for web UI files (AFTER SensESP has initialized LittleFS)
-    // This way: SensESP config in LittleFS, Web UI files in SPIFFS - no conflicts!
-    Serial.println("\nInitializing SPIFFS for web UI files...");
-    if (!SPIFFS.begin(false)) {  // false = don't auto-format
+    // This way: SensESP config in 'littlefs' partition, Web UI files in 'spiffs' partition - no conflicts!
+    Serial.println("\nInitializing SPIFFS for web UI files (using 'spiffs' partition)...");
+    // Mount to /www to avoid conflict with SensESP's LittleFS at /
+    if (!SPIFFS.begin(false, "/www", 10, "spiffs")) {  // false = don't auto-format, mount to /www, max 10 files, partition label "spiffs"
         Serial.println("WARNING: SPIFFS mount failed - web UI not available");
         Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
     } else {
-        Serial.println("SPIFFS mounted successfully");
+        Serial.println("SPIFFS mounted successfully to /www");
+        Serial.printf("  Total: %d bytes, Used: %d bytes\n", SPIFFS.totalBytes(), SPIFFS.usedBytes());
+        // List files
+        Serial.println("  Files in SPIFFS:");
+        File root = SPIFFS.open("/");
+        if (root && root.isDirectory()) {
+            File f = root.openNextFile();
+            while (f) {
+                Serial.printf("    %s (%d bytes)\n", f.name(), f.size());
+                f = root.openNextFile();
+            }
+        }
     }
     
     // Initialize hardware layer

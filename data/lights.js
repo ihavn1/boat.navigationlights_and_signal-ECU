@@ -312,25 +312,46 @@ function updateHornUI(horn) {
     }
 }
 
+// Track maximum countdown to calculate progress percentage
+let maxCountdown = 120; // Default 2 minutes (typical periodic interval)
+
 /**
- * Update mute button and countdown
+ * Update mute button, countdown, and progress bar
  */
 function updateMuteUI(isMuted, countdown) {
     const muteBtn = document.getElementById('muteBtn');
     const muteIcon = muteBtn.querySelector('.mute-icon');
     const muteText = muteBtn.querySelector('.mute-text');
     const countdownEl = document.getElementById('countdown');
+    const progressBar = document.getElementById('progressBar');
     
     if (isMuted) {
         muteBtn.classList.remove('active');
         muteIcon.textContent = '🔇';
         muteText.textContent = 'Periodic Muted';
         countdownEl.textContent = '--';
+        progressBar.style.width = '0%';
+        progressBar.classList.add('muted');
     } else {
         muteBtn.classList.add('active');
         muteIcon.textContent = '🔊';
         muteText.textContent = 'Periodic Active';
         countdownEl.textContent = countdown || '--';
+        progressBar.classList.remove('muted');
+        
+        // Update max countdown if we see a higher value (signal just started)
+        if (countdown > maxCountdown * 0.9) {
+            maxCountdown = Math.max(maxCountdown, countdown);
+        }
+        
+        // Calculate progress: bar fills up as countdown decreases
+        // 0% when countdown = maxCountdown (just started)
+        // 100% when countdown = 0 (about to play)
+        const progress = countdown !== null && maxCountdown > 0
+            ? Math.max(0, Math.min(100, ((maxCountdown - countdown) / maxCountdown) * 100))
+            : 0;
+        
+        progressBar.style.width = `${progress}%`;
     }
 }
 

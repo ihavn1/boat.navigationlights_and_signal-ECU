@@ -412,36 +412,18 @@ esp_err_t handleLightsRedirect(httpd_req_t* req) {
 esp_err_t handleStaticFile(httpd_req_t* req) {
     String path = String(req->uri);
     
-    Serial.printf("[StaticFile] Request for: %s\n", path.c_str());
-    
     // Security: prevent directory traversal
     if (path.indexOf("..") >= 0) {
-        Serial.println("[StaticFile] ERROR: Directory traversal attempt blocked");
         httpd_resp_send_404(req);
         return ESP_OK;
     }
     
-    // SPIFFS.open() operates on the filesystem directly, not through VFS mount point
-    // So we use the path as-is (e.g., /lights.html, not /www/lights.html)
-    
-    // Open file from SPIFFS
-    Serial.printf("[StaticFile] Opening file from SPIFFS: %s\n", path.c_str());
+    // Open file from SPIFFS (operates on filesystem directly, not through VFS mount point)
     File file = SPIFFS.open(path, "r");
     if (!file) {
-        Serial.printf("[StaticFile] ERROR: File not found: %s\n", path.c_str());
-        Serial.println("[StaticFile] Listing SPIFFS contents:");
-        File root = SPIFFS.open("/");
-        if (root && root.isDirectory()) {
-            File f = root.openNextFile();
-            while (f) {
-                Serial.printf("  - %s (%d bytes)\n", f.name(), f.size());
-                f = root.openNextFile();
-            }
-        }
         httpd_resp_send_404(req);
         return ESP_OK;
     }
-    Serial.printf("[StaticFile] File opened successfully, size: %d bytes\n", file.size());
     
     // Set content type based on extension
     const char* content_type = "text/plain";

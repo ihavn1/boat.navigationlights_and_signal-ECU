@@ -113,23 +113,13 @@ void setup() {
     // NOW initialize SPIFFS for web UI files (AFTER SensESP has initialized LittleFS)
     // This way: SensESP config in 'littlefs' partition, Web UI files in 'spiffs' partition - no conflicts!
     Serial.println("\nInitializing SPIFFS for web UI files (using 'spiffs' partition)...");
-    // Mount to /www to avoid conflict with SensESP's LittleFS at /
-    if (!SPIFFS.begin(false, "/www", 10, "spiffs")) {  // false = don't auto-format, mount to /www, max 10 files, partition label "spiffs"
+    // Mount to /www (VFS mount point) but access files directly via SPIFFS.open()
+    if (!SPIFFS.begin(false, "/www", 10, "spiffs")) {  // false = don't auto-format
         Serial.println("WARNING: SPIFFS mount failed - web UI not available");
         Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
     } else {
-        Serial.println("SPIFFS mounted successfully to /www");
+        Serial.println("SPIFFS mounted successfully");
         Serial.printf("  Total: %d bytes, Used: %d bytes\n", SPIFFS.totalBytes(), SPIFFS.usedBytes());
-        // List files
-        Serial.println("  Files in SPIFFS:");
-        File root = SPIFFS.open("/");
-        if (root && root.isDirectory()) {
-            File f = root.openNextFile();
-            while (f) {
-                Serial.printf("    %s (%d bytes)\n", f.name(), f.size());
-                f = root.openNextFile();
-            }
-        }
     }
     
     // Initialize hardware layer

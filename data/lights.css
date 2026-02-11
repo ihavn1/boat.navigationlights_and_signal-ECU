@@ -415,9 +415,40 @@ header {
     font-size: 1.5rem;
 }
 
-.countdown {
+.countdown-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 180px;
+}
+
+.countdown-label {
     font-weight: 600;
     color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 12px;
+    background: var(--color-surface);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-success) 0%, var(--color-warning) 70%, var(--color-danger) 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease-out;
+    box-shadow: 0 0 8px rgba(56, 142, 60, 0.6);
+}
+
+.progress-bar.muted {
+    background: var(--color-text-secondary);
+    box-shadow: none;
 }
 
 .horn-status {

@@ -164,8 +164,11 @@
                     <span class="mute-icon">🔇</span>
                     <span class="mute-text">Periodic Muted</span>
                 </button>
-                <div class="countdown">
-                    Next signal: <span id="countdown">--</span>s
+                <div class="countdown-container">
+                    <div class="countdown-label">Next signal: <span id="countdown">--</span>s</div>
+                    <div class="progress-bar-container">
+                        <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
@@ -198,17 +201,17 @@
                     👀 Attention
                     <small>—</small>
                 </button>
-                <button class="signal-btn" data-signal="overtake_starboard" title="—● = prolonged + short">
-                    ⤴️ Overtake R
-                    <small>—●</small>
+                <button class="signal-btn" data-signal="overtake_starboard" title="— — ● = 2 prolonged + 1 short (Rule 34c)">
+                    ⤴️ Overtake Starboard
+                    <small>— — ●</small>
                 </button>
-                <button class="signal-btn" data-signal="overtake_port" title="—●● = prolonged + 2 short">
-                    ⤵️ Overtake L
-                    <small>—●●</small>
+                <button class="signal-btn" data-signal="overtake_port" title="— — ●● = 2 prolonged + 2 short (Rule 34c)">
+                    ⤵️ Overtake Port
+                    <small>— — ●●</small>
                 </button>
-                <button class="signal-btn" data-signal="agreement_overtaken" title="—●●● = prolonged + 3 short">
+                <button class="signal-btn" data-signal="agreement_overtaken" title="—●—● = prolonged-short-prolonged-short (Rule 34c)">
                     ✓ Agree
-                    <small>—●●●</small>
+                    <small>—●—●</small>
                 </button>
             </div>
         </section>

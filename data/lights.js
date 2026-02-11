@@ -111,6 +111,9 @@ function updateUI(status) {
     // Update boat state
     updateStateUI(status.boatState);
     
+    // Update day shapes (black balls)
+    updateDayShapes(status.condition, status.boatState);
+    
     // Update lights
     updateLightsUI(status.lights);
     
@@ -187,6 +190,42 @@ function updateStateUI(state) {
     
     const label = formatStateLabel(state);
     document.getElementById('currentState').textContent = label;
+}
+
+/**
+ * Update day shape visibility (COLREGs Rules 27 & 30)
+ * - Rule 30: Anchored vessel shows single black ball
+ * - Rule 27: NUC vessel shows two black balls in vertical line
+ */
+function updateDayShapes(condition, boatState) {
+    // Day shapes only visible during day or restricted visibility
+    const isDayOrRestricted = condition === 'day' || condition === 'restricted_visibility';
+    
+    const anchorBall = document.getElementById('anchor-ball');
+    const nucBallUpper = document.getElementById('nuc-ball-upper');
+    
+    if (anchorBall && nucBallUpper) {
+        // Anchor ball: Show single ball for anchorage
+        const isAnchored = boatState === 'anchorage';
+        const showAnchorBall = isDayOrRestricted && isAnchored;
+        anchorBall.style.display = showAnchorBall ? 'block' : 'none';
+        
+        // NUC balls: Show both balls (lower is same as anchor ball position + upper)
+        const isNUC = boatState === 'nuc_making_way' || boatState === 'nuc_no_way';
+        const showNUCBalls = isDayOrRestricted && isNUC;
+        
+        // When NUC, the anchor-ball element acts as the lower NUC ball
+        if (showNUCBalls) {
+            anchorBall.style.display = 'block';  // Lower NUC ball
+            nucBallUpper.style.display = 'block';  // Upper NUC ball
+        } else if (!showAnchorBall) {
+            anchorBall.style.display = 'none';
+            nucBallUpper.style.display = 'none';
+        } else {
+            // Anchor only (upper ball hidden)
+            nucBallUpper.style.display = 'none';
+        }
+    }
 }
 
 /**

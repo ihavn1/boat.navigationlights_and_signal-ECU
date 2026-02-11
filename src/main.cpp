@@ -89,9 +89,17 @@ void setup() {
 #endif
     Serial.println("========================================");
     
-    // Initialize SPIFFS for web UI files
-    Serial.println("\nInitializing SPIFFS...");
-    if (!SPIFFS.begin(true)) {
+    // Initialize SensESP application FIRST (it handles its own filesystem for config)
+    SensESPAppBuilder builder;
+    sensesp_app = (&builder)
+        ->set_hostname("nav-lights-ecu")
+        ->enable_ota("boat-ecu")
+        ->get_app();
+    
+    // NOW initialize SPIFFS for web UI files (after SensESP has initialized its storage)
+    // CRITICAL: Use begin(false) to prevent auto-formatting which would wipe config!
+    Serial.println("\nInitializing SPIFFS for web UI...");
+    if (!SPIFFS.begin(false)) {
         Serial.println("ERROR: SPIFFS mount failed!");
         Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
     } else {
@@ -111,13 +119,6 @@ void setup() {
             }
         }
     }
-    
-    // Initialize SensESP application
-    SensESPAppBuilder builder;
-    sensesp_app = (&builder)
-        ->set_hostname("nav-lights-ecu")
-        ->enable_ota("boat-ecu")
-        ->get_app();
     
     // Initialize hardware layer
     relay_controller = new ESP32RelayController(

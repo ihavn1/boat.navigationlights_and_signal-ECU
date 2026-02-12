@@ -23,8 +23,9 @@
         <!-- Alert Banner -->
         <div id="alertBanner" class="alert-banner hidden"></div>
 
-        <!-- Condition Selection -->
-        <section class="card">
+        <main class="content-grid">
+            <!-- Condition Selection -->
+            <section class="card">
             <h2>Lighting Condition</h2>
             <div class="button-group">
                 <button class="condition-btn" data-value="day">
@@ -38,10 +39,10 @@
                 </button>
             </div>
             <div class="current-value">Current: <span id="currentCondition">-</span></div>
-        </section>
+            </section>
 
-        <!-- Boat State Selection -->
-        <section class="card">
+            <!-- Boat State Selection -->
+            <section class="card">
             <h2>Boat State</h2>
             <div class="button-group">
                 <button class="state-btn" data-value="moored">
@@ -67,10 +68,10 @@
                 </button>
             </div>
             <div class="current-value">Current: <span id="currentState">-</span></div>
-        </section>
+            </section>
 
-        <!-- Lights Status Display -->
-        <section class="card">
+            <!-- Lights Status Display -->
+            <section class="card full-span">
             <h2>Active Lights</h2>
             
             <!-- Boat Diagram - Starboard Side View -->
@@ -152,10 +153,10 @@
                   </g>
                 </svg>
             </div>
-        </section>
+            </section>
 
-        <!-- Sound Signals -->
-        <section class="card">
+            <!-- Sound Signals -->
+            <section class="card full-span">
             <h2>Sound Signals</h2>
             
             <!-- Periodic Signals Control -->
@@ -214,18 +215,18 @@
                     <small>—●—●</small>
                 </button>
             </div>
-        </section>
+            </section>
 
-        <!-- Emergency Stop -->
-        <section class="card emergency-section">
+            <!-- Emergency Stop -->
+            <section class="card emergency-section full-span">
             <button id="emergencyBtn" class="btn-emergency">
                 🛑 EMERGENCY STOP
             </button>
             <p class="emergency-note">Turns off all lights and horn immediately</p>
-        </section>
+            </section>
 
-        <!-- System Info -->
-        <section class="card info-section">
+            <!-- System Info -->
+            <section class="card info-section full-span">
             <h2>System Information</h2>
             <div class="info-grid">
                 <div class="info-item">
@@ -241,7 +242,8 @@
                     <span id="wifiRSSI">-</span>
                 </div>
             </div>
-        </section>
+            </section>
+        </main>
 
         <!-- Footer -->
         <footer>

@@ -126,6 +126,16 @@ pio run -t uploadfs
 
 This allows the ECU to be used on any boat configuration, from minimal (masthead, sidelights, sternlight only) to fully-equipped commercial vessels.
 
+## Security
+
+The SensESP web UI supports Digest Authentication for configuration pages.
+
+- **Protected (LAN)**: When accessed via normal WiFi (e.g., `nav-lights-ecu.local`), `/config` requires Digest Auth credentials.
+- **Not protected (AP mode)**: When connected to the device AP at `192.168.4.1`, SensESP bypasses auth for the captive portal.
+- **Required credentials**: Copy [src/secrets.example.h](src/secrets.example.h) to `src/secrets.h` and set `ADMIN_USER`/`ADMIN_PASS`. The `src/secrets.h` file is ignored by git.
+
+If you need the AP mode protected as well, the HTTP server auth bypass can be removed in firmware.
+
 ## Features
 
 ### COLREGs Compliance

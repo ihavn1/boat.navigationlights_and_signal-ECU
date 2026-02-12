@@ -32,10 +32,15 @@ The Navigation Lights ECU supports **runtime configuration** of optional hardwar
 5. ESP32 automatically restarts to apply changes
 
 ### Configuration Storage
-- **Filesystem**: LittleFS partition (64KB)
+- **Filesystem**: SPIFFS partition
 - **Format**: JSON via SensESP's CheckboxConfig
 - **Persistence**: Survives reboots, firmware updates preserve config
-- **Location**: `/Hardware/NUC_Lights` and `/Hardware/Towing_Lights` in LittleFS
+- **Location**: `/Hardware/NUC_Lights` and `/Hardware/Towing_Lights` in SPIFFS
+
+### Configuration Security
+- **Digest Auth (LAN)**: `/config` is protected when accessed via normal WiFi (e.g., `nav-lights-ecu.local`).
+- **AP Mode**: SensESP bypasses auth for the captive portal at `192.168.4.1`.
+- **Required credentials**: Copy [src/secrets.example.h](../src/secrets.example.h) to `src/secrets.h` and set `ADMIN_USER`/`ADMIN_PASS`.
 
 ## Implementation Details
 
@@ -146,8 +151,8 @@ Potential additional configurable hardware:
 
 ### Configuration Not Persisting
 - **Symptom**: Settings revert to defaults after restart
-- **Cause**: LittleFS not mounted or corrupted
-- **Fix**: Check serial output for LittleFS mount errors, reflash if needed
+- **Cause**: SPIFFS not mounted or corrupted
+- **Fix**: Check serial output for SPIFFS mount errors, reflash if needed
 
 ### Can't Access Config Page
 - **Symptom**: `http://192.168.4.1/config` not loading

@@ -35,6 +35,16 @@
 #include "signalk_integration.h"
 #include "web_api.h"
 
+#include "secrets.h"
+
+#ifndef ADMIN_USER
+#error "ADMIN_USER not defined. Define it in src/secrets.h."
+#endif
+
+#ifndef ADMIN_PASS
+#error "ADMIN_PASS not defined. Define it in src/secrets.h."
+#endif
+
 // Project includes
 #include "ESP32RelayController.h"
 #include "ESP32Timer.h"
@@ -74,7 +84,7 @@ namespace {
         }
         serializeJson(doc, f);
         f.close();
-        Serial.println("HTTP auth defaults written to /system/httpserver");
+        Serial.println("HTTP auth credentials written to /system/httpserver");
     }
 }
 
@@ -139,7 +149,7 @@ void setup() {
     // Initialize SensESP application FIRST (it manages SPIFFS for config storage)
     Serial.println("\nInitializing SensESP (SPIFFS used for config storage)...");
     SensESPAppBuilder builder;
-    ensureHttpAuthConfig("admin", "admin_strong_password");
+    ensureHttpAuthConfig(ADMIN_USER, ADMIN_PASS);
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
         ->enable_ota("boat-ecu")

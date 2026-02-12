@@ -100,6 +100,52 @@ It must be possible to see the status of what state the system, navigation light
 
 On startup and when the SignalK connection is established the complete status of the ECU must be sent to the SignalK server.
 
+## Runtime Hardware Configuration
+
+The system implements runtime hardware configuration allowing a single firmware image to adapt to different boat hardware installations without recompilation.
+
+### Configurable Hardware
+
+Two hardware features are configurable at runtime:
+
+1. **NUC Lights** (COLREGs Rule 27): Two all-round red lights mounted vertically
+   - Optional installation (not all boats carry NUC lights permanently)
+   - Controls GPIO 13 (upper light) and GPIO 15 (lower light)
+
+2. **Towing Lights** (COLREGs Rule 24): Yellow all-round light above white all-round light
+   - Optional installation (only boats used for towing require this)
+   - Controls GPIO 32 (yellow towing light)
+
+### Configuration Interface
+
+Hardware configuration is managed through the SensESP web configuration UI:
+
+- **Access**: Navigate to `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+- **Location**: Configuration items appear under "Hardware" section
+- **Persistence**: Settings stored in LittleFS and survive reboots
+- **Effect**: Changing configuration requires ESP32 restart (enforced by UI)
+
+### Benefits
+
+This design provides:
+
+- **Universal Firmware**: Single firmware image for all boat configurations
+- **Hardware Flexibility**: Install/remove optional lights without reflashing
+- **Day Shape Reminders**: State selection (NUC/Towing) remains functional even without hardware installed, allowing crew to track regulatory status for day shapes
+- **Graceful Degradation**: Web UI automatically adapts to hide unavailable light indicators
+- **Easy Commissioning**: Configure hardware during installation, not during compilation
+
+### Implementation
+
+The runtime configuration affects:
+
+- **Light Controller**: Skips relay activation for unconfigured hardware
+- **Web UI**: Hides light indicators in diagram when hardware not installed
+- **State Machine**: Maintains full state logic (state buttons always visible for day shape compliance)
+- **REST API**: Exposes capabilities via `/api/status` endpoint for UI adaptation
+
+For detailed implementation information, see [docs/RUNTIME_CONFIGURATION.md](docs/RUNTIME_CONFIGURATION.md).
+
 ## User interface
 
 The system must be controllable by selecting the conditions under which the boat is sailing and the state of the boat (see Background Description). When this is selected, the system must automatically turn on the specified light and emit the correct sound signals according to the above table. The periodic sound signals must initially be muted when they are started. This means that there must be a function to mute and unmute the sound signals.

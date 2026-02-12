@@ -49,6 +49,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - ✅ Animated day/night/restricted visibility backgrounds
 - ✅ Black ball day shapes for COLREGs Rules 27 & 30 (anchor/NUC)
 - ✅ Starboard boat diagram with accurate light positioning
+- ✅ **Runtime Hardware Configuration** (NUC/Towing lights via SensESP web UI)
 
 **Current Build**: `az-delivery-devkit-v4` environment with SensESP v3.2.2
 - RAM: **9.4%** (50060 / 532480 bytes)

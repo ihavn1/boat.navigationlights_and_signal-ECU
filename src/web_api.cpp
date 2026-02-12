@@ -8,6 +8,7 @@
 #include "web_api.h"
 #include "signalk_integration.h"  // For string conversion functions
 #include "sensesp_app.h"  // For sensesp_app global
+#include "sensesp/ui/ui_controls.h"  // For CheckboxConfig
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <SPIFFS.h>
@@ -141,6 +142,14 @@ esp_err_t handleGetStatus(httpd_req_t* req) {
     doc["signalkConnected"] = isSignalKConnected();
     doc["uptime"] = millis() / 1000;
     doc["freeHeap"] = ESP.getFreeHeap();
+    
+    // Hardware capabilities (runtime configuration from SensESP web UI)
+    // Read current values from config objects (they update when user changes via web UI)
+    JsonObject capsObj = doc.createNestedObject("capabilities");
+    extern std::shared_ptr<CheckboxConfig> g_config_has_nuc;
+    extern std::shared_ptr<CheckboxConfig> g_config_has_towing;
+    capsObj["hasNucLights"] = g_config_has_nuc ? g_config_has_nuc->get_value() : true;
+    capsObj["hasTowingLights"] = g_config_has_towing ? g_config_has_towing->get_value() : true;
     
     String response;
     serializeJson(doc, response);

@@ -32,10 +32,19 @@ All relay outputs use **active-LOW logic** by default for production use with op
 | **GPIO 27** | D27 | Starboard Sidelight | CH3 | Rule 21(a) | Green light (starboard side, right) |
 | **GPIO 14** | D14 | Sternlight | CH4 | Rule 21(c) | White light aft (rear) |
 | **GPIO 12** | D12 | All-round White | CH5 | Rule 30 | Anchorage light (visible 360°) |
-| **GPIO 13** | D13 | All-round Red Upper | CH6 | Rule 27(a) | NUC upper red light (vertical) |
-| **GPIO 15** | D15 | All-round Red Lower | CH7 | Rule 27(a) | NUC lower red light (vertical) |
-| **GPIO 32** | D32 | Yellow Towing Light | CH8 | Rule 24 | Yellow light above sternlight (towing) |
+| **GPIO 13** | D13 | All-round Red Upper | CH6 | Rule 27(a) | NUC upper red light (vertical) - **Optional** |
+| **GPIO 15** | D15 | All-round Red Lower | CH7 | Rule 27(a) | NUC lower red light (vertical) - **Optional** |
+| **GPIO 32** | D32 | Yellow Towing Light | CH8 | Rule 24 | Yellow light above sternlight (towing) - **Optional** |
 | **GPIO 4** | D4 | Horn / Sound Signal | CH9 | Rule 35 | Sound signal device |
+
+#### Optional Hardware (Runtime Configurable)
+
+NUC and Towing lights are **optional** and can be configured via the SensESP web interface at `http://192.168.4.1/config`:
+
+- **NUC Lights** (GPIO 13, 15): Configure if boat has NUC (Not Under Command) lights installed
+- **Towing Lights** (GPIO 32): Configure if boat has yellow towing light installed
+- All boat states remain selectable (for day shape reminders) even without lights installed
+- Configuration persists across reboots (stored in LittleFS partition)
 
 #### Relay Logic Modes
 

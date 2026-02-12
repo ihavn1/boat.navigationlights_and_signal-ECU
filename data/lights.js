@@ -100,10 +100,46 @@ async function fetchHealth() {
 // ============================================================================
 
 /**
+ * Apply hardware capabilities (hide unavailable lights in diagram)
+ * Note: State buttons remain visible for day shapes (black balls/diamonds)
+ */
+function applyCapabilities(capabilities) {
+    console.log('Applying hardware capabilities:', capabilities);
+    
+    // Hide NUC lights in boat diagram if not installed
+    // (but keep NUC state buttons - needed for day shapes)
+    if (capabilities.hasNucLights === false) {
+        const nucUpper = document.getElementById('nuc-upper');
+        const nucLower = document.getElementById('nuc-lower');
+        if (nucUpper) {
+            nucUpper.style.display = 'none';
+            console.log('NUC lights hidden in diagram (hardware not installed)');
+        }
+        if (nucLower) nucLower.style.display = 'none';
+    }
+    
+    // Hide towing light in boat diagram if not installed
+    // (but keep Towing state button - needed for day shapes)
+    if (capabilities.hasTowingLights === false) {
+        const towingLight = document.getElementById('yellow-towing-light');
+        if (towingLight) {
+            towingLight.style.display = 'none';
+            console.log('Towing light hidden in diagram (hardware not installed)');
+        }
+    }
+}
+
+/**
  * Update all UI elements with current status
  */
 function updateUI(status) {
     if (!status) return;
+    
+    // Apply hardware capabilities (only on first load)
+    if (status.capabilities && !window.capabilitiesApplied) {
+        applyCapabilities(status.capabilities);
+        window.capabilitiesApplied = true;
+    }
     
     // Update condition
     updateConditionUI(status.condition);

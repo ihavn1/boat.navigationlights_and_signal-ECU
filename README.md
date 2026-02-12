@@ -97,15 +97,36 @@ boat.navigationlights_and_signal-ECU/
 └── Project Proposal...md          # COLREGs requirements
 ```
 
+## Hardware Configuration
+
+The ECU supports **runtime configuration** of optional light hardware via the SensESP web interface:
+
+### Configuring Hardware
+1. Navigate to `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+2. Find the **Hardware** section
+3. Configure available hardware:
+   - **NUC Lights**: Check if boat has NUC (Not Under Command) lights installed
+   - **Towing Lights**: Check if boat has yellow towing light installed
+4. Click **Save** - ESP32 will restart and load configuration
+5. Configuration persists across reboots (stored in LittleFS)
+
+### Effects of Configuration
+- **State Selection**: All boat states (NUC, Towing, etc.) remain available for **day shape reminders** (black balls/diamonds)
+- **Light Control**: When hardware is not installed, lights are simply not activated (relays stay OFF)
+- **Web UI**: Fallback interface automatically hides unavailable light indicators in boat diagram
+- **SignalK**: Full state information always published regardless of hardware configuration
+
+This allows the ECU to be used on any boat configuration, from minimal (masthead, sidelights, sternlight only) to fully-equipped commercial vessels.
+
 ## Features
 
 ### COLREGs Compliance
 - ✅ Rules 20, 21, 23, 24, 25, 27, 30, 35 implemented
 - ✅ 21 condition/state combinations validated (7 boat states × 3 conditions)
-- ✅ Navigation lights (masthead, sidelights, sternlight)
-- ✅ Yellow towing light (Rule 24 - above sternlight)
-- ✅ NUC lights (2× red all-round vertical)
-- ✅ Anchorage light (all-round white)
+- ✅ Navigation lights (masthead, sidelights, sternlight) - **Required**
+- ✅ Yellow towing light (Rule 24 - above sternlight) - **Optional, runtime-configurable**
+- ✅ NUC lights (2× red all-round vertical) - **Optional, runtime-configurable**
+- ✅ Anchorage light (all-round white) - **Required**
 - ✅ Sound signals (short/prolonged blasts, periodic patterns)
 - ✅ Ad-hoc signal queueing (auto-plays after 2s delay if signal in progress)
 

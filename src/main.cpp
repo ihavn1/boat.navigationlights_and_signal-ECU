@@ -28,6 +28,8 @@
 #include <esp_partition.h>
 #include "sensesp_app_builder.h"
 #include "sensesp/system/led_blinker.h"
+#include "sensesp/ui/ui_controls.h"
+#include "sensesp/ui/config_item.h"
 #include "signalk_integration.h"
 #include "web_api.h"
 
@@ -70,6 +72,12 @@ LightController* light_controller = nullptr;
 SoundController* sound_controller = nullptr;
 NavigationLightsECU* ecu = nullptr;
 
+// Hardware capability configuration (runtime-configurable via SensESP web UI)
+bool g_has_nuc_lights = true;     // Configurable: Does boat have NUC (Not Under Command) lights?
+bool g_has_towing_lights = true;  // Configurable: Does boat have towing lights?
+std::shared_ptr<CheckboxConfig> g_config_has_nuc = nullptr;     // Config objects for reading current values
+std::shared_ptr<CheckboxConfig> g_config_has_towing = nullptr;
+
 void setup() {
     // Initialize logging subsystem
     SetupLogging();
@@ -109,6 +117,34 @@ void setup() {
         ->set_hostname("nav-lights-ecu")
         ->enable_ota("boat-ecu")
         ->get_app();
+    
+    // Add hardware capability configuration items (appear in SensESP web UI)
+    // Use ConfigItem() to register checkboxes with SensESP's configuration system
+    g_config_has_nuc = std::make_shared<CheckboxConfig>(
+        g_has_nuc_lights,
+        "NUC Lights Installed",
+        "/Hardware/NUC_Lights"
+    );
+    ConfigItem(g_config_has_nuc)
+        ->set_title("NUC Lights")
+        ->set_description("Does this boat have NUC (Not Under Command) lights installed?")
+        ->set_requires_restart(true);
+    g_has_nuc_lights = g_config_has_nuc->get_value();
+    
+    g_config_has_towing = std::make_shared<CheckboxConfig>(
+        g_has_towing_lights,
+        "Towing Lights Installed",
+        "/Hardware/Towing_Lights"
+    );
+    ConfigItem(g_config_has_towing)
+        ->set_title("Towing Lights")
+        ->set_description("Does this boat have towing lights installed?")
+        ->set_requires_restart(true);
+    g_has_towing_lights = g_config_has_towing->get_value();
+    
+    Serial.println("\nHardware configuration:");
+    Serial.printf("  NUC Lights: %s\n", g_has_nuc_lights ? "Installed" : "Not Installed");
+    Serial.printf("  Towing Lights: %s\n", g_has_towing_lights ? "Installed" : "Not Installed");
     
     // NOW initialize SPIFFS for web UI files (AFTER SensESP has initialized LittleFS)
     // This way: SensESP config in 'littlefs' partition, Web UI files in 'spiffs' partition - no conflicts!

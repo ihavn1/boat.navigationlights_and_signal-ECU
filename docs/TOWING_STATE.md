@@ -28,6 +28,14 @@ A power-driven vessel when towing shall exhibit:
 
 ## Hardware Implementation
 
+### Runtime Configuration
+
+**Important**: Towing lights are **optional** and runtime-configurable:
+- Configure at: `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+- Setting: "Towing Lights Installed" checkbox in Hardware section
+- Configuration persists across reboots (stored in LittleFS)
+- Towing **state** remains selectable even without lights (for day shape reminders)
+
 ### GPIO Assignment
 - **GPIO 32**: Yellow towing light relay control (9th relay output)
 - **Relay Module**: Requires 9 or 16-channel relay module (upgraded from 8-channel)

@@ -159,6 +159,10 @@ Each condition+state combination maps to specific light configurations and perio
 7. ✅ Ad-hoc signal queueing system (2-second delay after signal completion)
 8. ✅ Platform-independent debug logging for native tests
 9. ✅ All 119 unit tests passing on native platform
+10. ✅ Web API backend (7 REST endpoints, 29 tests passing)
+11. ✅ Fallback web UI (HTML/CSS/JS, deployed to SPIFFS)
+12. ✅ Towing state (COLREGs Rule 24) with full implementation
+13. ✅ Runtime hardware configuration (NUC/Towing lights configurable via SensESP web UI)
 
 ### Pending Work ⚠️
 1. **Hardware Integration Testing**: Validate queueing timing and prolonged blast duration on ESP32 hardware
@@ -166,6 +170,5 @@ Each condition+state combination maps to specific light configurations and perio
 3. **SensESP Integration**: Complete main.cpp with SensESP setup and SignalK client configuration
 4. **Hardware Wiring**: Connect relay module, verify GPIO mapping from HARDWARE.md
 5. **Maritime Field Testing**: Validate COLREGs compliance in actual conditions
-6. **(Optional) Web fallback UI**: Custom HTTP control page for when SignalK unavailable
 
-**Note**: All core logic validated via TDD - 119 unit tests covering state machine, light control, sound control, and SignalK integration
+**Note**: All core logic validated via TDD - 148 tests total (119 unit + 29 web API integration) covering state machine, light control, sound control, SignalK, and web API

@@ -656,11 +656,41 @@ footer a:hover {
 
 @media (min-width: 700px) {
     h1 {
-        font-size: 2rem;
+        font-size: 1.85rem;
     }
 
     .logo {
-        height: 60px;
+        height: 52px;
+    }
+
+    h2 {
+        font-size: 1.15rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    .card {
+        padding: var(--spacing-md);
+    }
+
+    .condition-btn,
+    .state-btn,
+    .signal-btn,
+    .btn-secondary {
+        padding: var(--spacing-sm);
+        font-size: 0.9rem;
+    }
+
+    .btn-emergency {
+        padding: var(--spacing-md);
+        font-size: 1.1rem;
+    }
+
+    .light-icon {
+        width: 40px;
+        height: 40px;
     }
 
     .button-group {
@@ -676,11 +706,11 @@ footer a:hover {
     }
 
     #boatDiagram {
-        max-width: 520px;
+        max-width: 480px;
     }
 
     .countdown-container {
-        min-width: 220px;
+        min-width: 200px;
     }
 }
 
@@ -690,7 +720,28 @@ footer a:hover {
     }
 
     header {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
+    }
+
+    .content-grid {
+        gap: var(--spacing-md);
+    }
+
+    .card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .button-group,
+    .signal-grid {
+        gap: var(--spacing-xs);
+    }
+
+    .signal-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .lights-grid {
+        gap: var(--spacing-sm);
     }
 }
 
@@ -701,6 +752,25 @@ footer a:hover {
 
     #boatDiagram {
         max-width: 600px;
+    }
+
+    .content-grid {
+        gap: var(--spacing-md);
+    }
+
+    .card {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .condition-btn,
+    .state-btn,
+    .signal-btn,
+    .btn-secondary {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .btn-emergency {
+        padding: var(--spacing-sm) var(--spacing-md);
     }
 }
 

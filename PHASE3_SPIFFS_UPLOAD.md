@@ -15,6 +15,13 @@ Upload the web UI frontend files (HTML/CSS/JS) to ESP32's SPIFFS filesystem and 
 - ESP32 connected via USB (COM3)
 - WiFi configured and connected
 - PlatformIO installed
+- If the partition table changed, run a full flash erase before uploading:
+
+```bash
+pio run -t erase
+pio run -t upload
+pio run -t uploadfs
+```
 
 ## Upload Steps
 

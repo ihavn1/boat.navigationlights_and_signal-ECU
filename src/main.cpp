@@ -23,6 +23,7 @@
  */
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <SPIFFS.h>
 #include <LittleFS.h>
 #include <esp_partition.h>
@@ -30,6 +31,7 @@
 #include "sensesp/system/led_blinker.h"
 #include "sensesp/ui/ui_controls.h"
 #include "sensesp/ui/config_item.h"
+#include "sensesp/system/hash.h"
 #include "signalk_integration.h"
 #include "web_api.h"
 
@@ -50,6 +52,30 @@ namespace {
             return static_cast<SensESPAppAccessor*>(app)->http_server_.get();
         }
     };
+}
+
+namespace {
+    void ensureHttpAuthConfig(const char* username, const char* password) {
+        const String config_path = "/system/httpserver";
+        const String hash_path = String("/") + sensesp::Base64Sha1(config_path);
+        if (SPIFFS.exists(hash_path) || SPIFFS.exists(config_path)) {
+            return;
+        }
+
+        StaticJsonDocument<128> doc;
+        doc["auth_required"] = true;
+        doc["username"] = username;
+        doc["password"] = password;
+
+        File f = SPIFFS.open(config_path, "w");
+        if (!f) {
+            Serial.println("WARNING: Failed to write HTTP auth config");
+            return;
+        }
+        serializeJson(doc, f);
+        f.close();
+        Serial.println("HTTP auth defaults written to /system/httpserver");
+    }
 }
 
 // GPIO pin definitions
@@ -110,9 +136,10 @@ void setup() {
         esp_partition_iterator_release(pi);
     }
     
-    // Initialize SensESP application FIRST (it manages LittleFS for config storage)
-    Serial.println("\nInitializing SensESP (will use 'littlefs' partition for config)...");
+    // Initialize SensESP application FIRST (it manages SPIFFS for config storage)
+    Serial.println("\nInitializing SensESP (SPIFFS used for config storage)...");
     SensESPAppBuilder builder;
+    ensureHttpAuthConfig("admin", "admin_strong_password");
     sensesp_app = (&builder)
         ->set_hostname("nav-lights-ecu")
         ->enable_ota("boat-ecu")
@@ -146,11 +173,9 @@ void setup() {
     Serial.printf("  NUC Lights: %s\n", g_has_nuc_lights ? "Installed" : "Not Installed");
     Serial.printf("  Towing Lights: %s\n", g_has_towing_lights ? "Installed" : "Not Installed");
     
-    // NOW initialize SPIFFS for web UI files (AFTER SensESP has initialized LittleFS)
-    // This way: SensESP config in 'littlefs' partition, Web UI files in 'spiffs' partition - no conflicts!
-    Serial.println("\nInitializing SPIFFS for web UI files (using 'spiffs' partition)...");
-    // Mount to /www (VFS mount point) but access files directly via SPIFFS.open()
-    if (!SPIFFS.begin(false, "/www", 10, "spiffs")) {  // false = don't auto-format
+    // SPIFFS is already mounted by SensESP; confirm availability for web UI files
+    Serial.println("\nValidating SPIFFS for web UI files...");
+    if (!SPIFFS.begin(false)) {  // false = don't auto-format
         Serial.println("WARNING: SPIFFS mount failed - web UI not available");
         Serial.println("Run 'pio run --target uploadfs' to upload web UI files");
     } else {

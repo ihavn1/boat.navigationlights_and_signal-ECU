@@ -93,7 +93,7 @@ boat.navigationlights_and_signal-ECU/
 │   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
 ├── test_web_api.ps1               # 29 Web API integration tests (✅ passing)
 ├── platformio.ini                 # Build configuration + custom partitions
-├── partitions_custom.csv          # Flash layout (LittleFS + SPIFFS separation)
+├── partitions_custom.csv          # Flash layout (single SPIFFS for config + web UI)
 └── Project Proposal...md          # COLREGs requirements
 ```
 
@@ -108,7 +108,15 @@ The ECU supports **runtime configuration** of optional light hardware via the Se
    - **NUC Lights**: Check if boat has NUC (Not Under Command) lights installed
    - **Towing Lights**: Check if boat has yellow towing light installed
 4. Click **Save** - ESP32 will restart and load configuration
-5. Configuration persists across reboots (stored in LittleFS)
+5. Configuration persists across reboots (stored in SPIFFS)
+
+**Note**: If you change the partition table, run a full flash erase before uploading. This clears old filesystem data that may no longer align with the new layout.
+
+```bash
+pio run -t erase
+pio run -t upload
+pio run -t uploadfs
+```
 
 ### Effects of Configuration
 - **State Selection**: All boat states (NUC, Towing, etc.) remain available for **day shape reminders** (black balls/diamonds)

@@ -45,6 +45,10 @@
 #error "ADMIN_PASS not defined. Define it in src/secrets.h."
 #endif
 
+#ifndef AP_PASSWORD
+#error "AP_PASSWORD not defined. Define it in src/secrets.h."
+#endif
+
 // Project includes
 #include "ESP32RelayController.h"
 #include "ESP32Timer.h"
@@ -151,6 +155,7 @@ void setup() {
     SensESPAppBuilder builder;
     ensureHttpAuthConfig(ADMIN_USER, ADMIN_PASS);
     sensesp_app = (&builder)
+        ->set_wifi_access_point("nav-lights-ecu", AP_PASSWORD)
         ->set_hostname("nav-lights-ecu")
         ->enable_ota("boat-ecu")
         ->get_app();

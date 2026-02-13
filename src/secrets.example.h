@@ -5,3 +5,4 @@
 
 #define ADMIN_USER "admin"
 #define ADMIN_PASS "change_me"
+#define AP_PASSWORD "thisisfine"

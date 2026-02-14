@@ -63,6 +63,42 @@ pio test -e esp32test
 pio test -e native && .\test_web_api.ps1
 ```
 
+## Over-The-Air (OTA) Updates
+
+Once the ESP32 is connected to WiFi, firmware and filesystem can be updated wirelessly without USB cable access.
+
+### Initial Setup (USB Required)
+```bash
+# First-time flash via USB
+pio run --target upload
+
+# Upload web UI files via USB
+pio run --target uploadfs
+```
+
+### Wireless Updates (After Initial Setup)
+```bash
+# Update firmware over WiFi
+pio run --target upload --upload-port nav-lights-ecu.local
+
+# Update web UI files over WiFi
+pio run --target uploadfs --upload-port nav-lights-ecu.local
+```
+
+**OTA Authentication**: 
+- Password automatically read from `src/secrets.h` (define `OTA_PASSWORD`)
+- Configured via `read_secrets.py` script (no passwords in git-tracked files)
+- If hostname resolution fails, use IP address: `--upload-port 10.100.100.244`
+
+**Requirements**:
+- ESP32 powered on and connected to same network
+- mDNS/Bonjour enabled (for `.local` hostname resolution)
+- Firewall allows mDNS (port 5353) and OTA (port 3232)
+
+**Safety**: If OTA fails, ESP32 keeps running old firmware. Fall back to USB if needed.
+
+**Use Case**: Particularly useful when ECU is installed in hard-to-reach locations on the boat.
+
 ## Project Structure
 
 ```

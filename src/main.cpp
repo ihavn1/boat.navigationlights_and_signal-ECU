@@ -49,6 +49,10 @@
 #error "AP_PASSWORD not defined. Define it in src/secrets.h."
 #endif
 
+#ifndef OTA_PASSWORD
+#error "OTA_PASSWORD not defined. Define it in src/secrets.h."
+#endif
+
 // Project includes
 #include "ESP32RelayController.h"
 #include "ESP32Timer.h"
@@ -157,7 +161,7 @@ void setup() {
     sensesp_app = (&builder)
         ->set_wifi_access_point("nav-lights-ecu", AP_PASSWORD)
         ->set_hostname("nav-lights-ecu")
-        ->enable_ota("boat-ecu")
+        ->enable_ota(OTA_PASSWORD)
         ->get_app();
     
     // Add hardware capability configuration items (appear in SensESP web UI)

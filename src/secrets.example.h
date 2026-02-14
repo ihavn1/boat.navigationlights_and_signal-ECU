@@ -6,3 +6,4 @@
 #define ADMIN_USER "admin"
 #define ADMIN_PASS "change_me"
 #define AP_PASSWORD "thisisfine"
+#define OTA_PASSWORD "change_me"  // Used for Over-The-Air firmware updates

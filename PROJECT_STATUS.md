@@ -187,10 +187,10 @@ pio device monitor
 - Test visibility compliance (light visibility at required distances)
 - Test sound signal audibility
 
-### ⏳ Phase 10: Optional Enhancements (0%)
-- Enhanced web configuration portal
-- OTA firmware updates
-- Data logging to SPIFFS
+### ⏳ Phase 10: Optional Enhancements
+- ✅ **OTA firmware updates** - Password-protected wireless updates via `read_secrets.py` script
+- ⏳ Enhanced web configuration portal
+- ⏳ Data logging to SPIFFS
 
 ## Test Coverage
 
@@ -340,9 +340,13 @@ pio device monitor
 6. Validate integration with boat's SignalK network
 
 ### Phase 10: Optional Enhancements (Future)
-1. Enhanced web configuration portal (WiFi credentials, SignalK server)
-2. Watchdog timer for firmware hang detection
-3. OTA firmware updates
+1. ✅ **OTA firmware updates** - Implemented with password authentication from secrets.h
+   - Wireless firmware and filesystem updates via `--upload-port nav-lights-ecu.local`
+   - Password-protected using OTA_PASSWORD from secrets.h (not committed to git)
+   - Auto-configured via `read_secrets.py` pre-upload script
+   - Safe rollback if OTA fails (keeps running old firmware)
+2. Enhanced web configuration portal (WiFi credentials, SignalK server)
+3. Watchdog timer for firmware hang detection
 4. Data logging to SPIFFS (diagnostic history)
 5. PWM dimming for lights (energy savings in anchorage mode)
 

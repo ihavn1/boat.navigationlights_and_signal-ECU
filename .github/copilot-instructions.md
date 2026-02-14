@@ -76,6 +76,10 @@ Each condition+state combination maps to specific light configurations and perio
 - Target: `esp32dev` board for ESP32 Dev Kit C V4
 - Dependencies: SensESP library (includes SignalK client)
 - Build: `pio run` | Flash: `pio run --target upload` | Monitor: `pio device monitor`
+- **OTA Updates**: After initial USB flash, wireless updates via `pio run --target upload --upload-port nav-lights-ecu.local`
+  - Password authentication from `src/secrets.h` (OTA_PASSWORD)
+  - Auto-configured via `read_secrets.py` pre-upload script
+  - Filesystem updates: `pio run --target uploadfs --upload-port nav-lights-ecu.local`
 
 ### Testing Workflow
 - **Framework**: Unity (PlatformIO built-in), run with `pio test -e native` for fast host testing
@@ -163,6 +167,7 @@ Each condition+state combination maps to specific light configurations and perio
 11. ✅ Fallback web UI (HTML/CSS/JS, deployed to SPIFFS)
 12. ✅ Towing state (COLREGs Rule 24) with full implementation
 13. ✅ Runtime hardware configuration (NUC/Towing lights configurable via SensESP web UI)
+14. ✅ OTA firmware updates (password-protected wireless updates via read_secrets.py)
 
 ### Pending Work ⚠️
 1. **Hardware Integration Testing**: Validate queueing timing and prolonged blast duration on ESP32 hardware

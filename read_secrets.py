@@ -38,6 +38,7 @@ def on_upload(source, target, env):
         else:
             print("⚠ Warning: Network upload without OTA_PASSWORD - authentication will fail")
 
-# Register the callback for upload phase
+# Register the callback for both firmware and filesystem uploads
 env.AddPreAction("upload", on_upload)
+env.AddPreAction("uploadfs", on_upload)
 

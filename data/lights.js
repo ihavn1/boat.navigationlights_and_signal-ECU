@@ -14,6 +14,7 @@ const ALERT_TIMEOUT = 5000; // 5 seconds
 let pollTimer = null;
 let currentStatus = null;
 let isConnected = false;
+let alertTimeout = null;
 
 // ============================================================================
 // Initialization
@@ -633,15 +634,24 @@ function stopPolling() {
 // ============================================================================
 
 /**
- * Show alert banner
+ * Show alert message in header
  */
 function showAlert(message, type = 'error') {
     const banner = document.getElementById('alertBanner');
-    banner.textContent = message;
-    banner.className = `alert-banner ${type}`;
     
-    setTimeout(() => {
+    // Clear any existing timeout
+    if (alertTimeout) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+    }
+    
+    banner.textContent = message;
+    banner.className = `status-badge alert-message ${type}`;
+    banner.classList.remove('hidden');
+    
+    alertTimeout = setTimeout(() => {
         banner.classList.add('hidden');
+        alertTimeout = null;
     }, ALERT_TIMEOUT);
 }
 

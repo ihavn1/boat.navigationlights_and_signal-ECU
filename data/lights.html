@@ -35,7 +35,7 @@
                     🌙 Darkness
                 </button>
                 <button class="condition-btn" data-value="restricted_visibility">
-                    🌫️ Restricted
+                    🌫️ Restricted Visibility
                 </button>
             </div>
             <div class="current-value">Current: <span id="currentCondition">-</span></div>
@@ -182,36 +182,36 @@
             <!-- Ad-Hoc Signals -->
             <h3>Ad-Hoc Signals</h3>
             <div class="signal-grid">
-                <button class="signal-btn" data-signal="turn_starboard" title="● = 1 short blast">
-                    ↪️ Turn Right
-                    <small>●</small>
-                </button>
                 <button class="signal-btn" data-signal="turn_port" title="●● = 2 short blasts">
-                    ↩️ Turn Left
+                    ↖️ Turn Port
                     <small>●●</small>
                 </button>
                 <button class="signal-btn" data-signal="astern_propulsion" title="●●● = 3 short blasts">
-                    ⬅️ Astern
+                    ⬇️ Astern
                     <small>●●●</small>
                 </button>
+                <button class="signal-btn" data-signal="turn_starboard" title="● = 1 short blast">
+                    ↗️ Turn Starboard
+                    <small>●</small>
+                </button>
                 <button class="signal-btn" data-signal="danger_confusion" title="●●●●● = 5+ short blasts">
-                    ⚠️ Danger
+                    ❓ What?
                     <small>●●●●●</small>
                 </button>
                 <button class="signal-btn" data-signal="pay_attention" title="— = 1 prolonged blast">
                     👀 Attention
                     <small>—</small>
                 </button>
+                <button class="signal-btn" data-signal="overtake_port" title="— — ●● = 2 prolonged + 2 short (Rule 34c)">
+                    <span class="icon-flip-vertical">⤴️</span> Overtake Port
+                    <small>— — ●●</small>
+                </button>
                 <button class="signal-btn" data-signal="overtake_starboard" title="— — ● = 2 prolonged + 1 short (Rule 34c)">
                     ⤴️ Overtake Starboard
                     <small>— — ●</small>
                 </button>
-                <button class="signal-btn" data-signal="overtake_port" title="— — ●● = 2 prolonged + 2 short (Rule 34c)">
-                    ⤵️ Overtake Port
-                    <small>— — ●●</small>
-                </button>
                 <button class="signal-btn" data-signal="agreement_overtaken" title="—●—● = prolonged-short-prolonged-short (Rule 34c)">
-                    ✓ Agree
+                    ✅ Overtake OK
                     <small>—●—●</small>
                 </button>
             </div>
@@ -248,7 +248,6 @@
         <!-- Footer -->
         <footer>
             <p>COLREGs Navigation Lights Controller</p>
-            <p><a href="/">SensESP Dashboard</a> | <a href="/config">Configuration</a></p>
         </footer>
     </div>
 

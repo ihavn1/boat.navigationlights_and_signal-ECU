@@ -401,11 +401,13 @@ function setConnectionStatus(connected) {
     if (connected) {
         badge.textContent = 'Connected';
         badge.classList.remove('disconnected');
+        badge.classList.remove('blink');
         badge.classList.add('connected');
     } else {
         badge.textContent = 'Disconnected';
         badge.classList.remove('connected');
         badge.classList.add('disconnected');
+        badge.classList.add('blink');
     }
 }
 
@@ -696,14 +698,14 @@ function formatStateLabel(state) {
  */
 function formatSignalLabel(signal) {
     const labels = {
-        'turn_starboard': 'Turn to Starboard',
-        'turn_port': 'Turn to Port',
+        'turn_starboard': 'Turn Starboard',
+        'turn_port': 'Turn Port',
         'astern_propulsion': 'Astern Propulsion',
-        'danger_confusion': 'Danger/Confusion',
+        'danger_confusion': 'What?',
         'pay_attention': 'Pay Attention',
         'overtake_starboard': 'Overtake Starboard',
         'overtake_port': 'Overtake Port',
-        'agreement_overtaken': 'Agreement Overtaken'
+        'agreement_overtaken': 'Overtake OK'
     };
     return labels[signal] || signal;
 }

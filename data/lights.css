@@ -162,6 +162,22 @@ header {
     color: white;
 }
 
+.status-badge.blink {
+    animation: status-blink 1.1s steps(2, jump-none) infinite;
+}
+
+@keyframes status-blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 /* ============================================================================
    Alert Banner
    ============================================================================ */
@@ -844,6 +860,12 @@ button:disabled {
 .text-center {
     text-align: center;
 }
+
+.icon-flip-vertical {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+
 
 .mt-sm { margin-top: var(--spacing-sm); }
 .mt-md { margin-top: var(--spacing-md); }

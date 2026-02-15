@@ -1041,6 +1041,38 @@
         "wires": []
     },
     {
+        "id": "sos9tt0uu1vv2ww3",
+        "type": "signalk-subscribe",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Subscribe: SOS Active",
+        "path": "electrical.switches.navigationLights.sosActive",
+        "period": 1000,
+        "x": 170,
+        "y": 1580,
+        "wires": [
+            [
+                "sos4vv5ww6xx7yy8"
+            ]
+        ]
+    },
+    {
+        "id": "sos4vv5ww6xx7yy8",
+        "type": "debug",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "SOS Active",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 400,
+        "y": 1580,
+        "wires": []
+    },
+    {
         "id": "ssss5tttt6uuuu7vv8",
         "type": "signalk-subscribe",
         "z": "f1a2b3c4d5e6f7g8",

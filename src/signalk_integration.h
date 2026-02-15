@@ -22,6 +22,7 @@
  * - electrical.switches.navigationLights.periodicCountdown - int (seconds)
  * - electrical.switches.navigationLights.lights.* - bool per light
  * - electrical.switches.navigationLights.horn.active - bool
+ * - electrical.switches.navigationLights.sosActive - bool
  * - electrical.switches.navigationLights.heartbeat - int
  */
 

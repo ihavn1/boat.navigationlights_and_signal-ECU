@@ -100,6 +100,7 @@ static ObservableValue<bool>* allround_red_upper_value = nullptr;
 static ObservableValue<bool>* allround_red_lower_value = nullptr;
 static ObservableValue<bool>* yellow_towing_light_value = nullptr;
 static ObservableValue<bool>* horn_value = nullptr;
+static ObservableValue<bool>* sos_active_value = nullptr;
 static ObservableValue<int>* heartbeat_value = nullptr;
 
 /**
@@ -157,6 +158,10 @@ static void updateAllObservableValues(NavigationLightsECU& ecu) {
     bool horn = ecu.isHornActive();
     Serial.print("  horn.active: "); Serial.println(horn ? "true" : "false");
     horn_value->set(horn);
+
+    bool sos_active = ecu.isSosActive();
+    Serial.print("  sos.active: "); Serial.println(sos_active ? "true" : "false");
+    sos_active_value->set(sos_active);
     
     Serial.println("[SignalK] updateAllObservableValues: Complete");
 }
@@ -187,6 +192,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
     allround_red_lower_value = new ObservableValue<bool>(initial_lights.allround_red_lower);
     yellow_towing_light_value = new ObservableValue<bool>(initial_lights.yellow_towing_light);
     horn_value = new ObservableValue<bool>(ecu.isHornActive());
+    sos_active_value = new ObservableValue<bool>(ecu.isSosActive());
     heartbeat_value = new ObservableValue<int>(0);  // Start at 0, will toggle
     
     Serial.println("[SignalK] ObservableValue objects created");
@@ -389,6 +395,12 @@ void setupSignalK(NavigationLightsECU& ecu) {
         String(SK_PATH_PREFIX) + ".horn.active",
         "/nav/horn",
         new SKMetadata("", "Horn active")
+    ));
+
+    sos_active_value->connect_to(new SKOutput<bool>(
+        String(SK_PATH_PREFIX) + ".sosActive",
+        "/notifications/distress",
+        new SKMetadata("", "SOS distress signal active")
     ));
     
     heartbeat_value->connect_to(new SKOutput<int>(

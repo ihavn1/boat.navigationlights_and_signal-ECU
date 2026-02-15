@@ -1,6 +1,6 @@
 # Navigation Lights and Signal ECU - Project Status
 
-**Last Updated**: February 11, 2026
+**Last Updated**: February 15, 2026
 
 ## Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
@@ -27,7 +27,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - [src/LightController.h](src/LightController.h) / [.cpp](src/LightController.cpp) - Light control logic
 - [src/SoundController.h](src/SoundController.h) / [.cpp](src/SoundController.cpp) - Sound signal timing with queueing
 - [test/test_light_controller/](test/test_light_controller/) - **9 tests passing**
-- [test/test_sound_controller/](test/test_sound_controller/) - **16 tests passing** (includes unmute immediate playback + ad-hoc queueing)
+- [test/test_sound_controller/](test/test_sound_controller/) - **17 tests passing** (includes SOS + queueing)
 
 ### ✅ Phase 4: SignalK Integration (100%) - CODE COMPLETE
 - ✅ [src/ESP32Timer.h](src/ESP32Timer.h) / [.cpp](src/ESP32Timer.cpp) - Production timer with platform-independent debug logging
@@ -38,13 +38,15 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
   - **Periodic Updates**: 60s heartbeat calls `updateAllObservableValues(ecu)` (matches boat.light-signal-ECU)
   - **Reconnection Handling**: Auto-republishes all values 2s after connection
   - 5 input paths (PUT requests) + 13 output paths (status publishing)
-- ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **74 tests passing** (conversions, integration, edge cases)
+- ✅ [test/test_signalk_integration/](test/test_signalk_integration/) - **76 tests passing** (includes SOS conversions)
 
 **Recent Feature Additions**:
 - ✅ Ad-hoc signal queueing (2-second delay after signal completion)
 - ✅ Unmute immediate playback (signals play immediately when unmuted)
 - ✅ Platform-independent debug logging (NATIVE_BUILD flag + DEBUG macros)
 - ✅ COLREGs Rule 35 corrections (making way = 1 blast, stopped = 2 blasts)
+- ✅ SOS ad-hoc signal (●●● ▬▬ ▬▬ ▬▬ ●●●) with horn-synced masthead + anchor flashing
+- ✅ Guarded SOS control in fallback web UI (lift cover + hold-to-send)
 - ✅ Visual progress bar for periodic signal countdown (Web UI enhancement)
 - ✅ Animated day/night/restricted visibility backgrounds
 - ✅ Black ball day shapes for COLREGs Rules 27 & 30 (anchor/NUC)
@@ -78,7 +80,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - `POST /api/condition` - Set lighting condition (day/darkness/restricted visibility)
 - `POST /api/state` - Set boat state (moored/underway/anchorage/NUC)
 - `POST /api/mute` - Mute/unmute periodic sound signals
-- `POST /api/signal` - Trigger ad-hoc signals (turn/astern/danger/overtake/etc)
+- `POST /api/signal` - Trigger ad-hoc signals (including SOS)
 - `POST /api/emergency` - Emergency stop (all lights/horn off)
 
 **Test Coverage**: [test_web_api.ps1](test_web_api.ps1) - **29/29 tests passing (100%)**
@@ -87,6 +89,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - 7 boat state tests (6 valid + 1 error)
 - 2 mute control tests
 - 9 ad-hoc signal tests (8 valid + 1 error)
+  - NOTE: Add SOS to automated ad-hoc signal test list
 - 2 emergency stop tests
 - 3 error handling tests (missing fields)
 
@@ -123,11 +126,12 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
   2. Condition control (Day/Darkness/Restricted visibility)
   3. Boat state selection (Moored/Underway/etc)
   4. Live light indicators with animated glow effects
-  5. Sound signal controls (mute + 8 ad-hoc patterns)
+  5. Sound signal controls (mute + 9 ad-hoc patterns, including SOS)
   6. Emergency stop button
   7. System info (uptime, heap, WiFi RSSI)
 - **Error Handling**: Global error catching with user-friendly alerts
 - **Visual Feedback**: Light indicators glow (white/red/green) when active
+- **Guarded SOS**: Lift cover + 3-second hold to trigger SOS
 - **No Dependencies**: Vanilla HTML5/CSS3/ES6 JavaScript
 
 **Technical Stack**:
@@ -194,15 +198,15 @@ pio device monitor
 
 ## Test Coverage
 
-**Total: 148 tests - All Passing ✅** (119 unit tests + 29 web API tests)
+**Total: 151 tests - All Passing ✅** (122 unit tests + 29 web API tests)
 
-### Native Unit Tests (119 tests, ~7.8s)
+### Native Unit Tests (122 tests, ~7.8s)
 | Test Suite | Tests | Files | Status |
 |------------|-------|-------|--------|
 | State Machine | 20 | [test_state_machine.cpp](test/test_state_machine/test_state_machine.cpp) | ✅ PASSED |
 | Light Controller | 9 | [test_light_controller.cpp](test/test_light_controller/test_light_controller.cpp) | ✅ PASSED |
-| Sound Controller | 16 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
-| SignalK Integration | 74 | [test_signalk_integration.cpp](test/test_signalk_integration/test_signalk_integration.cpp) | ✅ PASSED |
+| Sound Controller | 17 | [test_sound_controller.cpp](test/test_sound_controller/test_sound_controller.cpp) | ✅ PASSED |
+| SignalK Integration | 76 | [test_signalk_integration.cpp](test/test_signalk_integration/test_signalk_integration.cpp) | ✅ PASSED |
 
 ### Web API Tests (29 tests, ~15s)
 | Test Suite | Tests | Files | Status |
@@ -221,11 +225,11 @@ pio device monitor
 - Platform-independent debug logging
 
 ### Test Coverage Summary
-**Unit Tests** (119 total):
+**Unit Tests** (122 total):
 - State Machine: 20 tests - COLREGs rule validation
 - Light Controller: 9 tests - Relay control & safety
-- Sound Controller: 16 tests - Timing, queueing, countdown
-- SignalK Integration: 74 tests - Conversions, integration, edge cases
+- Sound Controller: 17 tests - Timing, queueing, countdown
+- SignalK Integration: 76 tests - Conversions, integration, edge cases
 
 **Web API Tests** (29 total):
 - Health & status endpoints: 2 tests
@@ -236,7 +240,7 @@ pio device monitor
 - Emergency stop: 2 tests
 - Error handling: 3 tests
 
-**Total Automated Tests**: 148 tests (119 unit + 29 web API) ✅ **100% passing**
+**Total Automated Tests**: 151 tests (122 unit + 29 web API) ✅ **100% passing**
 
 ### Hardware Validation: **Phase 5 - In Progress** 🚧
 - ESP32 Dev Kit C V4 + opto-isolated relay module required

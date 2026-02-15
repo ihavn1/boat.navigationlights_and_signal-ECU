@@ -26,13 +26,17 @@ SoundController::SoundController(IRelayController& relay_controller, ITimer& tim
       last_periodic_start_ms_(0),
       signal_in_progress_(false),
       current_signal_is_periodic_(false),
+    adhoc_signal_active_(false),
+    current_adhoc_signal_(AdHocSignal::TURN_STARBOARD),
       has_queued_adhoc_(false),
       queued_adhoc_signal_(AdHocSignal::TURN_STARBOARD),
       adhoc_delay_timer_id_(0),
       sequence_index_(0),
       sequence_timer_id_(0),
-      sequence_horn_active_(false),
-      sequence_state_start_ms_(0) {
+    sequence_horn_active_(false),
+    sequence_state_start_ms_(0),
+    horn_state_callback_(nullptr),
+    adhoc_signal_callback_(nullptr) {
 }
 
 SoundController::~SoundController() {
@@ -117,6 +121,11 @@ void SoundController::triggerAdHocSignal(AdHocSignal signal) {
     // Set flag immediately to prevent race condition
     signal_in_progress_ = true;
     current_signal_is_periodic_ = false;
+    adhoc_signal_active_ = true;
+    current_adhoc_signal_ = signal;
+    if (adhoc_signal_callback_) {
+        adhoc_signal_callback_(signal, true);
+    }
     playAdHocPattern(signal);
 }
 
@@ -125,6 +134,12 @@ void SoundController::stopAllSound() {
     signal_in_progress_ = false;
     current_signal_is_periodic_ = false;
     has_queued_adhoc_ = false;  // Clear queue on stop
+    if (adhoc_signal_active_) {
+        adhoc_signal_active_ = false;
+        if (adhoc_signal_callback_) {
+            adhoc_signal_callback_(current_adhoc_signal_, false);
+        }
+    }
     
     if (periodic_timer_id_ != 0) {
         timer_.cancel(periodic_timer_id_);
@@ -148,11 +163,17 @@ bool SoundController::isHornActive() const {
 void SoundController::startHorn() {
     DEBUG_PRINTLN("[HORN] Horn STARTED");
     relay_controller_.activate(RelayChannel::HORN);
+    if (horn_state_callback_) {
+        horn_state_callback_(true);
+    }
 }
 
 void SoundController::stopHorn() {
     DEBUG_PRINTLN("[HORN] Horn STOPPED");
     relay_controller_.deactivate(RelayChannel::HORN);
+    if (horn_state_callback_) {
+        horn_state_callback_(false);
+    }
 }
 
 void SoundController::scheduleNextPeriodicSignal() {
@@ -254,6 +275,10 @@ void SoundController::playAdHocPattern(AdHocSignal signal) {
             // ▬ ● ▬ ● - prolonged, short, prolonged, short (Rule 34(c))
             sequence = {{true}, {false}, {true}, {false}};
             break;
+        case AdHocSignal::SOS:
+            // ●●● ▬ ▬ ▬ ●●● - distress (SOS)
+            sequence = {{false}, {false}, {false}, {true}, {true}, {true}, {false}, {false}, {false}};
+            break;
     }
     
     DEBUG_PRINTF("[HORN] Playing ad-hoc signal with %d blasts\n", (int)sequence.size());
@@ -328,17 +353,7 @@ void SoundController::updateSequencePlayback() {
             
             // Check if sequence is complete
             if (sequence_index_ >= current_sequence_.size()) {
-                bool was_periodic = current_signal_is_periodic_;
-                signal_in_progress_ = false;
-                current_signal_is_periodic_ = false;
-                current_sequence_.clear();
-                sequence_index_ = 0;
-                DEBUG_PRINTLN("[HORN] Sequence complete");
-                
-                // If this was a periodic signal and we have a queued ad-hoc, schedule it
-                if (was_periodic && has_queued_adhoc_) {
-                    processQueuedAdHocSignal();
-                }
+                finishSequence();
             }
         }
     } else {
@@ -347,17 +362,7 @@ void SoundController::updateSequencePlayback() {
             // Check if we've played all blasts
             if (sequence_index_ >= current_sequence_.size()) {
                 // All blasts complete
-                bool was_periodic = current_signal_is_periodic_;
-                signal_in_progress_ = false;
-                current_signal_is_periodic_ = false;
-                current_sequence_.clear();
-                sequence_index_ = 0;
-                DEBUG_PRINTLN("[HORN] Sequence complete");
-                
-                // If this was a periodic signal and we have a queued ad-hoc, schedule it
-                if (was_periodic && has_queued_adhoc_) {
-                    processQueuedAdHocSignal();
-                }
+                finishSequence();
                 return;
             }
             
@@ -389,7 +394,36 @@ void SoundController::processQueuedAdHocSignal() {
     adhoc_delay_timer_id_ = timer_.scheduleOnce(2000, [this, signal]() {
         this->signal_in_progress_ = true;
         this->current_signal_is_periodic_ = false;
+        this->adhoc_signal_active_ = true;
+        this->current_adhoc_signal_ = signal;
+        if (this->adhoc_signal_callback_) {
+            this->adhoc_signal_callback_(signal, true);
+        }
         this->playAdHocPattern(signal);
         this->adhoc_delay_timer_id_ = 0;
     });
+}
+
+void SoundController::finishSequence() {
+    bool was_periodic = current_signal_is_periodic_;
+    bool was_adhoc = !current_signal_is_periodic_ && adhoc_signal_active_;
+    AdHocSignal finished_signal = current_adhoc_signal_;
+
+    signal_in_progress_ = false;
+    current_signal_is_periodic_ = false;
+    current_sequence_.clear();
+    sequence_index_ = 0;
+    DEBUG_PRINTLN("[HORN] Sequence complete");
+
+    if (was_adhoc) {
+        adhoc_signal_active_ = false;
+        if (adhoc_signal_callback_) {
+            adhoc_signal_callback_(finished_signal, false);
+        }
+    }
+
+    // If this was a periodic signal and we have a queued ad-hoc, schedule it
+    if (was_periodic && has_queued_adhoc_) {
+        processQueuedAdHocSignal();
+    }
 }

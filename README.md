@@ -4,7 +4,7 @@ ESP32-based controller for COLREGs-compliant navigation lights and sound signals
 
 ## Status: ✅ Code Complete + Web UI Ready for Upload 🌐
 
-**Test Coverage**: 153 tests passing (124 unit + 29 Web API integration)  
+**Test Coverage**: 151 tests expected (122 unit + 29 Web API integration)  
 **Build**: Successful (72.7% flash, 9.4% RAM)  
 **Code Status**: Complete and validated via comprehensive automated testing  
 **Hardware Status**: Running on ESP32 with Web API operational  
@@ -109,9 +109,9 @@ boat.navigationlights_and_signal-ECU/
 │   │   └── ITimer.h                # Timer interface
 │   ├── state_machine.cpp/.h        # COLREGs state management (✅ 20 tests)
 │   ├── LightController.cpp/.h      # Light relay control (✅ 9 tests)
-│   ├── SoundController.cpp/.h      # Horn/signal control (✅ 16 tests)
+│   ├── SoundController.cpp/.h      # Horn/signal control (✅ 17 tests)
 │   ├── NavigationLightsECU.cpp/.h  # ECU facade (✅ tested)
-│   ├── signalk_integration.cpp/.h  # SignalK layer (✅ 74 tests)
+│   ├── signalk_integration.cpp/.h  # SignalK layer (✅ 76 tests)
 │   ├── web_api.cpp/.h              # REST API backend (✅ 29 tests)
 │   ├── ESP32RelayController.cpp/.h # GPIO implementation
 │   ├── ESP32Timer.cpp/.h           # FreeRTOS timer
@@ -124,8 +124,8 @@ boat.navigationlights_and_signal-ECU/
 ├── test/                          # Unit and integration tests
 │   ├── test_state_machine/         # 23 COLREGs tests (includes towing)
 │   ├── test_light_controller/      # 9 relay tests
-│   ├── test_sound_controller/      # 16 timing tests
-│   ├── test_signalk_integration/   # 76 SignalK tests (includes towing)
+│   ├── test_sound_controller/      # 17 timing tests (includes SOS)
+│   ├── test_signalk_integration/   # 76 SignalK tests (includes SOS)
 │   └── test_signalk_esp32/         # 14 ESP32 hardware tests (⚠️ pending re-run)
 ├── test_web_api.ps1               # 29 Web API integration tests (✅ passing)
 ├── platformio.ini                 # Build configuration + custom partitions
@@ -183,6 +183,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - ✅ Anchorage light (all-round white) - **Required**
 - ✅ Sound signals (short/prolonged blasts, periodic patterns)
 - ✅ Ad-hoc signal queueing (auto-plays after 2s delay if signal in progress)
+- ✅ SOS ad-hoc signal (●●● ▬▬ ▬▬ ▬▬ ●●●) with horn-synced masthead + anchor flashing in darkness/restricted visibility
 
 ### SignalK Integration
 - ✅ Bidirectional communication (PUT requests + delta p
@@ -192,7 +193,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - ✅ **Frontend**: Responsive web interface (HTML/CSS/JS) - deployed
 - ✅ **Mobile-First Design**: Touch-friendly controls, dark marine theme
 - ✅ **Real-Time Updates**: 2-second polling with auto-reconnection
-- ✅ **Complete Control**: Condition, boat state, mute, ad-hoc signals, emergency stop
+- ✅ **Complete Control**: Condition, boat state, mute, ad-hoc signals (including SOS), emergency stop
 - ✅ **Visual Feedback**: Progress bar for periodic signal countdown, animated backgrounds
 - ✅ **System Monitoring**: Uptime, heap, WiFi RSSI, connection status
 - ✅ **Phase 8 Complete**: Frontend deployed with starboard boat diagram and COLREGs day shapes
@@ -202,7 +203,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - Direct IP: `http://10.100.100.244/lights`
 - Emergency AP: `http://192.168.4.1/lights`
 
-**Features**: Animated day/night/fog backgrounds, starboard boat diagram with navigation lights, black ball day shapes (COLREGs Rules 27 & 30), visual progress bar for periodic signal timing
+**Features**: Animated day/night/fog backgrounds, starboard boat diagram with navigation lights, black ball day shapes (COLREGs Rules 27 & 30), guarded SOS control, visual progress bar for periodic signal timing
 
 **Testing**: See [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md) for upload and testing guideublishing)
 - ✅ 5 input paths (condition, state, mute, ad-hoc signals, emergency stop)

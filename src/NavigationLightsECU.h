@@ -152,9 +152,17 @@ private:
     SoundController& sound_controller_;
 
     std::function<void()> state_change_callback_;
+    LightConfiguration base_lights_;
+    bool sos_active_;
+    bool horn_active_;
 
     // Apply current state to controllers
     void applyState();
+
+    void applyLightsWithSos();
+    void onHornStateChanged(bool horn_active);
+    void onAdHocSignalStateChanged(AdHocSignal signal, bool active);
+    bool shouldFlashSosLights() const;
 };
 
 #endif // NAVIGATION_LIGHTS_ECU_H

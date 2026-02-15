@@ -12,7 +12,15 @@ NavigationLightsECU::NavigationLightsECU(
     : state_machine_(),
       light_controller_(light_controller),
       sound_controller_(sound_controller),
-      state_change_callback_(nullptr) {
+      state_change_callback_(nullptr),
+      base_lights_(),
+      sos_active_(false),
+      horn_active_(false) {
+
+    sound_controller_.setHornStateCallback(
+        [this](bool horn_active) { this->onHornStateChanged(horn_active); });
+    sound_controller_.setAdHocSignalCallback(
+        [this](AdHocSignal signal, bool active) { this->onAdHocSignalStateChanged(signal, active); });
     
     // Apply initial state
     applyState();
@@ -71,6 +79,8 @@ void NavigationLightsECU::triggerAdHocSignal(AdHocSignal signal) {
 void NavigationLightsECU::emergencyStop() {
     light_controller_.allLightsOff();
     sound_controller_.stopAllSound();
+    sos_active_ = false;
+    horn_active_ = false;
     
     if (state_change_callback_) {
         state_change_callback_();
@@ -95,11 +105,46 @@ bool NavigationLightsECU::isHornActive() const {
 
 void NavigationLightsECU::applyState() {
     // Get required configuration from state machine
-    LightConfiguration lights = state_machine_.getRequiredLights();
+    base_lights_ = state_machine_.getRequiredLights();
     SoundSignalPattern sound = state_machine_.getPeriodicSoundSignal();
     uint16_t interval = state_machine_.getPeriodicSignalIntervalSeconds();
     
     // Apply to controllers
-    light_controller_.applyConfiguration(lights);
+    applyLightsWithSos();
     sound_controller_.setPeriodicSignal(sound, interval);
+}
+
+void NavigationLightsECU::applyLightsWithSos() {
+    LightConfiguration effective = base_lights_;
+    if (shouldFlashSosLights()) {
+        effective.masthead_light = true;
+        effective.allround_white = true;
+    }
+    light_controller_.applyConfiguration(effective);
+}
+
+void NavigationLightsECU::onHornStateChanged(bool horn_active) {
+    horn_active_ = horn_active;
+    if (sos_active_) {
+        applyLightsWithSos();
+    }
+}
+
+void NavigationLightsECU::onAdHocSignalStateChanged(AdHocSignal signal, bool active) {
+    if (signal != AdHocSignal::SOS) {
+        return;
+    }
+
+    sos_active_ = active;
+    applyLightsWithSos();
+}
+
+bool NavigationLightsECU::shouldFlashSosLights() const {
+    if (!sos_active_ || !horn_active_) {
+        return false;
+    }
+
+    Condition condition = state_machine_.getCondition();
+    return condition == Condition::HOURS_OF_DARKNESS ||
+           condition == Condition::RESTRICTED_VISIBILITY;
 }

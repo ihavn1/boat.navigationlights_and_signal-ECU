@@ -147,6 +147,15 @@ void test_ad_hoc_signal_works_when_periodic_muted(void) {
     TEST_ASSERT_TRUE(sound_controller->isHornActive());
 }
 
+void test_ad_hoc_sos_signal_sounds_horn(void) {
+    sound_controller->triggerAdHocSignal(AdHocSignal::SOS);
+    sound_controller->update();
+
+    TEST_ASSERT_TRUE(sound_controller->isHornActive());
+
+    sound_controller->stopAllSound();
+}
+
 // =============================================================================
 // UNMUTE IMMEDIATE PLAYBACK TESTS
 // =============================================================================
@@ -299,6 +308,7 @@ int main(int argc, char **argv) {
     // Ad-hoc signals (UI commands)
     RUN_TEST(test_ad_hoc_signal_sounds_horn);
     RUN_TEST(test_ad_hoc_signal_works_when_periodic_muted);
+    RUN_TEST(test_ad_hoc_sos_signal_sounds_horn);
     
     // Unmute immediate playback
     RUN_TEST(test_unmute_triggers_immediate_signal);

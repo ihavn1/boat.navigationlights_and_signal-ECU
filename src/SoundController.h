@@ -40,7 +40,8 @@ enum class AdHocSignal : uint8_t {
     PAY_ATTENTION = 4,        // ▬▬ (Rule 34)
     OVERTAKE_STARBOARD = 5,   // ▬▬ ▬▬ ● (Rule 34)
     OVERTAKE_PORT = 6,        // ▬▬ ▬▬ ●● (Rule 34)
-    AGREEMENT_OVERTAKEN = 7   // ▬▬ ● ▬▬ ● (Rule 34)
+    AGREEMENT_OVERTAKEN = 7,  // ▬▬ ● ▬▬ ● (Rule 34)
+    SOS = 8                   // ●●● ▬▬ ▬▬ ▬▬ ●●● (distress)
 };
 
 /**
@@ -113,6 +114,22 @@ public:
     void triggerAdHocSignal(AdHocSignal signal);
 
     /**
+     * @brief Subscribe to horn on/off transitions
+     * @param callback Invoked with true on horn start, false on horn stop
+     */
+    void setHornStateCallback(std::function<void(bool)> callback) {
+        horn_state_callback_ = callback;
+    }
+
+    /**
+     * @brief Subscribe to ad-hoc signal start/complete events
+     * @param callback Invoked with (signal, active)
+     */
+    void setAdHocSignalCallback(std::function<void(AdHocSignal, bool)> callback) {
+        adhoc_signal_callback_ = callback;
+    }
+
+    /**
      * @brief Stop all sound immediately (emergency/safety)
      */
     void stopAllSound();
@@ -136,6 +153,10 @@ private:
     // Signal playback state
     bool signal_in_progress_;
     bool current_signal_is_periodic_;  // Track if current signal is periodic (for queue processing)
+
+    // Ad-hoc signal activity state
+    bool adhoc_signal_active_;
+    AdHocSignal current_adhoc_signal_;
     
     // Ad-hoc signal queue (only supports one queued signal)
     bool has_queued_adhoc_;
@@ -172,6 +193,12 @@ private:
     
     // Queue management
     void processQueuedAdHocSignal();
+
+    // Sequence completion helper
+    void finishSequence();
+
+    std::function<void(bool)> horn_state_callback_;
+    std::function<void(AdHocSignal, bool)> adhoc_signal_callback_;
 };
 
 #endif // SOUND_CONTROLLER_H

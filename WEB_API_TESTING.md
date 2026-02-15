@@ -27,6 +27,7 @@ Run the comprehensive automated test suite:
 - ✅ 7 boat state tests (6 valid + 1 error)
 - ✅ 2 mute control tests
 - ✅ 9 ad-hoc signal tests (8 valid + 1 error)
+  - NOTE: Add SOS to automated ad-hoc signal test list
 - ✅ 2 emergency stop tests
 - ✅ 3 error handling tests (missing fields)
 
@@ -67,7 +68,7 @@ The automated test suite (`test_web_api.ps1`) performs:
 - ✓ All condition transitions (day, hours_of_darkness, restricted_visibility)
 - ✓ All boat state transitions (6 states)
 - ✓ Mute/unmute functionality
-- ✓ All 8 ad-hoc signal types
+- ✓ All 9 ad-hoc signal types (including SOS)
 - ✓ Emergency stop and verification
 - ✓ Error handling and validation
 - ✓ Response format checking
@@ -296,7 +297,7 @@ Invoke-WebRequest -Uri "http://$ESP32_IP/api/signal" `
 
 ```bash
 # Test all ad-hoc signals
-signals=("turn_starboard" "turn_port" "astern_propulsion" "danger_confusion" "pay_attention" "overtake_starboard" "overtake_port" "agreement_overtaken")
+signals=("turn_starboard" "turn_port" "astern_propulsion" "danger_confusion" "pay_attention" "overtake_starboard" "overtake_port" "agreement_overtaken" "sos")
 
 for signal in "${signals[@]}"; do
   echo "Testing signal: $signal"

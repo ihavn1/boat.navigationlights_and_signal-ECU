@@ -11,6 +11,8 @@
     --color-secondary: #00796b;
     --color-danger: #d32f2f;
     --color-danger-dark: #b71c1c;
+    --color-sos: #ff3b30;
+    --color-sos-dark: #c62828;
     --color-warning: #f57c00;
     --color-success: #388e3c;
     
@@ -551,6 +553,100 @@ header {
 .signal-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ============================================================================
+   SOS Guarded Control
+   ============================================================================ */
+
+.sos-panel {
+    margin-top: var(--spacing-md);
+    border: 2px solid rgba(255, 59, 48, 0.6);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.08), rgba(0, 0, 0, 0.2));
+    box-shadow: inset 0 0 18px rgba(255, 59, 48, 0.15);
+}
+
+.sos-panel.armed {
+    border-color: var(--color-sos);
+    box-shadow: 0 0 18px rgba(255, 59, 48, 0.25), inset 0 0 18px rgba(255, 59, 48, 0.25);
+}
+
+.sos-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+}
+
+.sos-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-sos);
+}
+
+.sos-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.sos-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.sos-arm,
+.sos-hold {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.sos-arm:hover,
+.sos-hold:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.sos-arm.armed {
+    border-color: var(--color-sos);
+    color: white;
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.75), rgba(150, 0, 0, 0.75));
+}
+
+.sos-hold {
+    --hold-progress: 0%;
+    position: relative;
+    border-color: var(--color-sos);
+    background:
+        radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.18), transparent 60%),
+        conic-gradient(var(--color-sos) var(--hold-progress), rgba(255, 255, 255, 0.08) 0);
+    color: white;
+}
+
+.sos-hold:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.sos-instructions {
+    margin-top: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    text-align: center;
 }
 
 /* ============================================================================

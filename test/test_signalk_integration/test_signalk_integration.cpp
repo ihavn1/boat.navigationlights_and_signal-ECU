@@ -66,6 +66,7 @@ const char* test_adHocSignalToString(AdHocSignal signal) {
         case AdHocSignal::OVERTAKE_STARBOARD: return "overtake_starboard";
         case AdHocSignal::OVERTAKE_PORT: return "overtake_port";
         case AdHocSignal::AGREEMENT_OVERTAKEN: return "agreement_overtaken";
+        case AdHocSignal::SOS: return "sos";
         default: return "turn_starboard";
     }
 }
@@ -78,6 +79,7 @@ AdHocSignal test_stringToAdHocSignal(const char* str) {
     if (strcmp(str, "overtake_starboard") == 0) return AdHocSignal::OVERTAKE_STARBOARD;
     if (strcmp(str, "overtake_port") == 0) return AdHocSignal::OVERTAKE_PORT;
     if (strcmp(str, "agreement_overtaken") == 0) return AdHocSignal::AGREEMENT_OVERTAKEN;
+    if (strcmp(str, "sos") == 0) return AdHocSignal::SOS;
     return AdHocSignal::TURN_STARBOARD;
 }
 
@@ -241,6 +243,10 @@ void test_adhoc_signal_to_string_agreement() {
     TEST_ASSERT_EQUAL_STRING("agreement_overtaken", test_adHocSignalToString(AdHocSignal::AGREEMENT_OVERTAKEN));
 }
 
+void test_adhoc_signal_to_string_sos() {
+    TEST_ASSERT_EQUAL_STRING("sos", test_adHocSignalToString(AdHocSignal::SOS));
+}
+
 void test_string_to_adhoc_signal_turn_starboard() {
     TEST_ASSERT_EQUAL(AdHocSignal::TURN_STARBOARD, test_stringToAdHocSignal("turn_starboard"));
 }
@@ -273,6 +279,10 @@ void test_string_to_adhoc_signal_agreement() {
     TEST_ASSERT_EQUAL(AdHocSignal::AGREEMENT_OVERTAKEN, test_stringToAdHocSignal("agreement_overtaken"));
 }
 
+void test_string_to_adhoc_signal_sos() {
+    TEST_ASSERT_EQUAL(AdHocSignal::SOS, test_stringToAdHocSignal("sos"));
+}
+
 void test_string_to_adhoc_signal_invalid_defaults_to_turn_starboard() {
     TEST_ASSERT_EQUAL(AdHocSignal::TURN_STARBOARD, test_stringToAdHocSignal("invalid_signal"));
 }
@@ -295,6 +305,8 @@ void test_adhoc_signal_roundtrip_conversion() {
         test_stringToAdHocSignal(test_adHocSignalToString(AdHocSignal::OVERTAKE_PORT)));
     TEST_ASSERT_EQUAL(AdHocSignal::AGREEMENT_OVERTAKEN, 
         test_stringToAdHocSignal(test_adHocSignalToString(AdHocSignal::AGREEMENT_OVERTAKEN)));
+    TEST_ASSERT_EQUAL(AdHocSignal::SOS, 
+        test_stringToAdHocSignal(test_adHocSignalToString(AdHocSignal::SOS)));
 }
 
 // =============================================================================
@@ -325,7 +337,7 @@ void test_signalk_strings_no_spaces() {
         TEST_ASSERT_NULL(strchr(str, ' '));
     }
     
-    for (int i = 0; i <= 7; i++) {
+    for (int i = 0; i <= 8; i++) {
         const char* str = test_adHocSignalToString((AdHocSignal)i);
         TEST_ASSERT_NULL(strchr(str, ' '));
     }
@@ -492,6 +504,9 @@ void test_all_adhoc_signals_trigger() {
     
     mock_ecu->triggerAdHocSignal(AdHocSignal::AGREEMENT_OVERTAKEN);
     TEST_ASSERT_EQUAL(AdHocSignal::AGREEMENT_OVERTAKEN, mock_ecu->last_adhoc_signal);
+
+    mock_ecu->triggerAdHocSignal(AdHocSignal::SOS);
+    TEST_ASSERT_EQUAL(AdHocSignal::SOS, mock_ecu->last_adhoc_signal);
     
     delete mock_ecu;
 }
@@ -734,6 +749,7 @@ int main(int argc, char **argv) {
     RUN_TEST(test_adhoc_signal_to_string_overtake_starboard);
     RUN_TEST(test_adhoc_signal_to_string_overtake_port);
     RUN_TEST(test_adhoc_signal_to_string_agreement);
+    RUN_TEST(test_adhoc_signal_to_string_sos);
     RUN_TEST(test_string_to_adhoc_signal_turn_starboard);
     RUN_TEST(test_string_to_adhoc_signal_turn_port);
     RUN_TEST(test_string_to_adhoc_signal_astern);
@@ -742,6 +758,7 @@ int main(int argc, char **argv) {
     RUN_TEST(test_string_to_adhoc_signal_overtake_starboard);
     RUN_TEST(test_string_to_adhoc_signal_overtake_port);
     RUN_TEST(test_string_to_adhoc_signal_agreement);
+    RUN_TEST(test_string_to_adhoc_signal_sos);
     RUN_TEST(test_string_to_adhoc_signal_invalid_defaults_to_turn_starboard);
     RUN_TEST(test_adhoc_signal_roundtrip_conversion);
     

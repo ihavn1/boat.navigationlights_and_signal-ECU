@@ -65,6 +65,7 @@ const char* sk_adHocSignalToString(AdHocSignal signal) {
         case AdHocSignal::OVERTAKE_STARBOARD: return "overtake_starboard";
         case AdHocSignal::OVERTAKE_PORT: return "overtake_port";
         case AdHocSignal::AGREEMENT_OVERTAKEN: return "agreement_overtaken";
+        case AdHocSignal::SOS: return "sos";
         default: return "turn_starboard";
     }
 }
@@ -77,6 +78,7 @@ AdHocSignal sk_stringToAdHocSignal(const String& str) {
     if (str == "overtake_starboard") return AdHocSignal::OVERTAKE_STARBOARD;
     if (str == "overtake_port") return AdHocSignal::OVERTAKE_PORT;
     if (str == "agreement_overtaken") return AdHocSignal::AGREEMENT_OVERTAKEN;
+    if (str == "sos") return AdHocSignal::SOS;
     return AdHocSignal::TURN_STARBOARD;
 }
 

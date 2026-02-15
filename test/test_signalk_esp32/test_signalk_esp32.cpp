@@ -20,7 +20,7 @@
 #include "../../src/SoundController.h"
 
 // Mock hardware pins for testing
-static const uint8_t TEST_PINS[8] = {25, 26, 27, 14, 12, 13, 15, 4};
+static const uint8_t TEST_PINS[9] = {25, 26, 27, 14, 12, 13, 15, 4, 16};
 
 // =============================================================================
 // TEST HELPERS
@@ -36,7 +36,8 @@ void setup_test_ecu() {
     // Create real hardware controllers
     relay_controller = new ESP32RelayController(
         TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
-        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7],
+        TEST_PINS[8]
     );
     relay_controller->begin();
     
@@ -311,7 +312,8 @@ void test_timer_callbacks_execute() {
 void test_relay_controller_initializes_pins_low() {
     relay_controller = new ESP32RelayController(
         TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
-        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7],
+        TEST_PINS[8]
     );
     relay_controller->begin();
     
@@ -332,7 +334,8 @@ void test_relay_controller_initializes_pins_low() {
 void test_relay_controller_set_relay() {
     relay_controller = new ESP32RelayController(
         TEST_PINS[0], TEST_PINS[1], TEST_PINS[2], TEST_PINS[3],
-        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7]
+        TEST_PINS[4], TEST_PINS[5], TEST_PINS[6], TEST_PINS[7],
+        TEST_PINS[8]
     );
     relay_controller->begin();
     

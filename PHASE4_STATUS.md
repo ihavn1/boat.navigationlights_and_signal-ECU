@@ -1,7 +1,7 @@
 # Phase 4 Status: SignalK Integration - CODE COMPLETE ✅
 
-**Last Updated**: February 8, 2026  
-**Test Coverage**: 119 native tests passing (ESP32 embedded tests pending re-run)  
+**Last Updated**: February 15, 2026  
+**Test Coverage**: 122 native tests passing (ESP32 embedded tests pending re-run)  
 **Build Status**: Successful (71.8% flash, 9.4% RAM)  
 **Hardware Validation**: Pending (Phase 5)
 
@@ -35,14 +35,15 @@
   - ObservableValue→SKOutput connections ensure fresh data propagates to SignalK
 - **Reconnection Handling**: Auto-republishes all values 2s after SignalK connection/reconnection
 - **SignalK Paths**: Base path `electrical.switches.navigationLights.*`
-- **Test Coverage**: 74 native tests (conversion, integration, edge cases)
+- **Test Coverage**: 76 native tests (includes SOS conversions)
 
 ### 5. Recent Feature Additions ✅
 - **Ad-hoc Signal Queueing**: Single-queue system with 2-second delay after signal completion (prevents overlapping horn signals)
 - **Unmute Immediate Playback**: Signal plays immediately when unmuted, countdown resets to full interval
 - **Platform-Independent Debug Logging**: DEBUG_PRINT/PRINTLN/PRINTF macros with NATIVE_BUILD flag
 - **COLREGs Rule 35 Corrections**: Making way = 1 prolonged blast (Rule 35a), Stopped = 2 prolonged blasts (Rule 35b)
-- **Test Coverage Expanded**: 16 sound controller tests (was 11), comprehensive queueing and unmute tests
+- **Test Coverage Expanded**: 17 sound controller tests (includes SOS)
+- **SOS Ad-Hoc Signal**: ●●● ▬▬ ▬▬ ▬▬ ●●● with horn-synced masthead + anchor flashing in darkness/restricted visibility
 
 ## Build Configuration
 
@@ -68,16 +69,16 @@ Status: SUCCESS
 ```
 
 ### Test Coverage ✅
-**119 native tests - All Passing**
+**122 native tests - All Passing**
 
-#### Native Unit Tests (119 tests)
+#### Native Unit Tests (122 tests)
 | Test Suite | Count | Duration | Status |
 |------------|-------|----------|--------|
 | State Machine | 20 tests | ~1.7s | ✅ PASSED |
 | Light Controller | 9 tests | ~1.8s | ✅ PASSED |
-| Sound Controller | 16 tests | ~2.4s | ✅ PASSED |
-| SignalK Integration | 74 tests | ~1.8s | ✅ PASSED |
-| **Native Total** | **119 tests** | **~7.8s** | **✅ ALL PASSED** |
+| Sound Controller | 17 tests | ~2.4s | ✅ PASSED |
+| SignalK Integration | 76 tests | ~1.8s | ✅ PASSED |
+| **Native Total** | **122 tests** | **~7.8s** | **✅ ALL PASSED** |
 
 #### ESP32 Embedded Tests (14 tests) - ⚠️ Pending Re-run
 | Test Suite | Count | Duration | Status |
@@ -93,7 +94,7 @@ Status: SUCCESS
 Validates: ECU initialization, state changes, COLREGs rules, timers, relay controllers on real ESP32 hardware
 The `NavigationLightsECU` facade enables dual UI support:
 - **Main UI**: SignalK over WiFi (implemented)
-- **Fallback UI**: Web-based control page (future enhancement - accessible at `/lights` when SignalK unavailable)
+- **Fallback UI**: Web-based control page (implemented, accessible at `/lights`, includes guarded SOS control)
 
 Both UIs control the same underlying controllers via the facade's unified API. The web fallback UI will use custom HTTP endpoints on SensESP's AsyncWebServer to provide direct browser-based control from any device on the boat's WiFi network.
 
@@ -117,7 +118,7 @@ Base: `electrical.switches.navigationLights.*`
 | `.condition` | string | day, hours_of_darkness, restricted_visibility | ConditionConsumer |
 | `.boatState` | string | moored, underway_making_way, underway_no_way, anchorage, nuc_making_way, nuc_no_way | BoatStateConsumer |
 | `.periodicMuted` | boolean | true/false | MuteConsumer |
-| `.adHocSignal` | string | turn_starboard, turn_port, astern_propulsion, danger_confusion, pay_attention, overtake_starboard, overtake_port, agreement_overtaken | AdHocSignalConsumer |
+| `.adHocSignal` | string | turn_starboard, turn_port, astern_propulsion, danger_confusion, pay_attention, overtake_starboard, overtake_port, agreement_overtaken, sos | AdHocSignalConsumer |
 | `.emergencyStop` | boolean | true (trigger only) | EmergencyStopConsumer |
 
 ### Output Paths (Status Publishing)
@@ -140,7 +141,7 @@ Base: `electrical.switches.navigationLights.*`
 ## Deployment Ready ⚠️ (Pending Hardware Validation)
 
 ### Completed Integration Testing
-- ✅ All 119 native unit tests passing
+- ✅ All 122 native unit tests passing
 - ✅ Firmware builds successfully (71.8% flash, 9.4% RAM)
 - ✅ COLREGs rules validated (all 18 combinations)
 - ✅ SignalK protocol implementation complete
@@ -196,10 +197,10 @@ Base: `electrical.switches.navigationLights.*`
 - ✅ All conversion functions validated
 - ✅ Ready for hardware deployment
 
-### Future: Web-Based Fallback UI
+### Web-Based Fallback UI (Implemented)
 - Custom HTTP endpoints for direct browser control when SignalK unavailable
 - Accessible at `http://nav-lights-ecu.local/lights` from any device on boat WiFi
-- Mirrors SignalK control surface (condition, state, mute, ad-hoc signals)
+- Mirrors SignalK control surface (condition, state, mute, ad-hoc signals including SOS)
 - Uses same `NavigationLightsECU` facade (UI-agnostic design)
 - Responsive HTML/JavaScript interface for mobile and desktop
 - Parallel operation with SensESP configuration UI
@@ -213,7 +214,7 @@ src/
 │   └── ITimer.h                # Timing abstraction
 ├── state_machine.h/cpp         # COLREGs logic (20 tests ✅)
 ├── LightController.h/cpp       # Relay → lights (9 tests ✅)
-├── SoundController.h/cpp       # Horn timing (11 tests ✅)
+├── SoundController.h/cpp       # Horn timing (17 tests ✅)
 ├── ESP32RelayController.h/cpp  # GPIO implementation
 ├── ESP32Timer.h/cpp            # Arduino millis() timer
 ├── NavigationLightsECU.h/cpp   # UI-agnostic facade ✅
@@ -222,7 +223,7 @@ src/
 test/
 ├── test_state_machine/         # 20 tests ✅
 ├── test_light_controller/      # 9 tests ✅
-└── test_sound_controller/      # 11 tests ✅ (1 skipped)
+└── test_sound_controller/      # 17 tests ✅
 ```
 
 ## Summary
@@ -232,7 +233,7 @@ test/
 - ✅ SignalK integration with SensESP v3 API complete
 - ✅ Build successful (71.8% flash, 9.4% RAM)
 - ✅ UI-agnostic architecture ready for dual UI (SignalK + web fallback)
-- ✅ 119 native tests passing, all conversion functions validated
+- ✅ 122 native tests passing, all conversion functions validated
 - ✅ Ready for hardware deployment and field testing
 
 **Current Focus**: Phase 5 - Hardware Integration Testing

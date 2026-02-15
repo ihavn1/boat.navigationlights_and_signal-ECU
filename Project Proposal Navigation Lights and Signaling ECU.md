@@ -77,7 +77,10 @@ The rules for lantern use and signaling are summarized in the table below.
 | **Wants to overtake on starboard** | **▬▬ ▬▬ ●** |
 | **Want to overtake to port** | **▬▬ ▬▬ ●●** |
 | **Agreement to be overtaken** | **▬▬ ● ▬▬ ●** |
+| **SOS<sup>\*</sup>** | **●●● ▬▬ ▬▬ ▬▬ ●●●** |
 
+The **SOS** ad hoc signal should be used very rarely, and has very high importance and can initiate SAR operations.
+Therefore, this function should stand out significantly from the other functions - especially on the Fallback Web page (see later). In Night and Restricted conditions, the masthead light and anchor light must flash in sync with the SOS signal sounding from the horn.
 # 
 
 # **Specifications**
@@ -170,6 +173,9 @@ A local web-based user interface running on the ECU itself must be provided for 
 - Mute/unmute periodic signals
 - Ad-hoc signal triggering (semi-automatic sound signals)
 - Real-time status display (countdown timer, active lights, horn status)
+
+**_NOTE:_** The **SOS** button should stand out significantly from the other buttons, as it should only be used in life-threatening situations.
+If it had been a physical button, it would typically be protected by a cover so that it is not activated by accident. A similar function is desired on this website. Suggestions are requested for how this virtual button can be designed so that it is protected against inappropriate use.
 
 **Access modes**:
 - Normal: `http://nav-lights-ecu.local/lights` (when connected to boat WiFi)

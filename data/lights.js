@@ -10,6 +10,7 @@
 const API_BASE = '/api';
 const POLL_INTERVAL = 2000; // 2 seconds
 const ALERT_TIMEOUT = 5000; // 5 seconds
+const SOS_HOLD_MS = 3000; // Hold duration to trigger SOS
 
 let pollTimer = null;
 let currentStatus = null;
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupStateButtons();
     setupMuteButton();
     setupSignalButtons();
+    setupSosControl();
     setupEmergencyButton();
     
     // Start polling
@@ -475,6 +477,88 @@ function setupSignalButtons() {
 }
 
 /**
+ * Set up guarded SOS control
+ */
+function setupSosControl() {
+    const armBtn = document.getElementById('sosArmBtn');
+    const holdBtn = document.getElementById('sosHoldBtn');
+    const panel = document.querySelector('.sos-panel');
+
+    if (!armBtn || !holdBtn || !panel) {
+        return;
+    }
+
+    let sosArmed = false;
+    let holdTimer = null;
+    let holdRaf = null;
+    let holdStart = 0;
+
+    const setProgress = (percent) => {
+        holdBtn.style.setProperty('--hold-progress', `${percent}%`);
+    };
+
+    const setArmed = (armed) => {
+        sosArmed = armed;
+        panel.classList.toggle('armed', armed);
+        armBtn.classList.toggle('armed', armed);
+        armBtn.textContent = armed ? 'Close Cover' : 'Lift Cover';
+        holdBtn.disabled = !armed;
+        setProgress(0);
+    };
+
+    const cancelHold = () => {
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+        if (holdRaf) {
+            cancelAnimationFrame(holdRaf);
+            holdRaf = null;
+        }
+        setProgress(0);
+    };
+
+    const updateProgress = (timestamp) => {
+        if (!holdTimer) {
+            return;
+        }
+        const elapsed = Math.max(0, timestamp - holdStart);
+        const percent = Math.min(100, (elapsed / SOS_HOLD_MS) * 100);
+        setProgress(percent);
+        if (percent < 100) {
+            holdRaf = requestAnimationFrame(updateProgress);
+        }
+    };
+
+    const startHold = () => {
+        if (!sosArmed || holdTimer) {
+            return;
+        }
+        holdStart = performance.now();
+        holdRaf = requestAnimationFrame(updateProgress);
+        holdTimer = setTimeout(() => {
+            cancelHold();
+            triggerSignal('sos');
+        }, SOS_HOLD_MS);
+    };
+
+    armBtn.addEventListener('click', () => {
+        cancelHold();
+        setArmed(!sosArmed);
+    });
+
+    holdBtn.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        startHold();
+    });
+    holdBtn.addEventListener('pointerup', cancelHold);
+    holdBtn.addEventListener('pointerleave', cancelHold);
+    holdBtn.addEventListener('pointercancel', cancelHold);
+
+    setArmed(false);
+}
+
+/**
  * Set up emergency stop button
  */
 function setupEmergencyButton() {
@@ -715,7 +799,8 @@ function formatSignalLabel(signal) {
         'pay_attention': 'Pay Attention',
         'overtake_starboard': 'Overtake Starboard',
         'overtake_port': 'Overtake Port',
-        'agreement_overtaken': 'Overtake OK'
+        'agreement_overtaken': 'Overtake OK',
+        'sos': 'SOS Distress'
     };
     return labels[signal] || signal;
 }

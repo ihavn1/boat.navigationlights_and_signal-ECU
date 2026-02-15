@@ -106,8 +106,13 @@ Body: { "muted": true|false }
 Response: { "success": true, "periodicMuted": true }
 
 POST /api/signal
-Body: { "signal": "turn_starboard|turn_port|astern_propulsion|danger_confusion|pay_attention|overtake_starboard|overtake_port|agreement_overtaken" }
+Body: { "signal": "turn_starboard|turn_port|astern_propulsion|danger_confusion|pay_attention|overtake_starboard|overtake_port|agreement_overtaken|sos" }
 Response: { "success": true, "triggered": "turn_starboard" }
+
+**SOS Behavior**:
+- Horn plays ●●● ▬▬ ▬▬ ▬▬ ●●●
+- In hours of darkness or restricted visibility, masthead + anchor light flash in sync with horn
+- Guarded control remains open after sending so SOS can be re-sent until the user closes the cover
 
 POST /api/emergency
 Body: {}
@@ -157,6 +162,7 @@ Response: { "success": true, "stopped": true }
 │  ┌────┐┌────┐┌────┐┌────┐         │
 │  │ ▬▬ ││▬▬●│││▬▬●●││▬●▬●│         │
 │  └────┘└────┘└────┘└────┘         │
+│  SOS Distress (guarded hold)       │
 │                                     │
 │  Active Lights: MST PSL SSL ST     │ <- Status Chips
 │                                     │
@@ -226,6 +232,7 @@ Response: { "success": true, "stopped": true }
 - **Horn Active**: Red pulsing indicator
 - **SignalK Connected**: Green dot in header
 - **SignalK Disconnected**: Yellow banner with warning
+- **SOS Distress**: Guarded control (lift cover + 3-second hold) with clear warning text
 
 ---
 

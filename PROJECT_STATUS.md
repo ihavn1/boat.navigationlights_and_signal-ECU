@@ -50,7 +50,10 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - ✅ Visual progress bar for periodic signal countdown (Web UI enhancement)
 - ✅ Animated day/night/restricted visibility backgrounds
 - ✅ Black ball day shapes for COLREGs Rules 27 & 30 (anchor/NUC)
-- ✅ Starboard boat diagram with accurate light positioning
+- ✅ **Starboard boat diagram with interior details** - SVG rendering shows windows, cabin, structural openings via compound path
+- ✅ **Light position indicators** - Color-coded placement on hull (green sidelight, white masthead/sternlight, red NUC)
+- ✅ **SOS distress signal** - ●●● ▬▬ ▬▬ ▬▬ ●●● with guarded control + light/horn synchronization
+- ✅ **Ad-hoc signal queueing** - 2-second delay between signals prevents overlapping horn
 - ✅ **Runtime Hardware Configuration** (NUC/Towing lights via SensESP web UI)
 
 **Current Build**: `az-delivery-devkit-v4` environment with SensESP v3.2.2

@@ -38,12 +38,15 @@
 - **Test Coverage**: 76 native tests (includes SOS conversions)
 
 ### 5. Recent Feature Additions ✅
+- **Boat Diagram SVG Enhancement**: Interior details (windows, cabin, structural openings) rendered via SVG compound path
+- **Light Position Indicators**: Color-coded placement markers on boat silhouette
 - **Ad-hoc Signal Queueing**: Single-queue system with 2-second delay after signal completion (prevents overlapping horn signals)
 - **Unmute Immediate Playback**: Signal plays immediately when unmuted, countdown resets to full interval
 - **Platform-Independent Debug Logging**: DEBUG_PRINT/PRINTLN/PRINTF macros with NATIVE_BUILD flag
 - **COLREGs Rule 35 Corrections**: Making way = 1 prolonged blast (Rule 35a), Stopped = 2 prolonged blasts (Rule 35b)
-- **Test Coverage Expanded**: 17 sound controller tests (includes SOS)
 - **SOS Ad-Hoc Signal**: ●●● ▬▬ ▬▬ ▬▬ ●●● with horn-synced masthead + anchor flashing in darkness/restricted visibility
+- **Guarded SOS Control**: Two-step activation (lift protective cover + 3-second hold) with visual countdown
+- **Test Coverage Expanded**: 17 sound controller tests (includes SOS), 76 SignalK tests
 
 ## Build Configuration
 

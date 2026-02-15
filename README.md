@@ -40,10 +40,20 @@ pio device monitor
 ```
 
 **Web UI Files** (data/ folder):
-- `lights.html` - Main UI (16.4KB) with boat diagram and COLREGs day shapes
-- `lights.css` - Styling (16.8KB) with animated backgrounds
-- `lights.js` - Frontend logic (20.8KB) with progress bar and real-time updates
-- `iha-logo.png` - Company logo (18.4KB)
+- `lights.html` - Main UI with SVG boat diagram and COLREGs day shapes (interior details: windows, cabin, openings)
+- `lights.css` - Styling with animated day/night/fog backgrounds
+- `lights.js` - Frontend logic with progress bar, real-time updates, and signal queueing
+- `iha-logo.png` - Company logo
+
+**Features**: 
+- ✅ **Boat Diagram**: Starboard-side view with interior details (windows, cabin, structural openings) rendered via SVG compound path
+- ✅ **Light Indicators**: Color-coded position markers (green sidelight, white masthead/sternlight, red NUC lights)
+- ✅ **Day Shapes**: Black balls for anchor/NUC rules (visible in daylight conditions)
+- ✅ **SOS Distress**: Guarded two-step control (lift cover + 3-second hold) with synchronized horn + light flashing
+- ✅ **Signal Queueing**: Ad-hoc signals queue when another signal is playing (2-second delay)
+- ✅ **Countdown Timer**: Visual progress bar for periodic signal intervals
+
+**Full feature documentation**: [WEB_UI_FEATURES.md](docs/WEB_UI_FEATURES.md)
 
 **Access web UI**: `http://nav-lights-ecu.local/lights` (or `http://10.100.100.244/lights`)  
 **Complete testing guide**: [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md)
@@ -196,7 +206,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - ✅ **Complete Control**: Condition, boat state, mute, ad-hoc signals (including SOS), emergency stop
 - ✅ **Visual Feedback**: Progress bar for periodic signal countdown, animated backgrounds
 - ✅ **System Monitoring**: Uptime, heap, WiFi RSSI, connection status
-- ✅ **Phase 8 Complete**: Frontend deployed with starboard boat diagram and COLREGs day shapes
+- ✅ **Phase 8 Complete**: Frontend deployed with starboard boat diagram (interior details), light indicators, COLREGs day shapes, guarded SOS control, signal queueing
 
 **Access URL**:
 - Primary: `http://nav-lights-ecu.local/lights`

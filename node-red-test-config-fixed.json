@@ -568,6 +568,35 @@
         ]
     },
     {
+        "id": "sos1sos2sos3sos4",
+        "type": "inject",
+        "z": "f1a2b3c4d5e6f7g8",
+        "name": "Signal: SOS (●●● ━ ━ ━ ●●●)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "electrical.switches.navigationLights.command.adHocSignal",
+        "payload": "sos",
+        "payloadType": "str",
+        "x": 180,
+        "y": 940,
+        "wires": [
+            [
+                "a1b2c3d4e5f6g7h8"
+            ]
+        ]
+    },
+    {
         "id": "mmmm1nnnn2oooo3pp4",
         "type": "inject",
         "z": "f1a2b3c4d5e6f7g8",

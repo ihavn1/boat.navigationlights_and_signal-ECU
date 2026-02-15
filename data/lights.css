@@ -506,6 +506,21 @@ header {
     }
 }
 
+/* SOS Lights - Synchronized with horn state */
+/* When both SOS and horn are active: force all lights ON with full glow */
+.light-icon.sos-on {
+    background: var(--color-light-white) !important;
+    border-color: var(--color-light-white) !important;
+    box-shadow: 0 0 20px var(--color-light-white),
+                0 0 40px var(--color-light-white) !important;
+    opacity: 1 !important;
+}
+
+#boatDiagram .light.sos-on {
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 25px #ffffff) !important;
+}
+
 .horn-icon {
     font-size: 1.5rem;
 }

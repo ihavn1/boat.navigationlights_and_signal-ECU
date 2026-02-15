@@ -138,6 +138,9 @@ esp_err_t handleGetStatus(httpd_req_t* req) {
     JsonObject hornObj = doc.createNestedObject("horn");
     hornObj["active"] = g_ecu->isHornActive();
     
+    // SOS signal status
+    doc["sosActive"] = g_ecu->isSosActive();
+    
     // System status
     doc["signalkConnected"] = isSignalKConnected();
     doc["uptime"] = millis() / 1000;

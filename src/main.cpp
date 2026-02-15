@@ -156,9 +156,11 @@ void setup() {
     
     // Initialize SensESP application FIRST (it manages SPIFFS for config storage)
     Serial.println("\nInitializing SensESP (SPIFFS used for config storage)...");
+    Serial.printf("Configuring WiFi for auto-connect: SSID=%s\n", WIFI_SSID);
     SensESPAppBuilder builder;
     ensureHttpAuthConfig(ADMIN_USER, ADMIN_PASS);
     sensesp_app = (&builder)
+        ->set_wifi_client(WIFI_SSID, WIFI_PASSWORD)
         ->set_wifi_access_point("nav-lights-ecu", AP_PASSWORD)
         ->set_hostname("nav-lights-ecu")
         ->enable_ota(OTA_PASSWORD)

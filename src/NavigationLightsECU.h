@@ -134,6 +134,11 @@ public:
      */
     bool isHornActive() const;
 
+    /**
+     * @brief Check if SOS signal is currently active
+     */
+    bool isSosActive() const;
+
     // =======================================================================
     // CALLBACKS (for SignalK publishing)
     // =======================================================================

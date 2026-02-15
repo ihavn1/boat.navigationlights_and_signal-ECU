@@ -8,7 +8,7 @@
 // ============================================================================
 
 const API_BASE = '/api';
-const POLL_INTERVAL = 2000; // 2 seconds
+const POLL_INTERVAL = 500; // 500ms for responsive SOS light sync with horn
 const ALERT_TIMEOUT = 5000; // 5 seconds
 const SOS_HOLD_MS = 3000; // Hold duration to trigger SOS
 
@@ -158,6 +158,9 @@ function updateUI(status) {
     
     // Update horn
     updateHornUI(status.horn);
+    
+    // Update SOS lights (only masthead + all-round white animate)
+    updateSosLightsAnimation(status.sosActive, status.horn && status.horn.active);
     
     // Update mute status
     updateMuteUI(status.periodicMuted, status.periodicCountdown);
@@ -349,6 +352,57 @@ function updateHornUI(horn) {
         hornStatus.classList.remove('active');
         hornState.textContent = 'Idle';
     }
+}
+
+/**
+ * Update SOS lights synchronized with horn state
+ * Only masthead and all-round white lights animate during SOS
+ * When SOS is active and horn is sounding: these lights get full brightness
+ * When horn stops: lights revert to normal state
+ */
+function updateSosLightsAnimation(sosActive, hornActive, lightsStatus) {
+    const shouldLightsBeOn = sosActive && hornActive;
+    
+    // Only these two lights participate in SOS animation
+    const sosLights = ['masthead', 'allroundWhite'];
+    const sosSvgIds = {
+        'masthead': 'masthead-light',
+        'allroundWhite': 'allround-white'
+    };
+    
+    // Update only masthead and all-round white lights
+    sosLights.forEach(lightName => {
+        const indicatorSelector = `[data-light="${lightName}"] .light-icon`;
+        const svgId = sosSvgIds[lightName];
+        
+        // Apply animation if both SOS and horn are active
+        if (shouldLightsBeOn) {
+            const indicator = document.querySelector(indicatorSelector);
+            if (indicator) {
+                indicator.classList.add('sos-on');
+            }
+            
+            if (svgId) {
+                const diagramLight = document.getElementById(svgId);
+                if (diagramLight) {
+                    diagramLight.classList.add('sos-on');
+                }
+            }
+        } else {
+            // Remove animation when horn stops
+            const indicator = document.querySelector(indicatorSelector);
+            if (indicator) {
+                indicator.classList.remove('sos-on');
+            }
+            
+            if (svgId) {
+                const diagramLight = document.getElementById(svgId);
+                if (diagramLight) {
+                    diagramLight.classList.remove('sos-on');
+                }
+            }
+        }
+    });
 }
 
 // Track maximum countdown to calculate progress percentage

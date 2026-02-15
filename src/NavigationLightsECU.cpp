@@ -103,6 +103,10 @@ bool NavigationLightsECU::isHornActive() const {
     return sound_controller_.isHornActive();
 }
 
+bool NavigationLightsECU::isSosActive() const {
+    return sos_active_;
+}
+
 void NavigationLightsECU::applyState() {
     // Get required configuration from state machine
     base_lights_ = state_machine_.getRequiredLights();

@@ -18,6 +18,18 @@ using namespace sensesp;
 
 // Global ECU pointer (set during setupWebAPI)
 static NavigationLightsECU* g_ecu = nullptr;
+static uint32_t g_last_fallback_ui_ms = 0;
+
+void markFallbackUiActive() {
+    g_last_fallback_ui_ms = millis();
+}
+
+bool isFallbackUiActive(uint32_t window_ms) {
+    if (g_last_fallback_ui_ms == 0) {
+        return false;
+    }
+    return (millis() - g_last_fallback_ui_ms) <= window_ms;
+}
 
 // ============================================================================
 // Helper Functions
@@ -110,6 +122,7 @@ bool readJsonBody(httpd_req_t* req, JsonDocument& doc) {
  * @brief GET /api/status - Return complete ECU state
  */
 esp_err_t handleGetStatus(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -163,6 +176,7 @@ esp_err_t handleGetStatus(httpd_req_t* req) {
  * @brief GET /api/health - Health check endpoint
  */
 esp_err_t handleGetHealth(httpd_req_t* req) {
+    markFallbackUiActive();
     StaticJsonDocument<256> doc;
     
     doc["healthy"] = true;
@@ -184,6 +198,7 @@ esp_err_t handleGetHealth(httpd_req_t* req) {
  * @brief POST /api/condition - Set sailing condition
  */
 esp_err_t handlePostCondition(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -222,6 +237,7 @@ esp_err_t handlePostCondition(httpd_req_t* req) {
  * @brief POST /api/state - Set boat state
  */
 esp_err_t handlePostState(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -264,6 +280,7 @@ esp_err_t handlePostState(httpd_req_t* req) {
  * @brief POST /api/mute - Toggle periodic signal mute
  */
 esp_err_t handlePostMute(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -298,6 +315,7 @@ esp_err_t handlePostMute(httpd_req_t* req) {
  * @brief POST /api/signal - Trigger ad-hoc signal
  */
 esp_err_t handlePostSignal(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -336,6 +354,7 @@ esp_err_t handlePostSignal(httpd_req_t* req) {
  * @brief POST /api/emergency - Emergency stop all outputs
  */
 esp_err_t handlePostEmergency(httpd_req_t* req) {
+    markFallbackUiActive();
     if (!g_ecu) {
         return sendJsonError(req, 500, "ECU not initialized");
     }
@@ -412,6 +431,7 @@ void setupWebAPI(HTTPServer* server, NavigationLightsECU* ecu) {
  * @brief Redirect handler for /lights -> /lights.html  
  */
 esp_err_t handleLightsRedirect(httpd_req_t* req) {
+    markFallbackUiActive();
     httpd_resp_set_status(req, "301 Moved Permanently");
     httpd_resp_set_hdr(req, "Location", "/lights.html");
     httpd_resp_send(req, nullptr, 0);
@@ -422,6 +442,7 @@ esp_err_t handleLightsRedirect(httpd_req_t* req) {
  * @brief Static file handler for SPIFFS
  */
 esp_err_t handleStaticFile(httpd_req_t* req) {
+    markFallbackUiActive();
     String path = String(req->uri);
     
     // Security: prevent directory traversal

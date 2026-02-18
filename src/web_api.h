@@ -34,4 +34,8 @@ void setupWebAPI(sensesp::HTTPServer* server, NavigationLightsECU* ecu);
  */
 void setupStaticFiles(sensesp::HTTPServer* server);
 
+// Fallback UI activity tracking for AP/STA coordination.
+void markFallbackUiActive();
+bool isFallbackUiActive(uint32_t window_ms);
+
 #endif // WEB_API_H

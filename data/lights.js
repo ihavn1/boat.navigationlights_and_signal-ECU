@@ -9,10 +9,14 @@
 
 const API_BASE = '/api';
 const POLL_INTERVAL = 500; // 500ms for responsive SOS light sync with horn
+const AP_POLL_INTERVAL = 1500; // Slower polling on AP for responsiveness
+const HEALTH_POLL_INTERVAL = 5000; // Health data doesn't need rapid updates
 const ALERT_TIMEOUT = 5000; // 5 seconds
 const SOS_HOLD_MS = 3000; // Hold duration to trigger SOS
 
 let pollTimer = null;
+let healthTimer = null;
+let statusInFlight = false;
 let currentStatus = null;
 let isConnected = false;
 let alertTimeout = null;
@@ -75,6 +79,10 @@ async function apiRequest(endpoint, options = {}) {
  * Fetch current ECU status
  */
 async function fetchStatus() {
+    if (statusInFlight) {
+        return;
+    }
+    statusInFlight = true;
     try {
         const status = await apiRequest('/status');
         currentStatus = status;
@@ -83,6 +91,8 @@ async function fetchStatus() {
     } catch (error) {
         setConnectionStatus(false);
         showAlert(`Failed to fetch status: ${error.message}`, 'error');
+    } finally {
+        statusInFlight = false;
     }
 }
 
@@ -746,15 +756,27 @@ async function emergencyStop() {
 /**
  * Start periodic status polling
  */
+function isApHost() {
+    return window.location.hostname === '192.168.4.1';
+}
+
 function startPolling() {
     if (pollTimer) {
         clearInterval(pollTimer);
     }
+    if (healthTimer) {
+        clearInterval(healthTimer);
+    }
+
+    const pollInterval = isApHost() ? AP_POLL_INTERVAL : POLL_INTERVAL;
     
     pollTimer = setInterval(async () => {
         await fetchStatus();
+    }, pollInterval);
+
+    healthTimer = setInterval(async () => {
         await fetchHealth();
-    }, POLL_INTERVAL);
+    }, HEALTH_POLL_INTERVAL);
 }
 
 /**
@@ -764,6 +786,10 @@ function stopPolling() {
     if (pollTimer) {
         clearInterval(pollTimer);
         pollTimer = null;
+    }
+    if (healthTimer) {
+        clearInterval(healthTimer);
+        healthTimer = null;
     }
 }
 

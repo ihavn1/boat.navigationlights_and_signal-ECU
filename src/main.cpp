@@ -27,6 +27,8 @@
 #include <SPIFFS.h>
 #include <LittleFS.h>
 #include <esp_partition.h>
+#include <WiFi.h>
+#include <esp_wifi.h>
 #include "sensesp_app_builder.h"
 #include "sensesp/system/led_blinker.h"
 #include "sensesp/ui/ui_controls.h"
@@ -93,6 +95,92 @@ namespace {
         serializeJson(doc, f);
         f.close();
         Serial.println("HTTP auth credentials written to /system/httpserver");
+    }
+}
+
+namespace {
+    constexpr uint32_t AP_CHECK_INTERVAL_MS = 1000;
+    constexpr uint32_t STA_RESUME_DELAY_MS = 30000;
+    constexpr uint32_t FALLBACK_ACTIVE_WINDOW_MS = 30000;
+
+    bool g_sta_suspended = false;
+    uint32_t g_last_ap_client_ms = 0;
+    uint32_t g_last_ap_check_ms = 0;
+    sensesp::HTTPServer* g_http_server = nullptr;
+    bool g_captive_portal_enabled = true;
+
+    void suspendStaIfNeeded() {
+        if (g_sta_suspended) {
+            return;
+        }
+        if (WiFi.status() == WL_CONNECTED) {
+            return;
+        }
+
+        WiFi.disconnect(true);
+        WiFi.mode(WIFI_AP);
+        g_sta_suspended = true;
+    }
+
+    void resumeStaIfNeeded() {
+        if (!g_sta_suspended) {
+            return;
+        }
+
+        WiFi.mode(WIFI_AP_STA);
+        WiFi.begin();
+        g_sta_suspended = false;
+    }
+
+    void setCaptivePortalEnabled(bool enabled) {
+        if (!g_http_server || g_captive_portal_enabled == enabled) {
+            return;
+        }
+        g_http_server->set_captive_portal(enabled);
+        g_captive_portal_enabled = enabled;
+    }
+
+    void stopWifiScanIfNeeded() {
+        if (!g_sta_suspended) {
+            return;
+        }
+        const int scan_status = WiFi.scanComplete();
+        if (scan_status == WIFI_SCAN_RUNNING) {
+            esp_wifi_scan_stop();
+            WiFi.scanDelete();
+        }
+    }
+
+    void manageStaApPriority() {
+        const uint32_t now = millis();
+        if (now - g_last_ap_check_ms < AP_CHECK_INTERVAL_MS) {
+            return;
+        }
+        g_last_ap_check_ms = now;
+
+        const int ap_clients = WiFi.softAPgetStationNum();
+        // Ensure WiFi stack is initialized; no additional action needed here.
+
+        const bool fallback_active = isFallbackUiActive(FALLBACK_ACTIVE_WINDOW_MS);
+
+        if (ap_clients > 0 && fallback_active) {
+            g_last_ap_client_ms = now;
+            suspendStaIfNeeded();
+            setCaptivePortalEnabled(false);
+            stopWifiScanIfNeeded();
+            return;
+        }
+
+        if (ap_clients > 0 && !fallback_active) {
+            resumeStaIfNeeded();
+            setCaptivePortalEnabled(true);
+            return;
+        }
+
+        if (g_sta_suspended && (now - g_last_ap_client_ms >= STA_RESUME_DELAY_MS)) {
+            resumeStaIfNeeded();
+            setCaptivePortalEnabled(true);
+        }
     }
 }
 
@@ -235,6 +323,7 @@ void setup() {
     HTTPServer* http_server = SensESPAppAccessor::getHttpServer(sensesp_app.get());
     setupWebAPI(http_server, ecu);
     setupStaticFiles(http_server);
+    g_http_server = http_server;
     
     Serial.println("\nSystem initialized successfully");
     Serial.println("Connect to http://nav-lights-ecu.local for configuration");
@@ -246,6 +335,9 @@ void loop() {
     // This MUST be called - it runs the ReactESP event loop which drives RepeatSensors
     static auto event_loop = sensesp_app->get_event_loop();
     event_loop->tick();
+
+    // Prefer AP responsiveness when a client is connected in fallback mode.
+    manageStaApPriority();
     
     // Update ECU (processes sound controller timers)
     if (ecu != nullptr) {

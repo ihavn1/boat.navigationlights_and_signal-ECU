@@ -566,7 +566,6 @@ function setupSosControl() {
         panel.classList.toggle('armed', armed);
         armBtn.classList.toggle('armed', armed);
         armBtn.textContent = armed ? 'Close Cover' : 'Lift Cover';
-        holdBtn.disabled = !armed;
         setProgress(0);
     };
 
@@ -606,9 +605,21 @@ function setupSosControl() {
         }, SOS_HOLD_MS);
     };
 
+    // Track if hold button has ever been enabled (after first cover lift)
+    let holdBtnEverEnabled = false;
+
     armBtn.addEventListener('click', () => {
         cancelHold();
-        setArmed(!sosArmed);
+        const newArmed = !sosArmed;
+        setArmed(newArmed);
+        
+        // On first cover lift, permanently enable hold button
+        if (newArmed && !holdBtnEverEnabled) {
+            holdBtnEverEnabled = true;
+        }
+        
+        // Disable hold button only if never enabled OR cover is closed
+        holdBtn.disabled = holdBtnEverEnabled ? !newArmed : true;
     });
 
     holdBtn.addEventListener('pointerdown', (event) => {
@@ -619,7 +630,9 @@ function setupSosControl() {
     holdBtn.addEventListener('pointerleave', cancelHold);
     holdBtn.addEventListener('pointercancel', cancelHold);
 
+    // Start with cover closed and hold button disabled
     setArmed(false);
+    holdBtn.disabled = true;
 }
 
 /**

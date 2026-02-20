@@ -483,7 +483,18 @@ function setConnectionStatus(connected) {
  */
 function updateSignalKStatus(connected) {
     const badge = document.getElementById('signalkStatus');
-    badge.textContent = `SignalK: ${connected ? 'Connected' : 'Disconnected'}`;
+    
+    if (connected) {
+        badge.textContent = 'SignalK: Connected';
+        badge.classList.remove('disconnected');
+        badge.classList.remove('blink');
+        badge.classList.add('connected');
+    } else {
+        badge.textContent = 'SignalK: Disconnected';
+        badge.classList.remove('connected');
+        badge.classList.add('disconnected');
+        badge.classList.add('blink');
+    }
 }
 
 // ============================================================================

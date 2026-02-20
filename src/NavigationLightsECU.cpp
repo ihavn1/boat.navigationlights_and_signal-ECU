@@ -132,6 +132,10 @@ void NavigationLightsECU::onHornStateChanged(bool horn_active) {
     if (sos_active_) {
         applyLightsWithSos();
     }
+
+    if (state_change_callback_) {
+        state_change_callback_();
+    }
 }
 
 void NavigationLightsECU::onAdHocSignalStateChanged(AdHocSignal signal, bool active) {
@@ -141,6 +145,10 @@ void NavigationLightsECU::onAdHocSignalStateChanged(AdHocSignal signal, bool act
 
     sos_active_ = active;
     applyLightsWithSos();
+
+    if (state_change_callback_) {
+        state_change_callback_();
+    }
 }
 
 bool NavigationLightsECU::shouldFlashSosLights() const {

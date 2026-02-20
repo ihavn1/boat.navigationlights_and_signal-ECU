@@ -452,6 +452,7 @@ void setupSignalK(NavigationLightsECU& ecu) {
         Serial.println("[SignalK] Heartbeat toggle: " + String(toggle));
         return toggle;
     });
+
     
     Serial.println("[SignalK] RepeatSensors configured:");
     Serial.println("  - Countdown: 1s");

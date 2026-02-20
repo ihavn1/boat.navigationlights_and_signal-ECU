@@ -1,0 +1,441 @@
+[
+    {
+        "id": "65e0a4cbbc7e7856",
+        "type": "tab",
+        "label": "Test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "579ce06ebfa83e18",
+        "type": "signalk-subscribe",
+        "z": "65e0a4cbbc7e7856",
+        "name": "electrical.switches.navigationLights.lights.portSidelight",
+        "mode": "sendAll",
+        "flatten": true,
+        "context": "vessels.self",
+        "path": "electrical.switches.navigationLights.lights.portSidelight",
+        "source": "",
+        "period": 1000,
+        "x": 420,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "69ed4532c030a67a",
+        "type": "inject",
+        "z": "65e0a4cbbc7e7856",
+        "name": "Condition: Darkness",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "hours_of_darkness",
+        "payloadType": "str",
+        "x": 330,
+        "y": 580,
+        "wires": [
+            [
+                "e10c41d853f1f92f"
+            ]
+        ]
+    },
+    {
+        "id": "e10c41d853f1f92f",
+        "type": "function",
+        "z": "65e0a4cbbc7e7856",
+        "name": "Pack Condition",
+        "func": "    msg.topic = \"electrical.switches.navigationLights.command.condition\";\n    msg.payload = msg.payload;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 600,
+        "wires": [
+            [
+                "b324becaf3ce8376"
+            ]
+        ]
+    },
+    {
+        "id": "b324becaf3ce8376",
+        "type": "signalk-send-pathvalue",
+        "z": "65e0a4cbbc7e7856",
+        "name": "",
+        "path": "",
+        "source": "",
+        "meta": "",
+        "x": 1150,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "67dc7f7036c43d0d",
+        "type": "inject",
+        "z": "65e0a4cbbc7e7856",
+        "name": "Condition: Day",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "day",
+        "payloadType": "str",
+        "x": 320,
+        "y": 640,
+        "wires": [
+            [
+                "e10c41d853f1f92f"
+            ]
+        ]
+    },
+    {
+        "id": "0c29968c0d8cb5a1",
+        "type": "ui-button",
+        "z": "65e0a4cbbc7e7856",
+        "group": "55d04870637f2704",
+        "name": "Day",
+        "label": "Day",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "day",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 270,
+        "y": 420,
+        "wires": [
+            [
+                "e10c41d853f1f92f"
+            ]
+        ]
+    },
+    {
+        "id": "85cc2d2b34e97438",
+        "type": "ui-button",
+        "z": "65e0a4cbbc7e7856",
+        "group": "55d04870637f2704",
+        "name": "Darkness",
+        "label": "Darkness",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "hours_of_darkness",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 280,
+        "y": 460,
+        "wires": [
+            [
+                "e10c41d853f1f92f"
+            ]
+        ]
+    },
+    {
+        "id": "6ee1d71d30ee9ea3",
+        "type": "function",
+        "z": "65e0a4cbbc7e7856",
+        "name": "Pack State",
+        "func": "    msg.topic = \"electrical.switches.navigationLights.command.boatState\";\n    msg.payload = msg.payload;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 860,
+        "wires": [
+            [
+                "b324becaf3ce8376"
+            ]
+        ]
+    },
+    {
+        "id": "5f353524f2a216e9",
+        "type": "inject",
+        "z": "65e0a4cbbc7e7856",
+        "name": "State: morred",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "morred",
+        "payloadType": "str",
+        "x": 310,
+        "y": 860,
+        "wires": [
+            [
+                "6ee1d71d30ee9ea3"
+            ]
+        ]
+    },
+    {
+        "id": "82e9f25a0688db3e",
+        "type": "inject",
+        "z": "65e0a4cbbc7e7856",
+        "name": "State: Underway Making Way",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "underway_making_way",
+        "payloadType": "str",
+        "x": 360,
+        "y": 920,
+        "wires": [
+            [
+                "6ee1d71d30ee9ea3"
+            ]
+        ]
+    },
+    {
+        "id": "5cd465d74d4380a7",
+        "type": "ui-button",
+        "z": "65e0a4cbbc7e7856",
+        "group": "55d04870637f2704",
+        "name": "Morred",
+        "label": "Morred",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "link",
+        "iconPosition": "left",
+        "payload": "morred",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 300,
+        "y": 780,
+        "wires": [
+            [
+                "6ee1d71d30ee9ea3"
+            ]
+        ]
+    },
+    {
+        "id": "90f86a8fbf847592",
+        "type": "ui-button",
+        "z": "65e0a4cbbc7e7856",
+        "group": "55d04870637f2704",
+        "name": "Underway Making Way",
+        "label": "Underway Making Way",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "emulateClick": false,
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "iconPosition": "left",
+        "payload": "underway_making_way",
+        "payloadType": "str",
+        "topic": "",
+        "topicType": "str",
+        "buttonColor": "",
+        "textColor": "",
+        "iconColor": "",
+        "enableClick": true,
+        "enablePointerdown": false,
+        "pointerdownPayload": "",
+        "pointerdownPayloadType": "str",
+        "enablePointerup": false,
+        "pointerupPayload": "",
+        "pointerupPayloadType": "str",
+        "x": 340,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3593092ba6b9507d",
+        "type": "comment",
+        "z": "65e0a4cbbc7e7856",
+        "name": "",
+        "info": "",
+        "x": 280,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "55d04870637f2704",
+        "type": "ui-group",
+        "name": "Group 1",
+        "page": "770c5231277277f1",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "770c5231277277f1",
+        "type": "ui-page",
+        "name": "Page 1",
+        "ui": "5e61c0be788069f0",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "a035252bf507bdb6",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "5e61c0be788069f0",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "a035252bf507bdb6",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "6481b4cf1251fe4e",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@signalk/node-red-embedded": "2.18.2",
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]

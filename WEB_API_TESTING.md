@@ -46,7 +46,7 @@ The following manual tests were used during development. For production validati
 ## Prerequisites
 - ESP32 with firmware flashed
 - ESP32 connected to WiFi network
-- Know the IP address or use mDNS: `nav-lights-ecu.local`
+- Know the IP address or use mDNS: `boat-helm-ecu.local`
 
 ## Automated Testing (Recommended)
 
@@ -82,15 +82,15 @@ The automated test suite (`test_web_api.ps1`) performs:
 ### Option 1: curl (Command Line)
 ```bash
 # Find your ESP32 IP if mDNS doesn't work
-ping nav-lights-ecu.local
+ping boat-helm-ecu.local
 
 # Or use IP directly
-ESP32_IP=nav-lights-ecu.local  # or 192.168.x.x
+ESP32_IP=boat-helm-ecu.local  # or 192.168.x.x
 ```
 
 ### Option 2: PowerShell (Windows)
 ```powershell
-$ESP32_IP = "nav-lights-ecu.local"  # or actual IP
+$ESP32_IP = "boat-helm-ecu.local"  # or actual IP
 ```
 
 ---
@@ -383,7 +383,7 @@ curl -X POST http://$ESP32_IP/api/condition \
 ## Complete Test Sequence (End-to-End)
 
 ```bash
-ESP32_IP=nav-lights-ecu.local
+ESP32_IP=boat-helm-ecu.local
 
 echo "=== 1. Initial Status ==="
 curl http://$ESP32_IP/api/status
@@ -440,7 +440,7 @@ Web API endpoints registered:
 
 **Check WiFi Connection:**
 ```bash
-ping nav-lights-ecu.local
+ping boat-helm-ecu.local
 # or
 ping 192.168.x.x
 ```

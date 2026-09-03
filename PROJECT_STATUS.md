@@ -1,4 +1,4 @@
-# Navigation Lights and Signal ECU - Project Status
+# boat.helm-ecu - Project Status
 
 **Last Updated**: February 15, 2026
 
@@ -101,7 +101,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 - ArduinoJson v7.4.2 for serialization
 - Protected member access via SensESPAppAccessor helper class
 - Proper HTTP status codes (200 OK, 400 Bad Request) with JSON error bodies
-- Access: `http://nav-lights-ecu.local/api/*`
+- Access: `http://boat-helm-ecu.local/api/*`
 
 **Automated Testing**: Full PowerShell test suite validates all endpoints
 ```powershell
@@ -147,7 +147,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 **Total Frontend Code**: 1,456 lines (217 HTML + 606 CSS + 633 JS)
 
 **Access URL** (after Phase 8 upload):
-- Primary: `http://nav-lights-ecu.local/lights.html`
+- Primary: `http://boat-helm-ecu.local/lights.html`
 - Direct IP: `http://10.100.100.244/lights.html`
 - Emergency AP: `http://192.168.4.1/lights.html`
 
@@ -161,7 +161,7 @@ ESP32-based ECU for controlling navigation lights and sound signals on pleasure 
 **Required Steps**:
 1. Build SPIFFS filesystem image from `data/` folder
 2. Upload to ESP32 via PlatformIO
-3. Test browser interface at `http://nav-lights-ecu.local/lights.html`
+3. Test browser interface at `http://boat-helm-ecu.local/lights.html`
 4. Validate API integration with frontend
 5. Test responsive design on mobile/tablet
 6. Verify real-time status updates
@@ -298,7 +298,7 @@ Both UIs control the same underlying controllers via the facade's unified API.
 - **WiFi**: Configurable via web portal (no hardcoded SSID)
 - **DHCP Range**: 10.100.100.100 - 10.100.100.250
 - **SignalK Server**: Configurable via web portal (no hardcoded IP)
-- **Hostname**: nav-lights-ecu.local
+- **Hostname**: boat-helm-ecu.local
 
 ## Next Steps
 
@@ -318,7 +318,7 @@ pio device monitor
 ```
 
 **Testing**:
-1. Access web UI: `http://nav-lights-ecu.local/lights.html`
+1. Access web UI: `http://boat-helm-ecu.local/lights.html`
 2. Verify all controls functional (condition, boat state, mute, signals)
 3. Test real-time status updates (2-second polling)
 4. Validate responsive design (mobile/tablet/desktop)
@@ -348,7 +348,7 @@ pio device monitor
 
 ### Phase 10: Optional Enhancements (Future)
 1. ✅ **OTA firmware updates** - Implemented with password authentication from secrets.h
-   - Wireless firmware and filesystem updates via `--upload-port nav-lights-ecu.local`
+   - Wireless firmware and filesystem updates via `--upload-port boat-helm-ecu.local`
    - Password-protected using OTA_PASSWORD from secrets.h (not committed to git)
    - Auto-configured via `read_secrets.py` pre-upload script
    - Safe rollback if OTA fails (keeps running old firmware)
@@ -392,7 +392,7 @@ pio test -e native
 ├── platformio.ini                  # Build configuration
 ├── README.md                       # Quick start
 ├── PHASE4_STATUS.md                # Detailed Phase 4 status
-└── Project Proposal Navigation Lights and Signaling ECU.md
+└── Project Proposal boat.helm-ecu.md
 ```
 
 ## Known Issues & Notes
@@ -410,7 +410,7 @@ pio test -e native
 
 ## Documentation
 
-- [Project Proposal](Project Proposal Navigation Lights and Signaling ECU.md) - Complete requirements, COLREGs tables, signal definitions
+- [Project Proposal](Project Proposal boat.helm-ecu.md) - Complete requirements, COLREGs tables, signal definitions
 - [AI Coding Instructions](.github/copilot-instructions.md) - Architecture, conventions, workflows for AI agents
 - [Phase 4 Status](PHASE4_STATUS.md) - Detailed SignalK integration status
 - [README](README.md) - Quick start guide

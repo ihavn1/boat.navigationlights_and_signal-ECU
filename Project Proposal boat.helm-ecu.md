@@ -123,7 +123,7 @@ Two hardware features are configurable at runtime:
 
 Hardware configuration is managed through the SensESP web configuration UI:
 
-- **Access**: Navigate to `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+- **Access**: Navigate to `http://192.168.4.1/config` (or `http://boat-helm-ecu.local/config`)
 - **Location**: Configuration items appear under "Hardware" section
 - **Persistence**: Settings stored in LittleFS and survive reboots
 - **Effect**: Changing configuration requires ESP32 restart (enforced by UI)
@@ -178,7 +178,7 @@ A local web-based user interface running on the ECU itself must be provided for 
 If it had been a physical button, it would typically be protected by a cover so that it is not activated by accident. A similar function is desired on this website. Suggestions are requested for how this virtual button can be designed so that it is protected against inappropriate use.
 
 **Access modes**:
-- Normal: `http://nav-lights-ecu.local/lights` (when connected to boat WiFi)
+- Normal: `http://boat-helm-ecu.local/lights` (when connected to boat WiFi)
 - Emergency AP: `http://192.168.4.1/lights` (when ESP32 creates its own access point)
 
 This approach provides:

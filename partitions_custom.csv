@@ -1,4 +1,4 @@
-# Custom partition table for Navigation Lights ECU
+# Custom partition table for boat.helm-ecu
 # Single SPIFFS partition for SensESP config + web UI files
 # Name,   Type, SubType,  Offset,   Size,     Flags
 nvs,      data, nvs,      0x9000,   0x5000,

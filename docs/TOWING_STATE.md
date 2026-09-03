@@ -2,7 +2,7 @@
 
 ## Overview
 
-The navigation lights ECU supports the **TOWING** boat state as defined in COLREGs Rule 24 for vessels engaged in towing operations. This document describes the implementation, requirements, and testing approach.
+The boat.helm-ecu supports the **TOWING** boat state as defined in COLREGs Rule 24 for vessels engaged in towing operations. This document describes the implementation, requirements, and testing approach.
 
 ## COLREGs Requirements
 
@@ -31,7 +31,7 @@ A power-driven vessel when towing shall exhibit:
 ### Runtime Configuration
 
 **Important**: Towing lights are **optional** and runtime-configurable:
-- Configure at: `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+- Configure at: `http://192.168.4.1/config` (or `http://boat-helm-ecu.local/config`)
 - Setting: "Towing Lights Installed" checkbox in Hardware section
 - Configuration persists across reboots (stored in LittleFS)
 - Towing **state** remains selectable even without lights (for day shape reminders)
@@ -195,7 +195,7 @@ pio test -e esp32test
 
 - **COLREGs Rule 24**: Towing and pushing (full text in Project Proposal)
 - **COLREGs Rule 35(c)**: Sound signals for vessels towing in restricted visibility
-- **Project Proposal**: [Project Proposal Navigation Lights and Signaling ECU.md](../Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md)
+- **Project Proposal**: [Project Proposal boat.helm-ecu.md](../Project%20Proposal%20boat.helm-ecu.md)
 - **Hardware Details**: [HARDWARE.md](../HARDWARE.md)
 - **SignalK Specification**: https://signalk.org/specification/latest/doc/
 

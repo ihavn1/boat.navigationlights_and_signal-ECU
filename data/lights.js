@@ -1,5 +1,5 @@
 /**
- * Navigation Lights ECU - Frontend JavaScript
+ * boat.helm-ecu - Frontend JavaScript
  * Handles API communication, UI updates, and real-time status monitoring
  */
 
@@ -26,7 +26,7 @@ let alertTimeout = null;
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Navigation Lights ECU - Initializing UI');
+    console.log('boat.helm-ecu - Initializing UI');
     
     // Set up event listeners
     setupConditionButtons();

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Navigation Lights ECU supports **runtime configuration** of optional hardware through the SensESP web interface. This allows the same firmware to work on boats with different hardware configurations without recompilation.
+The boat.helm-ecu supports **runtime configuration** of optional hardware through the SensESP web interface. This allows the same firmware to work on boats with different hardware configurations without recompilation.
 
 ## Configurable Hardware
 
@@ -23,7 +23,7 @@ The Navigation Lights ECU supports **runtime configuration** of optional hardwar
 ### Web UI Access
 1. Navigate to SensESP configuration page:
    - `http://192.168.4.1/config` (Access Point mode)
-   - `http://nav-lights-ecu.local/config` (WiFi client mode)
+   - `http://boat-helm-ecu.local/config` (WiFi client mode)
 2. Find the **Hardware** section
 3. Check/uncheck hardware options:
    - ☑ **NUC Lights Installed**
@@ -38,7 +38,7 @@ The Navigation Lights ECU supports **runtime configuration** of optional hardwar
 - **Location**: `/Hardware/NUC_Lights` and `/Hardware/Towing_Lights` in SPIFFS
 
 ### Configuration Security
-- **Digest Auth (LAN)**: `/config` is protected when accessed via normal WiFi (e.g., `nav-lights-ecu.local`).
+- **Digest Auth (LAN)**: `/config` is protected when accessed via normal WiFi (e.g., `boat-helm-ecu.local`).
 - **AP Mode**: SensESP bypasses auth for the captive portal at `192.168.4.1`.
 - **Required credentials**: Copy [src/secrets.example.h](../src/secrets.example.h) to `src/secrets.h` and set `ADMIN_USER`/`ADMIN_PASS`.
 
@@ -157,7 +157,7 @@ Potential additional configurable hardware:
 ### Can't Access Config Page
 - **Symptom**: `http://192.168.4.1/config` not loading
 - **Cause**: Not connected to ECU's WiFi Access Point
-- **Fix**: Connect to `nav-lights-ecu` WiFi network first
+- **Fix**: Connect to `boat-helm-ecu` WiFi network first
 
 ### Lights Activating When Disabled
 - **Symptom**: NUC/Towing lights turn on despite configuration OFF

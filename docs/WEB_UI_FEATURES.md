@@ -7,7 +7,7 @@
 
 ## Overview
 
-The fallback web control interface provides a browser-based alternative to SignalK for controlling the Navigation Lights and Signal ECU. Accessible at `http://nav-lights-ecu.local/lights` from any device on the boat's WiFi network.
+The fallback web control interface provides a browser-based alternative to SignalK for controlling boat.helm-ecu. Accessible at `http://boat-helm-ecu.local/lights` from any device on the boat's WiFi network.
 
 ---
 

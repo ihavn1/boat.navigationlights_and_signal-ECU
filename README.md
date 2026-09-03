@@ -1,4 +1,4 @@
-# Navigation Lights and Signal ECU
+# boat.helm-ecu
 
 ESP32-based controller for COLREGs-compliant navigation lights and sound signals on pleasure boats <15m. Integrated with SignalK for remote monitoring and control.
 
@@ -55,7 +55,7 @@ pio device monitor
 
 **Full feature documentation**: [WEB_UI_FEATURES.md](docs/WEB_UI_FEATURES.md)
 
-**Access web UI**: `http://nav-lights-ecu.local/lights` (or `http://10.100.100.244/lights`)  
+**Access web UI**: `http://boat-helm-ecu.local/lights` (or `http://10.100.100.244/lights`)
 **Complete testing guide**: [PHASE3_SPIFFS_UPLOAD.md](PHASE3_SPIFFS_UPLOAD.md)
 
 ### Run Tests
@@ -89,10 +89,10 @@ pio run --target uploadfs
 ### Wireless Updates (After Initial Setup)
 ```bash
 # Update firmware over WiFi
-pio run --target upload --upload-port nav-lights-ecu.local
+pio run --target upload --upload-port boat-helm-ecu.local
 
 # Update web UI files over WiFi
-pio run --target uploadfs --upload-port nav-lights-ecu.local
+pio run --target uploadfs --upload-port boat-helm-ecu.local
 ```
 
 **OTA Authentication**: 
@@ -112,7 +112,7 @@ pio run --target uploadfs --upload-port nav-lights-ecu.local
 ## Project Structure
 
 ```
-boat.navigationlights_and_signal-ECU/
+boat.helm-ecu/
 ├── src/                           # C++ source code
 │   ├── interfaces/                 # Hardware abstraction layer
 │   │   ├── IRelayController.h      # Relay interface
@@ -148,7 +148,7 @@ boat.navigationlights_and_signal-ECU/
 The ECU supports **runtime configuration** of optional light hardware via the SensESP web interface:
 
 ### Configuring Hardware
-1. Navigate to `http://192.168.4.1/config` (or `http://nav-lights-ecu.local/config`)
+1. Navigate to `http://192.168.4.1/config` (or `http://boat-helm-ecu.local/config`)
 2. Find the **Hardware** section
 3. Configure available hardware:
    - **NUC Lights**: Check if boat has NUC (Not Under Command) lights installed
@@ -176,7 +176,7 @@ This allows the ECU to be used on any boat configuration, from minimal (masthead
 
 The SensESP web UI supports Digest Authentication for configuration pages.
 
-- **Protected (LAN)**: When accessed via normal WiFi (e.g., `nav-lights-ecu.local`), `/config` requires Digest Auth credentials.
+- **Protected (LAN)**: When accessed via normal WiFi (e.g., `boat-helm-ecu.local`), `/config` requires Digest Auth credentials.
 - **Not protected (AP mode)**: When connected to the device AP at `192.168.4.1`, SensESP bypasses auth for the captive portal.
 - **Required credentials**: Copy [src/secrets.example.h](src/secrets.example.h) to `src/secrets.h` and set `ADMIN_USER`/`ADMIN_PASS`. The `src/secrets.h` file is ignored by git.
 
@@ -209,7 +209,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - ✅ **Phase 8 Complete**: Frontend deployed with starboard boat diagram (interior details), light indicators, COLREGs day shapes, guarded SOS control, signal queueing
 
 **Access URL**:
-- Primary: `http://nav-lights-ecu.local/lights`
+- Primary: `http://boat-helm-ecu.local/lights`
 - Direct IP: `http://10.100.100.244/lights`
 - Emergency AP: `http://192.168.4.1/lights`
 
@@ -236,7 +236,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 - [TEST_RESULTS.md](TEST_RESULTS.md) - Complete test documentation
 - [docs/TOWING_STATE.md](docs/TOWING_STATE.md) - Towing state implementation (COLREGs Rule 24)
 - [.github/copilot-instructions.md](.github/copilot-instructions.md) - Development guidelines
-- [Project Proposal Navigation Lights and Signaling ECU.md](Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md) - COLREGs requirements
+- [Project Proposal boat.helm-ecu.md](Project%20Proposal%20boat.helm-ecu.md) - COLREGs requirements
 
 ## Hardware
 
@@ -295,7 +295,7 @@ If you need the AP mode protected as well, the HTTP server auth bypass can be re
 ### Communication
 - **Primary**: WiFi (SignalK server via SensESP framework)
 - **Network**: DHCP (10.100.100.100-250 range)
-- **Hostname**: `nav-lights-ecu.local` (mDNS)
+- **Hostname**: `boat-helm-ecu.local` (mDNS)
 - **Web UI**: 
   - Built-in SensESP configuration portal (WiFi and SignalK settings)
   - Custom fallback control UI at `/lights` (works when SignalK unavailable)

@@ -1,6 +1,6 @@
 /**
  * @file signalk_integration.h
- * @brief SignalK integration for Navigation Lights ECU (SensESP v3 API)
+ * @brief SignalK integration for boat.helm-ecu (SensESP v3 API)
  * 
  * Implements bidirectional communication:
  * - Inputs: Subscribe to condition, boat state, signal commands from SignalK server (delta updates)

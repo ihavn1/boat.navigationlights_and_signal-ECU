@@ -1,4 +1,4 @@
-# Navigation Lights and Signal ECU - AI Coding Instructions
+# boat.helm-ecu - AI Coding Instructions
 
 ## Project Overview
 ESP32-based ECU for controlling navigation lights and sound signals on pleasure boats <15m, implementing COLREGs (International Maritime Organization rules). Built on SensESP platform using SignalK protocol for communication.
@@ -58,7 +58,7 @@ Each condition+state combination maps to specific light configurations and perio
 - **Making way (darkness)**: Sidelights + Sternlight + Masthead light
 - **NUC (darkness)**: Two all-round red lights (vertical) + sidelights/sternlight if making way
 - **Anchorage (darkness)**: Single all-round white light
-- Reference the state table in `Project Proposal Navigation Lights and Signaling ECU.md` for complete mapping
+- Reference the state table in `Project Proposal boat.helm-ecu.md` for complete mapping
 
 ### Sound Signal Requirements
 - **Periodic signals**: Auto-repeat at specified intervals (e.g., 2min), with mute/unmute capability (always start muted on boot)
@@ -76,10 +76,10 @@ Each condition+state combination maps to specific light configurations and perio
 - Target: `esp32dev` board for ESP32 Dev Kit C V4
 - Dependencies: SensESP library (includes SignalK client)
 - Build: `pio run` | Flash: `pio run --target upload` | Monitor: `pio device monitor`
-- **OTA Updates**: After initial USB flash, wireless updates via `pio run --target upload --upload-port nav-lights-ecu.local`
+- **OTA Updates**: After initial USB flash, wireless updates via `pio run --target upload --upload-port boat-helm-ecu.local`
   - Password authentication from `src/secrets.h` (OTA_PASSWORD)
   - Auto-configured via `read_secrets.py` pre-upload script
-  - Filesystem updates: `pio run --target uploadfs --upload-port nav-lights-ecu.local`
+  - Filesystem updates: `pio run --target uploadfs --upload-port boat-helm-ecu.local`
 
 ### Testing Workflow
 - **Framework**: Unity (PlatformIO built-in), run with `pio test -e native` for fast host testing
@@ -137,7 +137,7 @@ Each condition+state combination maps to specific light configurations and perio
 
 ### Fallback UI Option
 - Web-based control UI hosted on ESP32 as backup when SignalK unavailable
-- Accessible at `http://nav-lights-ecu.local/lights` from any device on boat's WiFi network
+- Accessible at `http://boat-helm-ecu.local/lights` from any device on boat's WiFi network
 - Custom HTTP endpoints on SensESP's AsyncWebServer
 - Responsive HTML/JavaScript interface mirroring SignalK control surface
 - Works in parallel with SensESP configuration UI
@@ -147,7 +147,7 @@ Each condition+state combination maps to specific light configurations and perio
 
 ## Key Files & References
 - [HARDWARE.md](../HARDWARE.md) - **Complete GPIO pin mapping, reserved pins, wiring diagrams**
-- [Project Proposal Navigation Lights and Signaling ECU.md](../Project%20Proposal%20Navigation%20Lights%20and%20Signaling%20ECU.md) - Complete COLREGs tables, signal definitions, and requirements
+- [Project Proposal boat.helm-ecu.md](../Project%20Proposal%20boat.helm-ecu.md) - Complete COLREGs tables, signal definitions, and requirements
 - Platform docs: SensESP GitHub repo, ESP32 Arduino core docs
 - COLREGs reference: Convention on International Regulations for Preventing Collisions at Sea, 1972
 

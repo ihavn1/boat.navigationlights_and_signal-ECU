@@ -58,14 +58,14 @@ Web API endpoints registered:
   GET  /api/health
   ...
 Frontend UI will be available at:
-  http://nav-lights-ecu.local/lights.html
+  http://boat-helm-ecu.local/lights.html
 ```
 
 ## Access the Web UI
 
 ### Option 1: mDNS Hostname (Recommended)
 ```
-http://nav-lights-ecu.local/lights.html
+http://boat-helm-ecu.local/lights.html
 ```
 
 ### Option 2: Direct IP Address
@@ -77,7 +77,7 @@ http://10.100.100.244/lights.html
 ### Option 3: Emergency AP Mode
 If WiFi disconnects, ESP32 creates access point:
 ```
-SSID: nav-lights-ecu-XXXXXX
+SSID: boat-helm-ecu-XXXXXX
 Password: (check SensESP config)
 URL: http://192.168.4.1/lights.html
 ```
@@ -184,7 +184,7 @@ Use IP address instead of mDNS hostname.
 **Check API Endpoints:**
 ```powershell
 # Test API directly
-Invoke-RestMethod http://nav-lights-ecu.local/api/health
+Invoke-RestMethod http://boat-helm-ecu.local/api/health
 ```
 
 **Check Browser Console:**
@@ -200,7 +200,7 @@ Look for fetch requests every 2 seconds in Network tab
 
 **Verify API Response:**
 ```powershell
-Invoke-RestMethod http://nav-lights-ecu.local/api/status
+Invoke-RestMethod http://boat-helm-ecu.local/api/status
 ```
 
 **Check SignalK:**
@@ -230,7 +230,7 @@ python -m http.server 8000
 ### 2. Edit API Base URL
 In `lights.js`, temporarily change:
 ```javascript
-const API_BASE = 'http://nav-lights-ecu.local/api';
+const API_BASE = 'http://boat-helm-ecu.local/api';
 ```
 
 ### 3. Test in Browser
@@ -309,7 +309,7 @@ esptool.py --chip esp32 --port COM3 write_flash 0x290000 spiffs_backup.bin
 
 Phase 3 is complete when:
 - ✅ SPIFFS upload successful
-- ✅ Web UI loads at http://nav-lights-ecu.local/lights.html
+- ✅ Web UI loads at http://boat-helm-ecu.local/lights.html
 - ✅ All 10 testing checklist items passed
 - ✅ Real-time updates working
 - ✅ Responsive design verified

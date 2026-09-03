@@ -350,7 +350,7 @@ Flash: [=======       ]  71.3% (1401737 / 1966080 bytes)
 
 ### Run All Tests
 ```bash
-cd c:\Projects\Boat\Software\boat.navigationlights_and_signal-ECU
+cd c:\Projects\Boat\Software\boat.helm-ecu
 pio test -e native
 ```
 

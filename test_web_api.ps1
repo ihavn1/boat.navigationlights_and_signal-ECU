@@ -1,11 +1,11 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Automated test suite for Navigation Lights ECU Web API
+    Automated test suite for boat.helm-ecu Web API
 .DESCRIPTION
     Tests all REST API endpoints with various scenarios and reports results
 .PARAMETER BaseUrl
-    Base URL of the ECU (default: http://nav-lights-ecu.local)
+    Base URL of the ECU (default: http://boat-helm-ecu.local)
 .PARAMETER Verbose
     Show detailed test output
 .EXAMPLE
@@ -15,7 +15,7 @@
 #>
 
 param(
-    [string]$BaseUrl = "http://nav-lights-ecu.local",
+    [string]$BaseUrl = "http://boat-helm-ecu.local",
     [switch]$Verbose
 )
 

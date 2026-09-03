@@ -1,6 +1,6 @@
 # Web-Based Fallback UI - Implementation Plan
 
-**Project**: Navigation Lights and Signal ECU  
+**Project**: boat.helm-ecu
 **Feature**: Custom Web Control Interface  
 **Date**: February 9, 2026  
 **Status**: ✅ Phase 1 Complete (Backend API)
@@ -27,7 +27,7 @@ Boat WiFi Network
 ├── SignalK Server (Primary Control Path)
 │   └── Node-RED Dashboard → SignalK PUT → ECU
 │
-├── ESP32 Navigation Lights ECU
+├── ESP32 boat.helm-ecu
 │   ├── Port 80: AsyncWebServer (SensESP)
 │   │   ├── /                    → SensESP Status Page
 │   │   ├── /config              → SensESP Configuration
@@ -37,7 +37,7 @@ Boat WiFi Network
 │   └── SignalK WebSocket Client
 │
 └── Browsers (Fallback Control Path)
-    └── Any device → http://nav-lights-ecu.local/lights
+    └── Any device → http://boat-helm-ecu.local/lights
 ```
 
 ### Technology Stack
@@ -396,7 +396,7 @@ data/
 </head>
 <body>
     <header>
-        <h1>Navigation Lights ECU</h1>
+        <h1>boat.helm-ecu</h1>
         <div id="connection-status" class="status-badge"></div>
     </header>
 
@@ -814,7 +814,7 @@ void test_json_status_generation() {
 7. Validate parallel SignalK operation
 
 ### Post-Deployment Validation
-- [ ] Web UI accessible at `http://nav-lights-ecu.local/lights`
+- [ ] Web UI accessible at `http://boat-helm-ecu.local/lights`
 - [ ] All control functions working
 - [ ] Auto-refresh functioning
 - [ ] SignalK integration unaffected

@@ -202,7 +202,7 @@ Base: `electrical.switches.navigationLights.*`
 
 ### Web-Based Fallback UI (Implemented)
 - Custom HTTP endpoints for direct browser control when SignalK unavailable
-- Accessible at `http://nav-lights-ecu.local/lights` from any device on boat WiFi
+- Accessible at `http://boat-helm-ecu.local/lights` from any device on boat WiFi
 - Mirrors SignalK control surface (condition, state, mute, ad-hoc signals including SOS)
 - Uses same `NavigationLightsECU` facade (UI-agnostic design)
 - Responsive HTML/JavaScript interface for mobile and desktop

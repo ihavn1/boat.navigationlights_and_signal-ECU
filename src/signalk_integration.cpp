@@ -1,6 +1,6 @@
 /**
  * @file signalk_integration.cpp
- * @brief SignalK integration for Navigation Lights ECU (SensESP v3 API)
+ * @brief SignalK integration for boat.helm-ecu (SensESP v3 API)
  */
 
 #include "signalk_integration.h"
@@ -105,7 +105,7 @@ static ObservableValue<int>* heartbeat_value = nullptr;
 
 /**
  * @brief Update all ObservableValues from ECU state
- * @param ecu Navigation lights ECU instance
+    * @param ecu boat.helm-ecu instance
  */
 static void updateAllObservableValues(NavigationLightsECU& ecu) {
     Serial.println("[SignalK] updateAllObservableValues: Updating all values");

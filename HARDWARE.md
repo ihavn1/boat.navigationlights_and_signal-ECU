@@ -1,4 +1,4 @@
-# Hardware Configuration - Navigation Lights ECU
+# Hardware Configuration - boat.helm-ecu
 
 ## ESP32 Development Board
 
@@ -179,7 +179,7 @@ ESP32 Dev Kit C V4          9+ Channel Relay Module
 ## Network Configuration
 
 ### WiFi Setup (First Boot)
-1. ESP32 creates Access Point: **"Configure nav-lights-ecu"**
+1. ESP32 creates Access Point: **"Configure boat-helm-ecu"**
 2. Connect with phone/laptop
 3. Captive portal opens automatically (or go to 192.168.4.1)
 4. Enter WiFi SSID and password
@@ -189,12 +189,12 @@ ESP32 Dev Kit C V4          9+ Channel Relay Module
 ### Production Network
 - **DHCP Range**: 10.100.100.100 - 10.100.100.250
 - **Expected IP**: Assigned by DHCP server on boat network
-- **Hostname**: `nav-lights-ecu.local` (mDNS)
+- **Hostname**: `boat-helm-ecu.local` (mDNS)
 - **SignalK Server**: Configurable via web UI (no hardcoded IP)
 
 ### Accessing the Device
 After WiFi configuration:
-- **Web UI**: `http://nav-lights-ecu.local` or `http://<DHCP-IP>`
+- **Web UI**: `http://boat-helm-ecu.local` or `http://<DHCP-IP>`
 - **SignalK Path**: `electrical.switches.navigationLights.*`
 - **Serial Console**: `pio device monitor` (115200 baud)
 
@@ -246,7 +246,7 @@ For bench testing without relays:
 - **Serial Output**: Connect `pio device monitor` to see boot messages
 
 ### WiFi Won't Connect
-- **AP Mode**: Look for "Configure nav-lights-ecu" WiFi network
+- **AP Mode**: Look for "Configure boat-helm-ecu" WiFi network
 - **Serial Console**: Check for error messages (wrong password, out of range)
 - **DHCP**: Ensure router/server is assigning 10.100.100.x addresses
 

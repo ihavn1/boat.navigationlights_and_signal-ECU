@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Main entry point for Navigation Lights and Signal ECU
+ * @brief Main entry point for boat.helm-ecu
  * 
  * Implements COLREGs-compliant navigation lights and sound signals for pleasure boats <15m.
  * Built on SensESP platform with SignalK protocol for communication.
@@ -249,8 +249,8 @@ void setup() {
     ensureHttpAuthConfig(ADMIN_USER, ADMIN_PASS);
     sensesp_app = (&builder)
         ->set_wifi_client(WIFI_SSID, WIFI_PASSWORD)
-        ->set_wifi_access_point("nav-lights-ecu", AP_PASSWORD)
-        ->set_hostname("nav-lights-ecu")
+        ->set_wifi_access_point("boat-helm-ecu", AP_PASSWORD)
+        ->set_hostname("boat-helm-ecu")
         ->enable_ota(OTA_PASSWORD)
         ->get_app();
     
@@ -326,8 +326,8 @@ void setup() {
     g_http_server = http_server;
     
     Serial.println("\nSystem initialized successfully");
-    Serial.println("Connect to http://nav-lights-ecu.local for configuration");
-    Serial.println("Web API available at http://nav-lights-ecu.local/api/status");
+    Serial.println("Connect to http://boat-helm-ecu.local for configuration");
+    Serial.println("Web API available at http://boat-helm-ecu.local/api/status");
 }
 
 void loop() {

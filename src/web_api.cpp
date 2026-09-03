@@ -423,8 +423,8 @@ void setupWebAPI(HTTPServer* server, NavigationLightsECU* ecu) {
     Serial.println("  POST /api/emergency");
     Serial.println();
     Serial.println("Frontend UI available at:");
-    Serial.println("  http://nav-lights-ecu.local/lights");
-    Serial.println("  http://nav-lights-ecu.local/lights.html");
+    Serial.println("  http://boat-helm-ecu.local/lights");
+    Serial.println("  http://boat-helm-ecu.local/lights.html");
 }
 
 /**

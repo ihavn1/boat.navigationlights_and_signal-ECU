@@ -249,8 +249,8 @@ void setup() {
     ensureHttpAuthConfig(ADMIN_USER, ADMIN_PASS);
     sensesp_app = (&builder)
         ->set_wifi_client(WIFI_SSID, WIFI_PASSWORD)
-        ->set_wifi_access_point("boat-helm-ecu", AP_PASSWORD)
-        ->set_hostname("boat-helm-ecu")
+        ->set_wifi_access_point("helm-ecu", AP_PASSWORD)
+        ->set_hostname("helm-ecu")
         ->enable_ota(OTA_PASSWORD)
         ->get_app();
     
